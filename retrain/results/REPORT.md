@@ -110,6 +110,74 @@
 
 ---
 
+## Baseline Models (Detailed)
+
+### Decision Agent (Dueling DQN with Cost-Weighted Cross-Entropy)
+
+- **Full Name:** Dueling Deep Q-Network with Cost-Weighted Cross-Entropy
+- **Architecture:** DuelingDQN(input_dim=22, output_dim=5, dropout=0.15) — Dueling architecture with separate value and advantage streams
+- **Training:** Cost-weighted cross-entropy against rule-oracle action. Per-row weight = `miss_cost` for danger gases (Smoke/Mixture) and `false_cost` for clean/Perfume rows. This encodes the cost-asymmetry directly into a weighted-CE objective.
+- **File:** `models/retrained/exp1_pareto/exp1_miss8_seed42.pth` (deployed checkpoint)
+- **Use:** Primary decision policy
+
+### Plain DQN (Dueling DQN with Standard Cross-Entropy)
+
+- **Full Name:** Dueling Deep Q-Network with Standard Cross-Entropy
+- **Architecture:** Same DuelingDQN(input_dim=22, output_dim=5, dropout=0.15)
+- **Training:** Standard cross-entropy (no cost weighting) — symmetric reward (+1/-1) instead of asymmetric cost weights
+- **File:** `models/retrained/exp2_comparators/exp2_B_plain_dqn_seed42.pth`
+- **Use:** Ablation — proves cost-weighting matters
+
+### MLP (Multi-Layer Perceptron)
+
+- **Full Name:** Multi-Layer Perceptron Classifier
+- **Architecture:** MLPClassifier(hidden_layer_sizes=(256, 256, 128), activation="relu", max_iter=400, early_stopping=True) — 3 hidden layers with ReLU activation
+- **Training:** Supervised classification with cross-entropy on the 22-feature state vectors
+- **File:** `models/retrained/exp2_comparators/exp2_D_mlp_seed42.joblib`
+- **Use:** Non-deep-learning baseline; shows danger of over-reliance on simple models
+
+### GBM (Gradient Boosting Machine)
+
+- **Full Name:** Cost-Sensitive Gradient Boosting Machine
+- **Architecture:** GradientBoostingClassifier(n_estimators=300) — 300 boosted trees
+- **Training:** Boosted trees with class weights: action 0 (Monitor) weighted 3.0, actions 3-4 (Raise Alarm, Emergency Shutdown) weighted 1.2, others weighted 1.0. This up-weights dangerous-gas misclassification.
+- **File:** `models/retrained/exp2_comparators/exp2_E_gbm_seed42.joblib`
+- **Use:** Classical ML baseline with cost-sensitive learning
+
+### SVM (Support Vector Machine)
+
+- **Full Name:** RBF Support Vector Classifier
+- **Architecture:** SVC(kernel="rbf", C=1.0, gamma="scale", probability=True) — RBF kernel with Platt calibration enabled
+- **Training:** Supervised classification with probability calibration
+- **File:** Not saved (in-memory only)
+- **Use:** Classical non-deep-learning baseline
+
+### Random Forest
+
+- **Full Name:** Random Forest Classifier
+- **Architecture:** RandomForestClassifier(n_estimators=300, n_jobs=1) — 300 decision trees
+- **Training:** Ensemble of decision trees with bootstrap aggregation
+- **File:** Not saved (in-memory only)
+- **Use:** Classical ensemble baseline
+
+### LSTM (Raw Window LSTM)
+
+- **Full Name:** Recurrent Neural Network with Sliding Window
+- **Architecture:** LSTM(input_dim=22, hidden=64, n_actions=5, dropout=0.2) with explicit dropout on final hidden state — recurrent net over K=10 consecutive 22-feature rows
+- **Training:** Within-run windowing (no class-straddling), cross-entropy. Windows are built only within contiguous runs of one gas class. Every row gets its own prediction from the window ending at that row, left-padded by repeating the first row of its own run when fewer than K rows of history exist.
+- **File:** Not saved (in-memory only)
+- **Use:** Temporal context baseline
+
+### CQL (Conservative Q-Learning)
+
+- **Full Name:** Conservative Q-Learning Agent
+- **Architecture:** DuelingDQN with conservative penalty — same architecture as Decision Agent but with CQL regularizer
+- **Training:** TD(0) Bellman bootstrap (r + γ·max Q(s',a')) on offline (s, a_data, r, s') tuples, plus CQL penalty: `loss = TD_error + α·(logsumexp_a Q(s,a) - Q(s, a_data))`. This pushes down Q-values of all actions relative to the behavior action, preventing overestimation of unseen (state, action) values.
+- **File:** Not saved (in-memory only)
+- **Use:** Genuine offline safe-RL baseline
+
+---
+
 ## Saved Model Weights
 
 - `models/retrained/exp1_pareto/` — 40 DuelingDQN checkpoints (8 cost ratios × 5 seeds + 1:1 floor × 5)

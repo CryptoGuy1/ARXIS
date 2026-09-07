@@ -1,0 +1,68 @@
+# ── security: never commit credentials ───────────────────────────
+retrain/token.json
+token.json
+*.token.json
+client_secret*.json
+credentials.json
+.env
+
+# ── virtual environments ─────────────────────────────────────────
+.venv/
+.venv-retrain/
+venv/
+env/
+
+# ── python bytecode / build ──────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# ── large binaries: keep out of git, distribute via a release or DOI
+*.pth
+*.pt
+*.joblib
+*.npy
+!models/model_config.json
+
+# ── run outputs written to the repo root by main.py ──────────────
+folder_live_test_log.csv
+folder_live_test_summary.csv
+folder_live_test_anomaly_sensitivity.csv
+dashboard_folder_live_test_results.csv
+output.log
+
+# ── scratch / editor / OS ────────────────────────────────────────
+.hermes-tmp.*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── temporary test / smoke outputs ───────────────────────────────
+*_smoke_*.py
+*_smoke_*.log
+*_inject_*.py
+*_merge_*.py
+*_exp3_derived.py
+*_rerun.ps1
+
+# ── thermal images (large binaries) ──────────────────────────────
+data/Mixture/
+data/NoGas/
+data/Smoke/
+data/Perfume/
+data/Thermal_Camera/
+data/thermal_data/
+
+# ── logs ──────────────────────────────────────────────────────────
+*.log
+retrain/results/*.log
+
+# ── thermal images (large binaries) ──────────────────────────────
+data/Mixture/
+data/NoGas/
+data/Smoke/
+data/Perfume/
+data/Thermal_Camera/
+data/thermal_data/

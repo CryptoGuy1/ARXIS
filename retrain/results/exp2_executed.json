@@ -1,0 +1,10 @@
+{
+  "table": "                model  acc_mean  acc_std  miss_mean  miss_std  fa_mean  fa_std  boundary_miss_mean  boundary_miss_std\nA_decision_agent_asym  0.963950 0.015126   0.000000  0.000000      0.0     0.0            0.000000           0.000000\n  B_unweighted_dqn_ce  0.968495 0.017788   0.000000  0.000000      0.0     0.0            0.000000           0.000000\n     D_supervised_mlp  0.971317 0.011147   0.000000  0.000000      0.0     0.0            0.000000           0.000000\n           E_cost_gbm  0.845298 0.000429   0.032188  0.001398      0.0     0.0            0.507521           0.101467",
+  "sig": [
+    "=== Paired significance (Wilcoxon, 5 seeds) ===",
+    "A(asym) vs B(plain) full-set miss:        W=nan p=1.0000  A=0.0000+-0.0000  B=0.0000+-0.0000",
+    "A(asym) vs E(GBM)  full-set miss:         W=0.0 p=0.0312  A=0.0000+-0.0000  E=0.0322+-0.0014",
+    "A(asym) vs B(plain) boundary-subset miss:  W=nan p=1.0000  A=0.0000+-0.0000  B=0.0000+-0.0000",
+    "A(asym) vs E(GBM)  boundary-subset miss:   W=0.0 p=0.0312  A=0.0000+-0.0000  E=0.5075+-0.1015"
+  ]
+}

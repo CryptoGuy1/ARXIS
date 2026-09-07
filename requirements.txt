@@ -1,0 +1,37 @@
+# ARXIS — pinned to the versions the reported results were produced with.
+# Python 3.11 (cp311). Resolved from .venv-retrain on 2026-08-31.
+#
+# Install:  pip install -r requirements.txt
+# Torch is CPU-only here; for CUDA see https://pytorch.org/get-started/locally/
+
+# ── core numerics ────────────────────────────────────────────────
+numpy==2.4.6
+pandas==3.0.5
+scipy==1.17.1            # REQUIRED by retrain/metrics.py (Clopper-Pearson, Wilcoxon)
+scikit-learn==1.9.0
+joblib==1.5.3
+
+# ── deep learning ────────────────────────────────────────────────
+torch==2.13.0
+torchvision==0.28.0
+ultralytics==8.4.136
+opencv-python==5.0.0.93
+pillow==12.3.0
+
+# ── plotting / reporting ─────────────────────────────────────────
+matplotlib==3.11.1       # REQUIRED by retrain/make_plots.py
+seaborn==0.13.2
+
+# ── dashboard ────────────────────────────────────────────────────
+streamlit==1.62.0
+plotly==7.0.0
+altair==6.2.2
+
+# ── explanation layer (talks to a local Ollama server) ───────────
+requests==2.34.2
+
+# ── OPTIONAL: only needed for retrain/drive_*.py and oauth_login.py.
+# Omit these unless you are re-downloading the dataset from Google Drive.
+# google-api-python-client==2.199.0
+# google-auth==2.56.3
+# google-auth-oauthlib==1.4.0

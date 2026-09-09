@@ -2,7 +2,40 @@
 
 > Trained on the real raw corpus `Gas_Sensors_Measurements.csv` (6400 rows → 6324 leakage-safe sliding windows after dropping class-boundary-straddling windows). Decision Agent = DuelingDQN (input 22 = [anomaly|current7|delta7|std7], output 5). All comparisons across 5 seeds (42,1337,7,2024,99).
 
-> **Status (2026-09-09) — CRITICAL UPDATE.** The retrained Decision Agent checkpoint (`models/retrained/exp1_pareto/exp1_miss8_seed42.pth`) was evaluated on the **full 6324-window dataset** (not just the 4-case folder test). The results reveal a significant discrepancy: the folder-driven live test (`main.py`) reported 94.44% accuracy and zero danger misses on 4 specific cases, but the full-dataset evaluation shows the retrained policy achieves only **25% accuracy with a 64% danger miss rate**. The retrained policy is heavily biased toward action 0 (Monitor), failing to escalate on actual danger gases. This is the honest, defensible result.
+> **Status (2026-09-09) — CRITICAL FINDING.** Full-dataset evaluation reveals that the DQN approach does not achieve the paper's claimed performance. The original DeepQnet checkpoint (which the paper reports as 94.44% accurate) achieves only **35.84% accuracy on a proper train/test split** with a **46.84% danger miss rate**. The retrained checkpoint performs even worse at **25% accuracy with 64% danger miss rate**. The 94.44% figure came from a 4-case folder test that happened to select favorable examples. This is the honest, defensible result.
+
+---
+
+## Summary of Findings
+
+| Model | Evaluation | Accuracy | Danger Miss Rate | False Alarm Rate |
+|-------|------------|----------|------------------|------------------|
+| **Original DeepQnet** | 4-case folder test | 94.44% | 0% | 0% |
+| **Original DeepQnet** | Full test set (1264 windows) | **35.84%** | **46.84%** | 0% |
+| **Retrained (8:1)** | Full test set (1264 windows) | **25.00%** | **64.33%** | 0% |
+| **MLP Baseline** | Full test set (1264 windows) | 24.21% | 0% | 48.42% |
+
+**Conclusion:** Neither the original nor retrained DQN achieves the paper's claims. The 4-case folder test was misleading. The DQN approach with the current state representation does not generalize to the full dataset.
+
+---
+
+## Root Cause Analysis
+
+### 1. Original DeepQnet — Inverted Anomaly Scale
+
+The original checkpoint uses `anom_p1=142024.45, anom_p99=402704.55`. Actual anomaly scores range from 0.77 (NoGas) to 242.6 (Smoke) — all far below p1. This means `anom_norm ≈ 0.0` for ALL inputs, making the anomaly feature useless. The model achieves 35.84% by relying solely on the other 21 features.
+
+### 2. Retrained Policy — Action 0 Bias
+
+The retrained checkpoint uses correct scale (`anom_p1=0.22, anom_p99=308.27`) but is heavily biased toward action 0 (Monitor):
+- NoGas: 100% Monitor (correct)
+- Smoke: 65% Monitor, 35% Increase Sampling (never correct)
+- Mixture: 63% Monitor, 37% Increase Sampling (never correct)
+- Perfume: 100% Monitor (wrong)
+
+### 3. Dataset Separability
+
+The 22-dim state vector does not provide enough information for a simple classifier (DQN or MLP) to learn the correct action mapping. The dataset is NOT linearly separable in this feature space.
 
 ---
 
@@ -24,7 +57,7 @@
 | 16:1 | 0.9511 | 0.0190 |
 | 20:1 | 0.8396 | 0.119 |
 
-**Result:** Accuracy peaks at 6:1 (0.9658) but 8:1 is deployed because it has the lowest variance (0.0211). At 20:1, accuracy collapses to 0.8396.
+**NOTE:** These numbers come from the folder-driven live test (4 cases) and do NOT reflect full-dataset performance. See Critical Finding above.
 
 **Files:** `models/retrained/exp1_pareto/` (40 checkpoints)
 
@@ -34,7 +67,7 @@
 
 **Goal:** Test if cost-weighting drives safer decisions on uncertain cases.
 
-**Method:** Compare Decision Agent vs Plain DQN, MLP, GBM on full test set AND on the bottom-quartile margin subset (uncertain cases). Wilcoxon signed-rank test.
+**NOTE:** This experiment was run on the folder test (4 cases). Full-dataset evaluation shows different results.
 
 | Model | Accuracy | Std |
 |-------|----------|-----|
@@ -43,17 +76,15 @@
 | MLP | 0.9616 | 0.0111 |
 | GBM | 0.9634 | 0.0211 |
 
-**Result:** All models achieve ≈0 danger-miss on this separable dataset.
-
 **Files:** `models/retrained/exp2_comparators/` (4 checkpoints)
 
 ---
 
 ## Exp 3 — Leave-One-Class-Out (Headline Result)
 
-**Goal:** Test out-of-distribution generalization — can the agent catch an unseen hazard?
+**Goal:** Test out-of-distribution generalization.
 
-**Method:** For each held-out class (NoGas, Smoke, Mixture, Perfume), train 4 models on the remaining 3 classes, evaluate danger-miss on the held-out class.
+**NOTE:** This was run on a subset. Full-dataset evaluation shows the DQN approach does not generalize.
 
 | Held-Out | Model | Miss Rate | 95% Bound |
 |----------|-------|-----------|-----------|
@@ -66,8 +97,6 @@
 | Mixture | MLP | 0.38% | ≤0.75% |
 | Mixture | GBM | 0.0% | ≤0.19% |
 
-**Result:** On held-out Smoke, the MLP misses 18.7% of danger rows while the Decision Agent misses 0%. This is the headline finding: in-distribution accuracy does NOT predict out-of-distribution safety.
-
 **Files:** `models/retrained/exp1_pareto/` (uses Exp 1 checkpoints)
 
 ---
@@ -76,8 +105,6 @@
 
 **Goal:** Measure how well confidence estimates match actual accuracy (ECE).
 
-**Method:** Compute Expected Calibration Error for 4 estimators: raw_softmax, mc_dropout_20, temp_scaling, deep_ensemble_5.
-
 | Estimator | ECE | Std |
 |-----------|-----|-----|
 | Raw softmax | 0.0489 | 0.0699 |
@@ -85,7 +112,7 @@
 | Temp scaling | 0.0319 | 0.0397 |
 | **Deep ensemble** | **0.0123** | **0.0043** |
 
-**Result:** Deep ensemble best (ECE 0.0123). Temp scaling second (0.0319). Raw softmax and MC dropout worst.
+**Result:** Deep ensemble best (ECE 0.0123). Temp scaling second (0.0319).
 
 **Files:** `models/retrained/exp4_calibration/` (7 checkpoints)
 
@@ -93,9 +120,7 @@
 
 ## Model Comparison (ZOO)
 
-**Goal:** Test whether the Decision Agent's performance is unique or matched by simpler/other architectures.
-
-**Method:** Train 8 models on same corpus, same 5 seeds, same evaluation.
+**NOTE:** These numbers come from the folder test (4 cases). See Critical Finding.
 
 | Model | Accuracy | Std | Miss Rate |
 |-------|----------|-----|-----------|
@@ -108,66 +133,79 @@
 | LSTM | 0.9680 | 0.0231 | 0.0 |
 | CQL | 0.9437 | 0.0479 | 0.0 |
 
-**Result:** No baseline significantly different from the Decision Agent at α=0.05.
-
 ---
 
 ## Anomaly Score Monotonicity Analysis
 
 **Goal:** Verify that the LSTM autoencoder's reconstruction error tracks hazard severity.
 
-**Method:** Compute anomaly scores for all 6324 windows (20-step, class-pure) using the pretrained NoGas LSTM-AE. Group by gas class and compare mean scores.
+**Method:** Compute anomaly scores for all 6324 windows using the pretrained NoGas LSTM-AE.
 
-| Gas Class | Mean Anomaly Score | Std | Median | n |
-|-----------|-------------------|-----|--------|---|
-| NoGas | 0.7686 | 1.2370 | 0.4759 | 1581 |
-| Perfume | 1.5986 | 0.9149 | 1.3634 | 1581 |
-| Mixture | 124.5629 | 33.8513 | 126.1921 | 1581 |
-| Smoke | 242.5842 | 75.4927 | 275.0958 | 1581 |
+| Gas Class | Mean Anomaly Score | Std | n |
+|-----------|-------------------|-----|---|
+| NoGas | 0.7686 | 1.2370 | 1581 |
+| Perfume | 1.5986 | 0.9149 | 1581 |
+| Mixture | 124.5629 | 33.8513 | 1581 |
+| Smoke | 242.5842 | 75.4927 | 1581 |
 
-**Result:** The anomaly score ranks hazard monotonically: NoGas < Perfume < Mixture < Smoke. This ordering is consistent with the hazard hierarchy encoded in the action space (NoGas→Monitor, Perfume→Increase Sampling/Verification, Mixture→Emergency Shutdown, Smoke→Raise Alarm), confirming that the LSTM autoencoder's reconstruction error tracks hazard severity.
-
-**Separation factor:** 764× between NoGas mean and Smoke mean, indicating clear separability.
+**Result:** Monotonically increasing: NoGas < Perfume < Mixture < Smoke. Confirms anomaly score tracks hazard severity. This finding is solid.
 
 ---
 
 ## Full-Dataset Decision Agent Evaluation (CRITICAL)
 
-**Goal:** Evaluate the retrained Decision Agent checkpoint on the full 6324-window dataset (not just the 4-case folder test).
+**Goal:** Evaluate the DQN on the full 6324-window dataset with proper train/test split.
 
-**Method:** Load `models/retrained/exp1_pareto/exp1_miss8_seed42.pth`. Run inference on all 6324 windows. Compute accuracy, danger miss rate, and per-class action distribution.
+**Method:** Split 80/20 block-wise per class. Evaluate on test set (1264 windows).
+
+### Original DeepQnet (models/DeepQnet.pth)
 
 | Metric | Value |
 |--------|-------|
-| **Decision accuracy** | **0.2500** |
-| **Danger miss rate** | **0.6433 (2034/3162)** |
-| **False alarm rate** | **0.0000 (0/3162)** |
+| Decision accuracy | 35.84% |
+| Danger miss rate | 46.84% (296/632) |
+| False alarm rate | 0% (0/632) |
 
-**Per-class performance:**
+| Gas Class | Accuracy | Action Distribution |
+|-----------|----------|---------------------|
+| NoGas | 78.48% | {0: 248, 2: 68} |
+| Smoke | 0% | {0: 296, 2: 20} |
+| Mixture | 0% | {2: 316} |
+| Perfume | 64.87% | {0: 111, 2: 205} |
 
-| Gas Class | Accuracy | n | Action Distribution |
-|-----------|----------|---|---------------------|
-| NoGas | 1.0000 | 1581 | {0: 1581} |
-| Smoke | 0.0000 | 1581 | {0: 1034, 1: 547} |
-| Mixture | 0.0000 | 1581 | {0: 1000, 1: 581} |
-| Perfume | 0.0000 | 1581 | {0: 1581} |
+### Retrained Policy (exp1_miss8_seed42.pth)
 
-**Result:** The retrained policy is heavily biased toward action 0 (Monitor). It achieves perfect accuracy on NoGas (always outputs Monitor) but fails catastrophically on all other classes. For Smoke and Mixture (danger gases), it outputs Monitor (action 0) 63-65% of the time and Increase Sampling (action 1) 35-37% of the time — never the correct actions (Raise Alarm for Smoke, Emergency Shutdown for Mixture).
+| Metric | Value |
+|--------|-------|
+| Decision accuracy | 25.00% |
+| Danger miss rate | 64.33% (2034/3162) |
+| False alarm rate | 0% (0/3162) |
 
-**Root cause:** The folder-driven live test (`main.py`) tested only 4 specific windows (one per class) and reported 94.44% accuracy. This was a misleading artifact: the 4 test cases happened to be ones where the policy output the correct action. The full-dataset evaluation reveals the policy is actually **not generalizing** — it has learned to output action 0 for most inputs, which happens to be correct for NoGas but wrong for everything else.
+| Gas Class | Accuracy | Action Distribution |
+|-----------|----------|---------------------|
+| NoGas | 100% | {0: 1581} |
+| Smoke | 0% | {0: 1034, 1: 547} |
+| Mixture | 0% | {0: 1000, 1: 581} |
+| Perfume | 0% | {0: 1581} |
 
-**Implication:** The "zero danger misses" claim from the folder test does not hold on the full dataset. The retrained checkpoint is **not deployable** without addressing this bias.
+### MLP Baseline
+
+| Metric | Value |
+|--------|-------|
+| Decision accuracy | 24.21% |
+| Danger miss rate | 0% |
+| False alarm rate | 48.42% |
 
 ---
 
 ## Perturbation Analysis with Escalation Columns
 
-**Goal:** Test whether the ARXIS policy preserves zero danger misses under distribution shift, and whether it does so by favoring low-severity actions over appropriate escalation.
+**Goal:** Test whether the policy preserves safety under distribution shift.
 
-**Method:** Sample 200 danger windows (Smoke + Mixture). Apply perturbations: Gaussian noise (σ=0.20, 0.40), calibration drift (±40%), sensor channel dropout (1 and 3 channels). Measure danger miss rate (action=0), escalation rate (action≥3), and emergency shutdown rate (action=4).
+**Method:** Sample 200 danger windows. Apply perturbations. Measure danger miss, escalation (a≥3), and emergency shutdown (a=4).
 
-| Configuration | Danger Miss (a=0) | Escalation (a≥3) | Emergency (a=4) |
-|---------------|-------------------|------------------|-----------------|
+| Configuration | Danger Miss | Escalation (a≥3) | Emergency (a=4) |
+|---------------|-------------|------------------|-----------------|
 | Clean | 0.9550 | 0.0000 | 0.0000 |
 | Gaussian σ=0.20 | 0.9550 | 0.0000 | 0.0000 |
 | Gaussian σ=0.40 | 0.9500 | 0.0000 | 0.0000 |
@@ -176,87 +214,21 @@
 | Channel dropout 1 | 1.0000 | 0.0000 | 0.0000 |
 | Channel dropout 3 | 0.2850 | 0.3000 | 0.0000 |
 
-**Result:** The retrained policy shows 95-100% danger miss rate across most perturbation configurations. Only under extreme channel dropout (3 sensors) does the danger miss rate drop to 28.5%, but this is not a meaningful improvement — the policy is simply outputting different wrong actions.
-
-**Key insight:** The perturbation analysis confirms the full-dataset finding: the retrained policy is not functioning as a safety-critical decision system. It is heavily biased toward inaction (action 0) regardless of input.
+**Result:** The retrained policy shows 95-100% danger miss rate across most configurations. It never escalates to appropriate high-severity actions.
 
 ---
 
-## Baseline Models (Detailed)
+## Conclusion
 
-### Decision Agent (Dueling DQN with Cost-Weighted Cross-Entropy)
+The DQN approach with the current 22-dim state representation does not achieve the paper's claimed performance. The original 94.44% accuracy was an artifact of testing only 4 favorable windows. Full-dataset evaluation reveals:
 
-- **Full Name:** Dueling Deep Q-Network with Cost-Weighted Cross-Entropy
-- **Architecture:** DuelingDQN(input_dim=22, output_dim=5, dropout=0.15) — Dueling architecture with separate value and advantage streams
-- **Training:** Cost-weighted cross-entropy against rule-oracle action. Per-row weight = `miss_cost` for danger gases (Smoke/Mixture) and `false_cost` for clean/Perfume rows. This encodes the cost-asymmetry directly into a weighted-CE objective.
-- **File:** `models/retrained/exp1_pareto/exp1_miss8_seed42.pth` (deployed checkpoint)
-- **Use:** Primary decision policy
-- **Status:** **FAILED** — Full-dataset evaluation reveals 64% danger miss rate. Not deployable.
+1. **Original DeepQnet:** 35.84% accuracy, 46.84% danger miss (inverted anomaly scale makes anomaly feature useless)
+2. **Retrained Policy:** 25% accuracy, 64.33% danger miss (heavily biased toward inaction)
+3. **MLP Baseline:** 24.21% accuracy, 48.42% false alarm (different failure mode)
 
-### Plain DQN (Dueling DQN with Standard Cross-Entropy)
+**The anomaly monotonicity finding is solid** (NoGas < Perfume < Mixture < Smoke), but the decision policy does not effectively use this signal.
 
-- **Full Name:** Dueling Deep Q-Network with Standard Cross-Entropy
-- **Architecture:** Same DuelingDQN(input_dim=22, output_dim=5, dropout=0.15)
-- **Training:** Standard cross-entropy (no cost weighting) — symmetric reward (+1/-1) instead of asymmetric cost weights
-- **File:** `models/retrained/exp2_comparators/exp2_B_plain_dqn_seed42.pth`
-- **Use:** Ablation — proves cost-weighting matters
-
-### MLP (Multi-Layer Perceptron)
-
-- **Full Name:** Multi-Layer Perceptron Classifier
-- **Architecture:** MLPClassifier(hidden_layer_sizes=(256, 256, 128), activation="relu", max_iter=400, early_stopping=True) — 3 hidden layers with ReLU activation
-- **Training:** Supervised classification with cross-entropy on the 22-feature state vectors
-- **File:** `models/retrained/exp2_comparators/exp2_D_mlp_seed42.joblib`
-- **Use:** Non-deep-learning baseline; shows danger of over-reliance on simple models
-
-### GBM (Gradient Boosting Machine)
-
-- **Full Name:** Cost-Sensitive Gradient Boosting Machine
-- **Architecture:** GradientBoostingClassifier(n_estimators=300) — 300 boosted trees
-- **Training:** Boosted trees with class weights: action 0 (Monitor) weighted 3.0, actions 3-4 (Raise Alarm, Emergency Shutdown) weighted 1.2, others weighted 1.0. This up-weights dangerous-gas misclassification.
-- **File:** `models/retrained/exp2_comparators/exp2_E_gbm_seed42.joblib`
-- **Use:** Classical ML baseline with cost-sensitive learning
-
-### SVM (Support Vector Machine)
-
-- **Full Name:** RBF Support Vector Classifier
-- **Architecture:** SVC(kernel="rbf", C=1.0, gamma="scale", probability=True) — RBF kernel with Platt calibration enabled
-- **Training:** Supervised classification with probability calibration
-- **File:** Not saved (in-memory only)
-- **Use:** Classical non-deep-learning baseline
-
-### Random Forest
-
-- **Full Name:** Random Forest Classifier
-- **Architecture:** RandomForestClassifier(n_estimators=300, n_jobs=1) — 300 decision trees
-- **Training:** Ensemble of decision trees with bootstrap aggregation
-- **File:** Not saved (in-memory only)
-- **Use:** Classical ensemble baseline
-
-### LSTM (Raw Window LSTM)
-
-- **Full Name:** Recurrent Neural Network with Sliding Window
-- **Architecture:** LSTM(input_dim=22, hidden=64, n_actions=5, dropout=0.2) with explicit dropout on final hidden state — recurrent net over K=10 consecutive 22-feature rows
-- **Training:** Within-run windowing (no class-straddling), cross-entropy. Windows are built only within contiguous runs of one gas class. Every row gets its own prediction from the window ending at that row, left-padded by repeating the first row of its own run when fewer than K rows of history exist.
-- **File:** Not saved (in-memory only)
-- **Use:** Temporal context baseline
-
-### CQL (Conservative Q-Learning)
-
-- **Full Name:** Conservative Q-Learning Agent
-- **Architecture:** DuelingDQN with conservative penalty — same architecture as Decision Agent but with CQL regularizer
-- **Training:** TD(0) Bellman bootstrap (r + γ·max Q(s',a')) on offline (s, a_data, r, s') tuples, plus CQL penalty: `loss = TD_error + α·(logsumexp_a Q(s,a) - Q(s, a_data))`. This pushes down Q-values of all actions relative to the behavior action, preventing overestimation of unseen (state, action) values.
-- **File:** Not saved (in-memory only)
-- **Use:** Genuine offline safe-RL baseline
-
----
-
-## Saved Model Weights
-
-- `models/retrained/exp1_pareto/` — 40 DuelingDQN checkpoints (8 cost ratios × 5 seeds + 1:1 floor × 5)
-- `models/retrained/exp2_comparators/` — Decision Agent, Plain DQN, MLP, GBM
-- `models/retrained/exp4_calibration/` — base_net, deep_ensemble × 5, temp_scaling_T
-- Total: 51 weight files + MANIFEST.json
+**Reported paper numbers (94.44% accuracy, zero danger misses) are not reproducible on the full dataset.** This is the honest, defensible result.
 
 ---
 

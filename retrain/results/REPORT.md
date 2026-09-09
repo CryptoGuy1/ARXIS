@@ -2,6 +2,8 @@
 
 > Trained on the real raw corpus `Gas_Sensors_Measurements.csv` (6400 rows → 6324 leakage-safe sliding windows after dropping class-boundary-straddling windows). Decision Agent = DuelingDQN (input 22 = [anomaly|current7|delta7|std7], output 5). All comparisons across 5 seeds (42,1337,7,2024,99).
 
+> **Status (2026-09-09) — CRITICAL UPDATE.** The retrained Decision Agent checkpoint (`models/retrained/exp1_pareto/exp1_miss8_seed42.pth`) was evaluated on the **full 6324-window dataset** (not just the 4-case folder test). The results reveal a significant discrepancy: the folder-driven live test (`main.py`) reported 94.44% accuracy and zero danger misses on 4 specific cases, but the full-dataset evaluation shows the retrained policy achieves only **25% accuracy with a 64% danger miss rate**. The retrained policy is heavily biased toward action 0 (Monitor), failing to escalate on actual danger gases. This is the honest, defensible result.
+
 ---
 
 ## Exp 1 — Cost-Weighted Pareto
@@ -129,33 +131,54 @@
 
 ---
 
+## Full-Dataset Decision Agent Evaluation (CRITICAL)
+
+**Goal:** Evaluate the retrained Decision Agent checkpoint on the full 6324-window dataset (not just the 4-case folder test).
+
+**Method:** Load `models/retrained/exp1_pareto/exp1_miss8_seed42.pth`. Run inference on all 6324 windows. Compute accuracy, danger miss rate, and per-class action distribution.
+
+| Metric | Value |
+|--------|-------|
+| **Decision accuracy** | **0.2500** |
+| **Danger miss rate** | **0.6433 (2034/3162)** |
+| **False alarm rate** | **0.0000 (0/3162)** |
+
+**Per-class performance:**
+
+| Gas Class | Accuracy | n | Action Distribution |
+|-----------|----------|---|---------------------|
+| NoGas | 1.0000 | 1581 | {0: 1581} |
+| Smoke | 0.0000 | 1581 | {0: 1034, 1: 547} |
+| Mixture | 0.0000 | 1581 | {0: 1000, 1: 581} |
+| Perfume | 0.0000 | 1581 | {0: 1581} |
+
+**Result:** The retrained policy is heavily biased toward action 0 (Monitor). It achieves perfect accuracy on NoGas (always outputs Monitor) but fails catastrophically on all other classes. For Smoke and Mixture (danger gases), it outputs Monitor (action 0) 63-65% of the time and Increase Sampling (action 1) 35-37% of the time — never the correct actions (Raise Alarm for Smoke, Emergency Shutdown for Mixture).
+
+**Root cause:** The folder-driven live test (`main.py`) tested only 4 specific windows (one per class) and reported 94.44% accuracy. This was a misleading artifact: the 4 test cases happened to be ones where the policy output the correct action. The full-dataset evaluation reveals the policy is actually **not generalizing** — it has learned to output action 0 for most inputs, which happens to be correct for NoGas but wrong for everything else.
+
+**Implication:** The "zero danger misses" claim from the folder test does not hold on the full dataset. The retrained checkpoint is **not deployable** without addressing this bias.
+
+---
+
 ## Perturbation Analysis with Escalation Columns
 
 **Goal:** Test whether the ARXIS policy preserves zero danger misses under distribution shift, and whether it does so by favoring low-severity actions over appropriate escalation.
 
 **Method:** Sample 200 danger windows (Smoke + Mixture). Apply perturbations: Gaussian noise (σ=0.20, 0.40), calibration drift (±40%), sensor channel dropout (1 and 3 channels). Measure danger miss rate (action=0), escalation rate (action≥3), and emergency shutdown rate (action=4).
 
-| Configuration | Model | Decision Acc. | Danger Miss Rate | Escalation Rate (a≥3) | Emergency Shutdown (a=4) |
-|---------------|-------|---------------|------------------|----------------------|-------------------------|
-| Clean test set | Rule-oracle | 100.00% | 0.0000 | 1.0000 | 1.0000 |
-| Clean test set | Supervised MLP | 98.20% | 0.0000 | 0.0000 | 0.0000 |
-| Clean test set | ARXIS policy | 94.44% | 0.0000 | 0.0000 | 0.0000 |
-| Gaussian noise, σ=0.20 | Supervised MLP | 89.7% | 0.0000 | 0.0000 | 0.0000 |
-| Gaussian noise, σ=0.20 | ARXIS policy | 73.2% | 0.0000 | 0.0000 | 0.0000 |
-| Gaussian noise, σ=0.40 | Supervised MLP | 69.3% | 0.0000 | 0.0000 | 0.0000 |
-| Gaussian noise, σ=0.40 | ARXIS policy | 58.0% | 0.0000 | 0.0000 | 0.0000 |
-| Calibration drift, ±40% | Supervised MLP | 59.1% | 0.0187 | 0.0000 | 0.0000 |
-| Calibration drift, ±40% | ARXIS policy | 53.7% | 0.0000 | 0.0000 | 0.0000 |
-| Channel dropout, 1 sensor | Supervised MLP | 36.0% | 0.0000 | 0.0000 | 0.0000 |
-| Channel dropout, 1 sensor | ARXIS policy | 55.6% | 0.0000 | 0.0000 | 0.0000 |
-| Channel dropout, 3 sensors | Supervised MLP | 28.9% | 0.0000 | 0.0000 | 0.0000 |
-| Channel dropout, 3 sensors | ARXIS policy | 29.9% | 0.0000 | 0.0000 | 0.0000 |
+| Configuration | Danger Miss (a=0) | Escalation (a≥3) | Emergency (a=4) |
+|---------------|-------------------|------------------|-----------------|
+| Clean | 0.9550 | 0.0000 | 0.0000 |
+| Gaussian σ=0.20 | 0.9550 | 0.0000 | 0.0000 |
+| Gaussian σ=0.40 | 0.9500 | 0.0000 | 0.0000 |
+| Calibration +40% | 0.9550 | 0.0000 | 0.0000 |
+| Calibration -40% | 0.9550 | 0.0000 | 0.0000 |
+| Channel dropout 1 | 1.0000 | 0.0000 | 0.0000 |
+| Channel dropout 3 | 0.2850 | 0.3000 | 0.0000 |
 
-**Result:** ARXIS preserves zero danger misses across all perturbation configurations. However, the escalation columns reveal a limitation: the ARXIS policy achieves zero danger misses by favoring low-severity actions (Increase Sampling, Request Verification) over high-severity escalation (Raise Alarm, Emergency Shutdown). Under all perturbation configurations, the escalation rate (a≥3) remains zero, indicating the policy is conservative to the point of avoiding appropriate high-severity responses.
+**Result:** The retrained policy shows 95-100% danger miss rate across most perturbation configurations. Only under extreme channel dropout (3 sensors) does the danger miss rate drop to 28.5%, but this is not a meaningful improvement — the policy is simply outputting different wrong actions.
 
-This behavior represents a deliberate trade-off embedded in the asymmetric reward design—penalizing missed hazards more heavily than unnecessary escalation—but it may not align with operational expectations that demand explicit alarm or shutdown actions for hazardous conditions. The rule-oracle baseline (which always escalates to the maximum appropriate action) achieves 100% escalation, highlighting the gap between the learned policy and the ideal response.
-
-**Key insight:** "Zero danger misses" should not be interpreted as "appropriate escalation." The policy degrades gracefully in the sense that it never misses a hazard entirely, but it may under-escalate relative to what operators expect.
+**Key insight:** The perturbation analysis confirms the full-dataset finding: the retrained policy is not functioning as a safety-critical decision system. It is heavily biased toward inaction (action 0) regardless of input.
 
 ---
 
@@ -168,6 +191,7 @@ This behavior represents a deliberate trade-off embedded in the asymmetric rewar
 - **Training:** Cost-weighted cross-entropy against rule-oracle action. Per-row weight = `miss_cost` for danger gases (Smoke/Mixture) and `false_cost` for clean/Perfume rows. This encodes the cost-asymmetry directly into a weighted-CE objective.
 - **File:** `models/retrained/exp1_pareto/exp1_miss8_seed42.pth` (deployed checkpoint)
 - **Use:** Primary decision policy
+- **Status:** **FAILED** — Full-dataset evaluation reveals 64% danger miss rate. Not deployable.
 
 ### Plain DQN (Dueling DQN with Standard Cross-Entropy)
 

@@ -16,7 +16,7 @@ def evaluate_actions(y_true_gas, y_pred_action):
     decision_acc = correct / len(y_true_gas)
 
     danger_total = danger_missed = 0
-    false_alarms = total_alerts = 0
+    clean_total = false_alarms = total_alerts = 0
     for g, a in zip(y_true_gas, y_pred_action):
         g = int(g)
         a = int(a)
@@ -24,14 +24,25 @@ def evaluate_actions(y_true_gas, y_pred_action):
             danger_total += 1
             if a == 0:
                 danger_missed += 1
+        if g == 0:
+            clean_total += 1
+            if a >= 3:
+                false_alarms += 1
         if a >= 3:
             total_alerts += 1
-            if g == 0:
-                false_alarms += 1
     miss_rate = danger_missed / max(danger_total, 1)
-    false_alarm_rate = false_alarms / max(total_alerts, 1)
+    # FIXED (post-audit): the previous implementation divided false alarms by
+    # the number of alerts raised, not by the number of clean windows.  The two
+    # agree only at zero, which is why the discrepancy went unnoticed, and only
+    # the per-clean-window form converts to an alarm burden (alarms per 1,000
+    # clean windows).  `retrain/safety_metrics.py` has always used the
+    # per-clean-window definition and is the module behind every published
+    # number; this function is now consistent with it.
+    false_alarm_rate = false_alarms / max(clean_total, 1)
+    fa_per_alert = false_alarms / max(total_alerts, 1)
     return dict(decision_acc=decision_acc, miss_rate=miss_rate,
-                false_alarm_rate=false_alarm_rate)
+                false_alarm_rate=false_alarm_rate,
+                false_alarm_per_alert=fa_per_alert)
 
 
 def expected_calibration_error(probs, y_correct, n_bins=10):

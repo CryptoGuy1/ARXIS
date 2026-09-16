@@ -1,0 +1,87 @@
+v14: editorial pass on structure, Summary and style
+
+No experiment was re-run and no reported number changed. This commit changes the
+shape of the paper and the way it reads, in response to an editorial review.
+
+1. Structure. All nine experiments now precede the Discussion; Experiments 8 and
+   9 previously sat after it. The two eventization analyses (alarm episodes,
+   hazard episodes) moved from Model Application into Results, because they
+   reinterpret the perturbation sweep and in one case reverse a model ordering.
+   Model Application became Engineering Implications and now carries only what
+   follows from the results. Sections renamed: Prior Research Review ->
+   Related Work and Positioning; Proposed Method -> Methodology; Experimental
+   Results and Discussion -> Results; Conclusion -> Conclusions.
+
+   Tables renumbered with their content: proposed screen 14 -> 16, alarm
+   episodes 15 -> 14, hazard episodes 16 -> 15.
+
+   Experiments 4, 5 and 7 are grouped into one supporting subsection, keeping
+   only the finding each contributes to the rest of the paper, with the detail
+   pointed at S3, S4 and S7.
+
+2. Summary cut from 565 to 404 words. The reject-option and raw-fault findings
+   are one sentence; the "one in eleven" discussion is gone from the abstract
+   and kept where it is derived. It had also called the 0.011 / 0.245
+   comparison "reconstruction error" when it is the normalized anomaly feature.
+
+3. Title: ARXIS: Safety-Oriented Evaluation of Learned Gas-Monitoring Models
+   Under Class Exclusion and Sensor Degradation. Propagated to the supporting
+   information and the README.
+
+4. Style. Eleven rhetorical constructions the review flagged are removed
+   ("worth stating precisely", "three things follow", "that is the point",
+   "the objection is reasonable", and the rest), replaced with result ->
+   qualification -> implication. "rather than" fell from 93 uses to 55.
+
+   Two errors surfaced while rewriting: the Conclusions said "Four findings
+   follow" above five, and its scope paragraph still claimed no reject option
+   was tested and that all degradation was in standardized features, both made
+   false by Experiments 8 and 9.
+
+5. Repeated caveats consolidated to one definitive treatment each. The overlap
+   and dependence caveat was stated in full twice; the Limitations copy is now
+   a cross-reference.
+
+6. Tables 14 and 15 condensed to their informative rows, with the complete
+   tables added as Tables S11 and S12 under a new supporting Section S13,
+   generated from the result files rather than transcribed. Some condensed rows
+   name a count of models instead of one model; four new gates check those
+   groupings against v3_episode_metrics.csv.
+
+7. Body length: 23,223 -> 20,621 words, a cut of 11.2%. The review asked for
+   25 to 30%. Reaching that from here means deleting the qualifications four
+   earlier review rounds required (bound-versus-estimate language, constructed
+   target declarations, class-exclusion-is-not-domain-shift, descriptive-counts
+   framing, persistence-rule sensitivity), which trades one reviewer's objection
+   for another's. Two further reductions are available as decisions rather than
+   edits and are set out in the change review.
+
+   Word bands in verify_v13.py retightened to the new structure so they bind.
+
+8. Repaired a defect the previous commit introduced. The Kumar et al. (2024)
+   reference was moved to keep the reference list alphabetical using
+   t.index("Laberge"), which matched an in-text citation in the Introduction
+   rather than the reference entry. The full reference was spliced into the
+   middle of a sentence about alarm burden and shipped that way, with every
+   suite passing, because nothing checked the body for reference-shaped text.
+   Sentence restored, reference relocated, and three gates added: no
+   reference-style entry in body prose, no bare DOI or URL in body prose, and
+   no citation without a matching entry in either direction. The gates were
+   checked by re-injecting the fault.
+
+9. Added Lima et al. (2026), "Autoencoders for Early Kick Detection: Improving
+   Safety in Offshore Oilwell Drilling", SPE J. online 10 June 2026,
+   SPE-231854-PA, from the DSEA collection record. Volume, issue and pages are
+   not quoted: the article page is behind a bot check that was not worked
+   around, so the entry uses the online-first form and needs completing if the
+   paper has since been assigned to an issue.
+
+Nine verification gates rewritten to follow reworded prose; each still checks
+the same substantive claim.
+
+verify_v13.py 963 checks, 1 deliberate failure (the Ultralytics version, which
+nothing in this repository records). self_audit.py 951 checks, 0.
+test_safety_metrics.py 30 assertions, 0. audit_release.py 0 problems.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_018C1Tj1bRjrSAAeN9ooaRRg

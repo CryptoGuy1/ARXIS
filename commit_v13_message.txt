@@ -1,0 +1,242 @@
+v13: correct four evaluation defects, add episode-level and block-bootstrap evidence
+
+Four defects in the evaluation code were found and corrected. Every number in
+the manuscript was regenerated after the fixes; none was edited by hand.
+
+1. Block-wise holdout applied the embargo on one side of the test band only,
+   so windows immediately before each test block could still overlap it in raw
+   time. The embargo is now two-sided (retrain/raw_pipeline.py). Minimum
+   separation is now 21 window starts on every seed.
+
+2. The LSTM autoencoder used for the anomaly path was fitted, scaler and
+   checkpoint both, on all NoGas data including the test partition. It is now
+   refitted inside each training partition (partition_anomaly / train_anomaly_on
+   in retrain/raw_pipeline.py). Held-out ROC-AUC falls from 0.9928 +/- 0.0053
+   to 0.9251 +/- 0.0618 and the false-positive rate rises from 0.0000 to
+   0.1101 +/- 0.0992. The reported figures are the corrected ones.
+
+3. The CUSUM baseline carried its statistic across class-block boundaries
+   (retrain/new_baselines.py). It now resets at each block change. Its false-
+   alarm rate moves from 0 to 0.1861.
+
+4. Calibration used an i.i.d. bootstrap and a random permutation split
+   (retrain/run_calib_actions_v2.py). Both now respect temporal blocking:
+   moving-block bootstrap, and a contiguous per-class calibration tail with a
+   20-window embargo. The fitted temperature reverses from 0.787 +/- 0.156
+   (under-confident) to 1.423 +/- 0.202 (over-confident); the manuscript's
+   calibration discussion was rewritten accordingly.
+
+Uncertainty treatment
+  - Moving-block bootstrap at L = 20, 100, 316 (retrain/run_block_bootstrap.py).
+  - Binomial bounds are labelled independence-reference bounds, not exact
+    confidence bounds.
+  - Disjoint-support correction: only 31/632 hazardous and 15/316 clean test
+    windows have pairwise-disjoint raw support, which moves a bound on a zero
+    from 0.47 percent to 9.21 percent and from 0.94 percent to 18.10 percent.
+
+New evidence
+  - Episode-level hazard metrics and detection latency
+    (retrain/run_episode_metrics.py, Table 14).
+  - Eventized alarm burden, compression 5.5x to 316x
+    (retrain/run_alarm_episodes.py, Table 13).
+  - ROPE-width sweep at +/- 0.5, 1 and 2 points (retrain/run_rope_sensitivity.py).
+  - Per-class reconstruction error under the partition-local anomaly path
+    (retrain/run_anomaly_by_class.py).
+
+Numerical contradictions corrected
+  117 vs 128; the stale 0.0098 / 0.3405 figure caption; 2.48 vs 2.42;
+  "203" to "about 200"; "factor of 40", which was a ratio of bounds and not a
+  ratio of rates; and "factor of 43", where the exact value is 45.79 and the
+  value recomputed from the displayed figures is 45.68, now stated as
+  "about 46". Every quoted ratio is now gated twice, against the exact value
+  and against the value a reader recomputes from the printed table.
+
+Verification
+  verify_v13.py runs 770 checks against the result files.
+  audit_release.py reports 0 problems: every artifact the manuscript names by
+  file name exists, and every result file the drivers produce is named in the
+  manuscript. That audit found v3_metric_cost.json produced but never cited; it
+  is the measurement behind the claim that the metric set is cheap to compute,
+  and the supporting information now quotes it (0.478 ms vs 0.264 ms, 1.81x).
+
+One gate is deliberately open: the Ultralytics version string in Appendix A is
+still a placeholder, and verify_v13.py fails on it by design. See
+SUBMISSION_GATE.md. Do not submit until that string is supplied from the
+training environment and the run reports 770 checks, 0 failures.
+
+Second round: the five-part adversarial review
+----------------------------------------------
+One promise the paper made and had not kept, and one artifact it cited and could
+not produce, were both found by that review and are fixed here.
+
+The eventized alarm result is collapsed under one persistence rule (on-delay 3,
+off-delay 15) and the paper used it to reorder the models, while saying only that
+"the effect of that choice is bounded below" and never bounding it.
+retrain/run_persistence_sweep.py now re-eventizes the same alarm-grade flag
+sequences at 25 on-delay x off-delay settings with nothing refitted, and reports
+Kendall tau against the deployed rule plus every pairwise reversal (Table S7,
+new Supplementary Section S9).
+
+  - The single-channel reordering survives all 25 settings: the shallow tree
+    annunciates strictly less than the cost-weighted policy at 20, equal at 5,
+    and more at none.
+  - The secondary four-vs-seven-channel observation reverses at 2 settings, both
+    at an off-delay of 60 windows, and is now reported with that qualification.
+  - The claim that every condition falls within or near the EEMUA reference once
+    eventized does NOT survive. At noise sigma = 0.5 the grid reaches 109
+    episodes per hour, and at sigma = 0.3 the deployed rule reports zero
+    annunciated episodes from every comparator while a shorter on-delay reports
+    up to 50 per hour. The claim is now stated as conditional on the rule, in the
+    body and in a new Limitations entry.
+
+v3_metric_cost.json was cited in Supplementary Section S8 but no script in the
+repository produced it. retrain/run_metric_cost.py now does, and the regenerated
+figures replace the old ones: 0.455 ms against 0.290 ms, ratio 1.57x, previously
+0.478 / 0.264 / 1.81x.
+
+Wording corrections, each gated:
+  - The missed-hazard bound read as an estimate ("consistent with a true rate
+    near one in eleven"); it is an upper bound and now says so in both places.
+  - The ten-comparator Pearson intervals were labelled 95% confidence intervals;
+    ten author-chosen models sharing one corpus are not a sample from a
+    population, so they are now exploratory reference intervals.
+  - The class-disjoint experiment now states plainly that no comparator has a
+    reject option and that it is a class-exclusion, forced-classification stress
+    test rather than open-set detection.
+  - Table 14's ten episodes per condition are declared descriptive counts:
+    7/10 carries a one-sided 95% lower bound of 0.39 and even 10/10 only
+    establishes detection above 0.74.
+  - Run-level SDs are declared computational rather than physical replication;
+    the Bayesian correlated t-test is offered as a sensitivity analysis over an
+    assumed dependence structure; bootstrap agreement is declared robustness to
+    the analysis choice, not independent confirmation.
+  - Limitations said dropout was "zeroing of the standardized channel features"
+    while Experiment 6 said it was the training mean. Both are true under a
+    training-partition standard scaler; the first reads as an electrical zero,
+    which it is not, and now says so.
+
+Reproducibility:
+  - Appendix A's prose artifact list is replaced by Table A-1, a provenance table
+    mapping every reported object to its driver, result file, protocol and make
+    target.
+  - The four superseded drivers (run_exp1_real, run_exp3_loco,
+    run_exp4_calibration, run_expzoo) carry deprecation headers and are declared
+    in the appendix. Their headers described the network in reinforcement-
+    learning terms although it is trained by cost-weighted cross-entropy.
+  - Yao et al. (2024) added, at the sentence on joint drift and unknown-class
+    treatment that previously carried no citation.
+
+verify_v13.py now runs 802 checks, 31 of them added this round, one per claim
+introduced or corrected. audit_release.py reports 0 problems. The single
+remaining failure is still the Ultralytics version placeholder; see
+SUBMISSION_GATE.md.
+
+Third round: the complete must-fix pre-submission plan
+------------------------------------------------------
+The Table 10 bounds were computed from an average, not from a count. The stated
+rule is the worst case across partitions, but the code took the mean missed-
+hazard RATE over five seeds, multiplied by 1,581 and rounded that product into a
+pseudo-count. Where the seeds agree the two agree; on this corpus they do not.
+
+  Smoke / multilayer perceptron   misses per partition 4, 23, 30, 216, 234
+                                  bound 7.49%  ->  16.35%
+  Mixture / shallow tree          misses per partition 0, 0, 489, 489, 988
+                                  bound 26.71% ->  64.51%
+  Mixture / k-nearest neighbors   24, 28, 31, 38, 80    3.28% -> 6.06%
+  Mixture / multilayer perceptron 0, 0, 0, 24, 54       1.53% -> 4.27%
+
+run_final.py now writes v3_loco_perseed.csv with the integer count each partition
+produced, run_partition_bounds.py reads it, and Table 10 carries the counts as a
+column of their own. The shallow tree is flawless on two partitions and
+catastrophic on three; an average is a poor summary of that, which is the reason
+the counts are printed.
+
+Dependent claims, all updated:
+  - the headline separation is now a factor of about 86, not 40, gated against
+    both the exact ratio and the ratio recomputed from the printed figures;
+  - "ten of eleven pass a miss-rate screen at or below 3.3%" was false under the
+    stated method. Eight of eleven hold worst-partition bounds at or below 3.3%,
+    and the word "pass" is gone from the paper.
+
+rho disagreed with the paper's own counts. Eq. 11 said 0.202; 4,900 and 1,264
+give 0.20506. The cause was a hard-coded (1264, 4980) in the comparison driver,
+and 4,980 is not a number the pipeline produces under any seed.
+run_split_counts.py derives rho from the partition and checks it across all 35
+protocol seeds; run_bayes_recompute.py redoes the posteriors at the corrected
+value from the stored per-run accuracies, so nothing was retrained to change an
+arithmetic constant. Seven of ten equivalence probabilities moved, none by more
+than 0.003, and no conclusion changed.
+
+Errors of fact:
+  - the Conclusion said the early/late protocol cost three models "between 27 and
+    29 points"; Table 7 gives 41.2, 37.9 and 29.5;
+  - Fig. 18 and Table 15 were cited and do not exist (15 figures, 14 tables);
+  - Table 5 said "exact upper bound" where the Methods explain it is not exact;
+  - Dehnaw et al. (2024) was cited for local language models; that paper is about
+    edge gas detection, and Gemma Team (2025) now carries the claim;
+  - the supporting information still had the old title, including the phrase
+    "Under Distribution Shift" that the manuscript disclaims.
+
+Eq. 2 used one symbol for two objects: a*(Perfume) = {1,2} made Eq. 3 take the
+log-probability of a set. Now Eq. 2a gives the single-valued training target y(g)
+and Eq. 2b the acceptable set A(g), which is what the code always did. Action 2
+is never a positive training target, and the paper now says so.
+
+Removed the binomial lower bounds added to Table 14 last round. Ten entries are
+five runs times two classes over two physical acquisitions; attaching an interval
+to them is pseudo-replication. A gate fails if they come back.
+
+Narrowed: class exclusion has no reject option; five-seed results are
+descriptive; run-level SDs are computational, not physical, replication; the
+paired bootstrap preserves pairing and makes no parametric assumption but does
+not remove dependence; disjoint-support counts are conservative reference counts,
+never an effective sample size; every per-hour alarm figure comes from a
+316-window segment, about 10.5 minutes, and says so.
+
+Title now "A Safety-Oriented Evaluation Protocol for Learned Gas-Monitoring
+Models: Leakage-Controlled Class Exclusion and Synthetic Sensor Perturbation on a
+Laboratory MOX Benchmark". Keywords drop "sensor degradation".
+
+verify_v13.py runs 838 checks, 36 added this round, including Table 10's
+per-partition counts recomputed cell by cell from v3_loco_perseed.csv.
+audit_release.py reports 0 problems. The Ultralytics placeholder is still the one
+failing check; see SUBMISSION_GATE.md.
+
+Fourth round: self-audit
+------------------------
+Three rounds of corrections introduced defects of their own. Two are worth
+naming. Round two added binomial lower bounds to Table 14's episode counts; round
+three removed them because ten entries over two physical acquisitions cannot
+carry an interval. And the round-three corrections were applied to tables but not
+to the prose quoting them: the research-question table still said the miss-bound
+ratio was 40 after it moved to 86, and six posteriors quoted inline were left at
+their pre-rho values.
+
+The cause was structural. verify_v13.py compared table cells to result files and
+nothing compared the document to itself, so a number in prose disagreeing with
+the table it quotes, one table disagreeing with another, or a value a previous
+revision replaced surviving into this one, were all unguarded.
+
+self_audit.py closes that: 989 checks, none of which reads a result file. Seven
+families, the blunt one being a list of eighteen strings that were once true and
+are now wrong, which fails if any reappears anywhere. verify_v13.py now also
+checks every posterior named in prose against the artifact.
+
+test_safety_metrics.py adds the unit tests the plan asked for and I had skipped:
+30 assertions covering the identity that miss, under-escalation and escalation
+sum to one over 200 random hazardous partitions, that the false-alarm denominator
+admits no Perfume window, both branches of the bound at the values the paper
+quotes, boundary handling at a = 2 against a = 3, the burden conversion, and a
+two-sided embargo on every seed and class.
+
+Fixed this round: the research-question table's stale ratio; six stale posteriors
+in prose; "unseen hazard" where the vocabulary is "held-out hazardous class"; two
+superlatives replaced by the numbers they stood in for; "a eleventh"; a paragraph
+opening on a bare pronoun; fifteen sentences past 52 words; and the Conclusion
+omitting the escalation ratio the Summary and research-question table both quote.
+
+make check now runs verify_v13.py, self_audit.py, test_safety_metrics.py and
+audit_release.py. State: 847 / 1 deliberate, 989 / 0, 30 / 0, 0 problems.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_018C1Tj1bRjrSAAeN9ooaRRg

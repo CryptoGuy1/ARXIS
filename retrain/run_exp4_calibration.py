@@ -1,4 +1,17 @@
-"""Exp #4 — Confidence-Calibrated Escalation.
+"""DEPRECATED. Superseded by the drivers listed in Appendix A, Table A-1.
+
+This script predates the current experiment set and produces no number in the
+manuscript or the supporting information. It is retained for provenance only.
+Two differences from the current path matter to anyone who runs it by mistake:
+the header below describes the decision network in reinforcement-learning terms
+although it is trained by cost-weighted cross-entropy and always was, and this
+path does not participate in the verification run that checks every reported
+value against a stored result file. Use the driver named in Table A-1 for the
+quantity you want.
+
+Original header follows.
+
+Exp #4 — Confidence-Calibrated Escalation.
 
 Report Expected Calibration Error (ECE) + decision accuracy for four
 confidence estimators, each across 5 seeds:

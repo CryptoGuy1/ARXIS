@@ -1,0 +1,278 @@
+{
+ "_meta": {
+  "block_lengths": [
+   20,
+   100,
+   316
+  ],
+  "replicates": 4000,
+  "seed": 20260911,
+  "confidence": 0.95,
+  "window_size": 20,
+  "note": "moving-block bootstrap within each test partition; one acquisition episode per class, so episode-level resampling is not available on this corpus"
+ },
+ "A_cost_weighted": {
+  "miss": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 632,
+   "binomial_upper_pct": 0.47288662485831523,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 31
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 6
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 2
+   }
+  },
+  "fa": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 316,
+   "binomial_upper_pct": 0.9435370321169256,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 15
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 3
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 1
+   }
+  }
+ },
+ "B_unweighted": {
+  "miss": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 632,
+   "binomial_upper_pct": 0.47288662485831523,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 31
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 6
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 2
+   }
+  },
+  "fa": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 316,
+   "binomial_upper_pct": 0.9435370321169256,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 15
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 3
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 1
+   }
+  }
+ },
+ "D_mlp": {
+  "miss": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 632,
+   "binomial_upper_pct": 0.47288662485831523,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 31
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 6
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 2
+   }
+  },
+  "fa": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 316,
+   "binomial_upper_pct": 0.9435370321169256,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 15
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 3
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 1
+   }
+  }
+ },
+ "E_gbm": {
+  "miss": {
+   "point": 0.009177215189873418,
+   "k_per_partition": 5.8,
+   "n_per_partition": 632,
+   "binomial_upper_pct": 1.865144247989815,
+   "L20": {
+    "ci_lo": 0.0006329113924050633,
+    "ci_hi": 0.021835443037974682,
+    "effective_n": 31
+   },
+   "L100": {
+    "ci_lo": 0.00031645569620253165,
+    "ci_hi": 0.025316455696202535,
+    "effective_n": 6
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.018354430379746836,
+    "effective_n": 2
+   }
+  },
+  "fa": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 316,
+   "binomial_upper_pct": 0.9435370321169256,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 15
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 3
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 1
+   }
+  }
+ },
+ "RF": {
+  "miss": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 632,
+   "binomial_upper_pct": 0.47288662485831523,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 31
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 6
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 2
+   }
+  },
+  "fa": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 316,
+   "binomial_upper_pct": 0.9435370321169256,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 15
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 3
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 1
+   }
+  }
+ },
+ "ThresholdRule": {
+  "miss": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 632,
+   "binomial_upper_pct": 0.47288662485831523,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 31
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 6
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 2
+   }
+  },
+  "fa": {
+   "point": 0.0,
+   "k_per_partition": 0.0,
+   "n_per_partition": 316,
+   "binomial_upper_pct": 0.9435370321169256,
+   "L20": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 15
+   },
+   "L100": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 3
+   },
+   "L316": {
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "effective_n": 1
+   }
+  }
+ }
+}

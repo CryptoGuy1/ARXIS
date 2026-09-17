@@ -10,6 +10,16 @@
 
 ---
 
+> **⚠️ REVIEWERS: This repository is under active development.**
+> The manuscript submission is tagged at **`v13-submission`** (commit `e4f00a...91c7`).
+> Please check out that tag for the exact version under review:
+> ```bash
+> git checkout v13-submission
+> ```
+> The `main` branch contains the latest development state and may differ from the submission.
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -38,7 +48,7 @@ ARXIS detects four gas conditions from MQ sensor arrays and selects one of five 
 | 1 | Increase Sampling | Collect more sensor data |
 | 2 | Request Verification | Ask for human confirmation |
 | 3 | Raise Alarm | Alert operators |
-| 4 | Emergency Shutdown | Immediate shutdown |
+| 4 | Escalate | Notify operators of confirmed hazard |
 
 ### Canonical Gas Mapping
 

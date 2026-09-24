@@ -1,0 +1,9 @@
+held_out,model,danger_rows,observed_misses,miss_rate,miss_upper_95pct
+Smoke,A_decision_agent,1581,0,0.0,0.1893
+Smoke,B_plain_dqn,1581,0,0.0,0.1893
+Smoke,D_mlp,1581,296,0.187476,20.4103
+Smoke,E_gbm,1581,0,0.0,0.1893
+Mixture,A_decision_agent,1581,7,0.004301,0.83
+Mixture,B_plain_dqn,1581,0,0.0,0.1893
+Mixture,D_mlp,1581,6,0.003542,0.7477
+Mixture,E_gbm,1581,0,0.0,0.1893

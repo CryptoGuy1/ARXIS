@@ -1,0 +1,23 @@
+{
+  "note": "Continuity list extracted from ARXIS_Manuscript_v9.md, the last revision before the editorial reframing. verify_v13.py asserts that every figure here still appears in the current documents, so a figure cannot be lost silently. The v9 manuscript itself is not shipped: it quotes values this paper has since corrected, and a reader finding it in the repository would read superseded numbers.",
+  "source": "ARXIS_Manuscript_v9.md",
+  "figures": [
+    "fig_ablation",
+    "fig_actionmatrix",
+    "fig_alarmburden",
+    "fig_anomaly",
+    "fig_anominfluence",
+    "fig_architecture",
+    "fig_calibration",
+    "fig_costsweep",
+    "fig_disposition",
+    "fig_dissociation",
+    "fig_leakage",
+    "fig_loco",
+    "fig_perception",
+    "fig_perturb",
+    "fig_powered",
+    "fig_protocol",
+    "fig_roc"
+  ]
+}

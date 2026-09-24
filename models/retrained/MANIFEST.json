@@ -1,0 +1,26 @@
+{
+  "description": "Retrained model weights and derived outputs for ARXIS validation. Generated on the REAL Gas_Sensors_Measurements.csv (single corpus). Original models/ weights untouched. Last refreshed: 2026-08-31 (post re-run).",
+  "note": "On 2026-08-31 the exp1_pareto/*.pth checkpoints were re-saved in DecisionTool-compatible wrapped format (model_state_dict + input_dim/n_actions/sensor_cols/all_feat_cols + anom_p1/anom_p99/feat_scaler_mean/feat_scaler_scale). The scale constants are NOT arbitrary: each is exactly what raw_pipeline.prepare() computed on that seed's block_wise_holdout training split, so the model reconstructs the same 22-dim state at inference it saw during training.",
+  "training_objective": "IMPORTANT: every exp1_pareto and exp2_comparators checkpoint is trained by COST-WEIGHTED CROSS-ENTROPY against the rule-oracle action, inside a DuelingDQN-shaped network. There is no replay buffer, no target network, no n-step return, no epsilon-greedy exploration and no temporal-difference bootstrap in these checkpoints. The only checkpoint trained with a genuine RL objective is the CQL agent in retrain/zoo.py (TD(0) Bellman target + conservative logsumexp penalty), which exists as a comparator. Any document describing these weights as DQN-trained is wrong.",
+  "n_seeds": 5,
+  "seeds": [42, 1337, 7, 2024, 99],
+  "checkpoints": {
+    "retrained/exp1_pareto/": "40 DuelingDQN .pth (8 cost ratios x 5 seeds), cost-weighted CE, DecisionTool-compatible wrapped format with per-seed scale keys",
+    "retrained/exp1_pareto/exp1_baseline_1to1_seed*.pth": "5 DuelingDQN plain-CE (1:1 floor) checkpoints, same format",
+    "retrained/exp2_comparators/": "A (asym 10:1), B (plain), D (MLP .joblib), E (GBM .joblib)",
+    "retrained/exp4_calibration/": "base_net, deep_ensemble x5, temp_scaling_T .npy"
+  },
+  "results": {
+    "exp1_pareto.csv": "Exp #1 reward-asymmetry Pareto frontier. Accuracy PEAKS at 6:1 (0.9658 +/- 0.0274); 8:1 is 0.9633 +/- 0.0215 and is the deployed ratio because it has the tighter seed spread. Every ratio from 1:1 to 16:1 attains miss_rate = 0.0; 20:1 collapses to 0.8396. Do not describe 8:1 as the accuracy peak.",
+    "exp2_boundary.csv": "Exp #2 decision-boundary comparators",
+    "exp3_loco.csv": "Exp #3 leave-one-class-out (16 rows: 4 classes x 4 models). Each row from a completed model training. See NOTE_provenance_exp3.md. NOTE: acc_mean is 0.0 in every cell by construction (a held-out class's correct action is never in the training target set); the informative columns are miss_mean and escalation_mean.",
+    "exp3_clopper_pearson.csv/.json": "Exact 95% one-sided upper bounds on danger-miss, reported PER (model, held-out class). Zero-miss pairs bound at 0.1893%; A_decision_agent on held-out Mixture (7/1581) bounds at 0.83%; D_mlp on held-out Smoke (296/1581) bounds at 20.41%. REPLACES an earlier version that reported one 0.1893% row per class with no model column and therefore applied the best model's bound to every model.",
+    "exp4_calibration.csv": "Exp #4 calibration, RE-RUN 2026-08-31 after the calibration-split / ensemble-fit fixes. Valid to quote. Caveat: raw and temp-scaled ECE are dominated by seed 42 (raw 0.174 vs 0.009-0.023 for the other four seeds), so mean +/- std is not a fair summary for those two rows; the deep ensemble is the only stable estimator (0.0123 +/- 0.0043).",
+    "expzoo.csv": "Exp ZOO comparators, RE-RUN 2026-08-31 after the LSTM window/dropout fixes. Valid to quote. No comparison reaches significance at n=5 seeds (best p = 0.1875, RF); RF attains the highest accuracy (0.9769 +/- 0.0086)."
+  },
+  "known_open_items": [
+    "Exp #3 was aggregated from independent per-class trainings, not one uninterrupted run (Cygwin fork limit). See NOTE_provenance_exp3.md.",
+    "src/ live logs (logs/) and utils/ were deleted and have not been restored.",
+    "The Google OAuth token used by retrain/drive_*.py must still be revoked at console.cloud.google.com."
+  ]
+}

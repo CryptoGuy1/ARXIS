@@ -1,0 +1,393 @@
+{
+ "on_grid": [
+  1,
+  2,
+  3,
+  5,
+  10
+ ],
+ "off_grid": [
+  5,
+  10,
+  15,
+  30,
+  60
+ ],
+ "deployed": [
+  3,
+  15
+ ],
+ "conditions": {
+  "clean@0.0": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "kendall_tau_vs_deployed_min": NaN,
+   "kendall_tau_vs_deployed_mean": NaN,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 0,
+   "n_model_pairs": 15,
+   "reversals": []
+  },
+  "dropout@1.0": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 5.69620253164557,
+    "B_unweighted": 3.4177215189873418,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 2.278481012658228,
+    "ThresholdRule": 1.139240506329114
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 1.139240506329114,
+    "B_unweighted": 1.139240506329114,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 1.139240506329114
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 10.253164556962025,
+    "B_unweighted": 7.974683544303797,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 2.278481012658228,
+    "ThresholdRule": 1.139240506329114
+   },
+   "kendall_tau_vs_deployed_min": 0.5640760748177662,
+   "kendall_tau_vs_deployed_mean": 0.8372607429918411,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 14,
+   "n_model_pairs": 15,
+   "reversals": [
+    "B_unweighted vs RF at on=1,off=30",
+    "A_cost_weighted vs RF at on=1,off=60",
+    "B_unweighted vs RF at on=1,off=60",
+    "B_unweighted vs RF at on=2,off=30",
+    "A_cost_weighted vs RF at on=2,off=60",
+    "B_unweighted vs RF at on=2,off=60",
+    "B_unweighted vs RF at on=3,off=30",
+    "A_cost_weighted vs RF at on=3,off=60",
+    "B_unweighted vs RF at on=3,off=60",
+    "RF vs ThresholdRule at on=10,off=5",
+    "RF vs ThresholdRule at on=10,off=10",
+    "RF vs ThresholdRule at on=10,off=15",
+    "RF vs ThresholdRule at on=10,off=30",
+    "RF vs ThresholdRule at on=10,off=60"
+   ]
+  },
+  "dropout@4.0": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 10.253164556962025,
+    "B_unweighted": 6.8354430379746836,
+    "D_mlp": 1.139240506329114,
+    "E_gbm": 0.0,
+    "RF": 6.8354430379746836,
+    "ThresholdRule": 2.278481012658228
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 4.556962025316456,
+    "B_unweighted": 2.278481012658228,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 1.139240506329114,
+    "ThresholdRule": 2.278481012658228
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 19.367088607594937,
+    "B_unweighted": 14.810126582278482,
+    "D_mlp": 2.278481012658228,
+    "E_gbm": 0.0,
+    "RF": 7.974683544303797,
+    "ThresholdRule": 2.278481012658228
+   },
+   "kendall_tau_vs_deployed_min": 0.7412493166611012,
+   "kendall_tau_vs_deployed_mean": 0.929252724778328,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 2,
+   "n_model_pairs": 15,
+   "reversals": [
+    "RF vs ThresholdRule at on=5,off=60",
+    "RF vs ThresholdRule at on=10,off=60"
+   ]
+  },
+  "dropout@7.0": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 5.69620253164557,
+    "B_unweighted": 5.69620253164557,
+    "D_mlp": 1.139240506329114,
+    "E_gbm": 0.0,
+    "RF": 7.974683544303797,
+    "ThresholdRule": 5.69620253164557
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 5.69620253164557,
+    "B_unweighted": 5.69620253164557,
+    "D_mlp": 1.139240506329114,
+    "E_gbm": 0.0,
+    "RF": 4.556962025316456,
+    "ThresholdRule": 5.69620253164557
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 5.69620253164557,
+    "B_unweighted": 5.69620253164557,
+    "D_mlp": 1.139240506329114,
+    "E_gbm": 0.0,
+    "RF": 10.253164556962025,
+    "ThresholdRule": 5.69620253164557
+   },
+   "kendall_tau_vs_deployed_min": 0.5,
+   "kendall_tau_vs_deployed_mean": 0.9263354503153698,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 9,
+   "n_model_pairs": 15,
+   "reversals": [
+    "A_cost_weighted vs RF at on=3,off=60",
+    "B_unweighted vs RF at on=3,off=60",
+    "RF vs ThresholdRule at on=3,off=60",
+    "A_cost_weighted vs RF at on=5,off=60",
+    "B_unweighted vs RF at on=5,off=60",
+    "RF vs ThresholdRule at on=5,off=60",
+    "A_cost_weighted vs RF at on=10,off=60",
+    "B_unweighted vs RF at on=10,off=60",
+    "RF vs ThresholdRule at on=10,off=60"
+   ]
+  },
+  "drift@0.3": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "kendall_tau_vs_deployed_min": NaN,
+   "kendall_tau_vs_deployed_mean": NaN,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 0,
+   "n_model_pairs": 15,
+   "reversals": []
+  },
+  "drift@0.5": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 1.139240506329114,
+    "B_unweighted": 2.278481012658228,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "kendall_tau_vs_deployed_min": NaN,
+   "kendall_tau_vs_deployed_mean": NaN,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 0,
+   "n_model_pairs": 15,
+   "reversals": []
+  },
+  "noise@0.3": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 50.12658227848102,
+    "B_unweighted": 41.0126582278481,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 25.06329113924051
+   },
+   "kendall_tau_vs_deployed_min": NaN,
+   "kendall_tau_vs_deployed_mean": NaN,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 0,
+   "n_model_pairs": 15,
+   "reversals": []
+  },
+  "noise@0.5": {
+   "models": [
+    "A_cost_weighted",
+    "B_unweighted",
+    "D_mlp",
+    "E_gbm",
+    "RF",
+    "ThresholdRule"
+   ],
+   "episodes_per_hour_deployed": {
+    "A_cost_weighted": 4.556962025316456,
+    "B_unweighted": 5.69620253164557,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 3.4177215189873418
+   },
+   "episodes_per_hour_min_over_grid": {
+    "A_cost_weighted": 0.0,
+    "B_unweighted": 0.0,
+    "D_mlp": 0.0,
+    "E_gbm": 0.0,
+    "RF": 0.0,
+    "ThresholdRule": 0.0
+   },
+   "episodes_per_hour_max_over_grid": {
+    "A_cost_weighted": 97.9746835443038,
+    "B_unweighted": 99.1139240506329,
+    "D_mlp": 10.253164556962025,
+    "E_gbm": 25.06329113924051,
+    "RF": 12.531645569620254,
+    "ThresholdRule": 109.36708860759494
+   },
+   "kendall_tau_vs_deployed_min": -0.7833494518006403,
+   "kendall_tau_vs_deployed_mean": 0.6243397418166047,
+   "n_grid_points_compared": 24,
+   "n_pairwise_reversals": 22,
+   "n_model_pairs": 15,
+   "reversals": [
+    "A_cost_weighted vs ThresholdRule at on=1,off=5",
+    "B_unweighted vs ThresholdRule at on=1,off=5",
+    "A_cost_weighted vs ThresholdRule at on=1,off=10",
+    "B_unweighted vs ThresholdRule at on=1,off=10",
+    "E_gbm vs ThresholdRule at on=1,off=30",
+    "RF vs ThresholdRule at on=1,off=30",
+    "A_cost_weighted vs D_mlp at on=1,off=60",
+    "A_cost_weighted vs E_gbm at on=1,off=60",
+    "A_cost_weighted vs RF at on=1,off=60",
+    "B_unweighted vs D_mlp at on=1,off=60",
+    "B_unweighted vs E_gbm at on=1,off=60",
+    "B_unweighted vs RF at on=1,off=60",
+    "D_mlp vs ThresholdRule at on=1,off=60",
+    "E_gbm vs ThresholdRule at on=1,off=60",
+    "RF vs ThresholdRule at on=1,off=60",
+    "A_cost_weighted vs B_unweighted at on=2,off=5",
+    "A_cost_weighted vs B_unweighted at on=2,off=10",
+    "A_cost_weighted vs B_unweighted at on=5,off=5",
+    "A_cost_weighted vs B_unweighted at on=5,off=10",
+    "A_cost_weighted vs B_unweighted at on=5,off=15",
+    "A_cost_weighted vs B_unweighted at on=5,off=30",
+    "A_cost_weighted vs B_unweighted at on=5,off=60"
+   ]
+  }
+ }
+}

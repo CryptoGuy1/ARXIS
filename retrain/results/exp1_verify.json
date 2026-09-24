@@ -1,0 +1,186 @@
+{
+  "run1": [
+    {
+      "config": "FLOOR_1to1",
+      "C": "1:1",
+      "acc_mean": 0.9661442006269594,
+      "acc_std": 0.019906573189161784,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_2:1",
+      "C": "2:1",
+      "acc_mean": 0.9626959247648903,
+      "acc_std": 0.015263029617755745,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_4:1",
+      "C": "4:1",
+      "acc_mean": 0.9594043887147334,
+      "acc_std": 0.01645208144801891,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_6:1",
+      "C": "6:1",
+      "acc_mean": 0.9717868338557996,
+      "acc_std": 0.009223042551676996,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_8:1",
+      "C": "8:1",
+      "acc_mean": 0.9778996865203761,
+      "acc_std": 0.004481497948431291,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_10:1",
+      "C": "10:1",
+      "acc_mean": 0.9289968652037619,
+      "acc_std": 0.10244088914640502,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_12:1",
+      "C": "12:1",
+      "acc_mean": 0.8840125391849529,
+      "acc_std": 0.12807186916472937,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_16:1",
+      "C": "16:1",
+      "acc_mean": 0.8840125391849531,
+      "acc_std": 0.12858039437347527,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_20:1",
+      "C": "20:1",
+      "acc_mean": 0.8362068965517242,
+      "acc_std": 0.12724796885366105,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    }
+  ],
+  "run2": [
+    {
+      "config": "FLOOR_1to1",
+      "C": "1:1",
+      "acc_mean": 0.9661442006269594,
+      "acc_std": 0.019906573189161784,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_2:1",
+      "C": "2:1",
+      "acc_mean": 0.9626959247648903,
+      "acc_std": 0.015263029617755745,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_4:1",
+      "C": "4:1",
+      "acc_mean": 0.9594043887147334,
+      "acc_std": 0.01645208144801891,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_6:1",
+      "C": "6:1",
+      "acc_mean": 0.9717868338557996,
+      "acc_std": 0.009223042551676996,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_8:1",
+      "C": "8:1",
+      "acc_mean": 0.9778996865203761,
+      "acc_std": 0.004481497948431291,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_10:1",
+      "C": "10:1",
+      "acc_mean": 0.9289968652037619,
+      "acc_std": 0.10244088914640502,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_12:1",
+      "C": "12:1",
+      "acc_mean": 0.8840125391849529,
+      "acc_std": 0.12807186916472937,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_16:1",
+      "C": "16:1",
+      "acc_mean": 0.8840125391849531,
+      "acc_std": 0.12858039437347527,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    },
+    {
+      "config": "asym_20:1",
+      "C": "20:1",
+      "acc_mean": 0.8362068965517242,
+      "acc_std": 0.12724796885366105,
+      "miss_mean": 0.0,
+      "miss_std": 0.0,
+      "fa_mean": 0.0,
+      "fa_std": 0.0
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+ "n_windows_total": 6324,
+ "n_train": 4900,
+ "n_test": 1264,
+ "rho": 0.20506164828033743,
+ "n_seeds_checked": 35,
+ "protocols": [
+  "five-seed",
+  "thirty-run"
+ ]
+}

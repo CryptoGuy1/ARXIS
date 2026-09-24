@@ -1,0 +1,17 @@
+{
+  "temp_scaling": {
+    "W": 15.0,
+    "p": 0.03125,
+    "better_than_raw_on_seeds": "5/5"
+  },
+  "deep_ensemble_5": {
+    "W": 15.0,
+    "p": 0.03125,
+    "better_than_raw_on_seeds": "5/5"
+  },
+  "mc_dropout_20": {
+    "W": 0.0,
+    "p": 1.0,
+    "better_than_raw_on_seeds": "0/5"
+  }
+}

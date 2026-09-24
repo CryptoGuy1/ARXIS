@@ -1,0 +1,8 @@
+model,clean_air_alarm_rate,perfume_alarm_rate,nonhazardous_alarm_rate,clean_air_per_1000,nonhazardous_per_1000
+A_cost_weighted,0.0,0.0113924050632911,0.00569620253164555,0.0,5.696202531645549
+D_mlp,0.0,0.0056962025316455,0.00284810126582275,0.0,2.8481012658227502
+E_gbm,0.0,0.0,0.0,0.0,0.0
+KNN,0.0,0.0,0.0,0.0,0.0
+RF,0.0,0.0,0.0,0.0,0.0
+SVM,0.0,0.0,0.0,0.0,0.0
+ThresholdRule,0.0,0.0,0.0,0.0,0.0

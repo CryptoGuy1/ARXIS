@@ -1,0 +1,98 @@
+{
+  "units": "miss_upper_95pct is a PERCENTAGE (e.g. 0.1893 means 0.1893%, not 18.93%).",
+  "definition": "A danger-miss is a danger row (Smoke or Mixture) assigned action 0 (Monitor). Actions 1-2 on a danger row are NOT counted as misses by this metric; see escalation_mean in exp3_loco.csv for the stricter alarm-grade criterion.",
+  "method": "Exact one-sided Clopper-Pearson upper bound. k==0: U = 1-(1-conf)^(1/n). k>0: U = BetaInv(conf; k+1, n-k).",
+  "warning": "A bound is a property of a (model, held-out class) PAIR. The previous version of this file reported a single 0.1893% row per class with no model column, which silently applied the best model's zero-miss bound to every model. D_mlp misses 18.75% of held-out Smoke danger rows; its true bound is 20.41%, not 0.1893%. Do not pool across models.",
+  "per_model_per_class": [
+    {
+      "held_out": "Smoke",
+      "model": "A_decision_agent",
+      "danger_rows": 1581,
+      "observed_misses": 0,
+      "miss_rate": 0.0,
+      "miss_upper_95pct": 0.1893
+    },
+    {
+      "held_out": "Smoke",
+      "model": "B_plain_dqn",
+      "danger_rows": 1581,
+      "observed_misses": 0,
+      "miss_rate": 0.0,
+      "miss_upper_95pct": 0.1893
+    },
+    {
+      "held_out": "Smoke",
+      "model": "D_mlp",
+      "danger_rows": 1581,
+      "observed_misses": 296,
+      "miss_rate": 0.187476,
+      "miss_upper_95pct": 20.4103
+    },
+    {
+      "held_out": "Smoke",
+      "model": "E_gbm",
+      "danger_rows": 1581,
+      "observed_misses": 0,
+      "miss_rate": 0.0,
+      "miss_upper_95pct": 0.1893
+    },
+    {
+      "held_out": "Mixture",
+      "model": "A_decision_agent",
+      "danger_rows": 1581,
+      "observed_misses": 7,
+      "miss_rate": 0.004301,
+      "miss_upper_95pct": 0.83
+    },
+    {
+      "held_out": "Mixture",
+      "model": "B_plain_dqn",
+      "danger_rows": 1581,
+      "observed_misses": 0,
+      "miss_rate": 0.0,
+      "miss_upper_95pct": 0.1893
+    },
+    {
+      "held_out": "Mixture",
+      "model": "D_mlp",
+      "danger_rows": 1581,
+      "observed_misses": 6,
+      "miss_rate": 0.003542,
+      "miss_upper_95pct": 0.7477
+    },
+    {
+      "held_out": "Mixture",
+      "model": "E_gbm",
+      "danger_rows": 1581,
+      "observed_misses": 0,
+      "miss_rate": 0.0,
+      "miss_upper_95pct": 0.1893
+    }
+  ],
+  "per_model_pooled_over_both_danger_classes": [
+    {
+      "model": "A_decision_agent",
+      "danger_rows": 3162,
+      "observed_misses": 7,
+      "miss_upper_95pct": 0.4154
+    },
+    {
+      "model": "B_plain_dqn",
+      "danger_rows": 3162,
+      "observed_misses": 0,
+      "miss_upper_95pct": 0.0947
+    },
+    {
+      "model": "D_mlp",
+      "danger_rows": 3162,
+      "observed_misses": 302,
+      "miss_upper_95pct": 10.4544
+    },
+    {
+      "model": "E_gbm",
+      "danger_rows": 3162,
+      "observed_misses": 0,
+      "miss_upper_95pct": 0.0947
+    }
+  ]
+}

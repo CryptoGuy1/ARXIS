@@ -1,14 +1,14 @@
 {
- "generated_utc": "2026-10-07T16:57:23+00:00",
+ "generated_utc": "2026-10-08T17:57:00+00:00",
  "git": {
-  "commit": "4ae4cc69040a1cb715aca3ab6ff131cf4f4d6658",
+  "commit": "96bb97df85c450e7ab8d7e23d388727da22fc3f1",
   "branch": "main",
-  "describe": "v15-submission-1-g4ae4cc6-dirty",
-  "dirty": true,
+  "describe": "v15-submission-2-g96bb97d",
+  "dirty": false,
   "remote": "https://github.com/CryptoGuy1/ARXIS.git"
  },
  "host": {
-  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "platform": "Linux-6.18.44-fc-v80-x86_64-with-glibc2.39",
   "machine": "x86_64",
   "processor": "x86_64",
   "node": "vm",
@@ -127,7 +127,7 @@
   {
    "path": "retrain/run_final.py",
    "purpose": "30-run comparison, Bayesian equivalence, ordinal objective",
-   "sha256_16": "6f2f69bc05832ed4"
+   "sha256_16": "f3e0fae0cab0155f"
   },
   {
    "path": "retrain/run_rho_sensitivity.py",
@@ -152,7 +152,7 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "278ae663d2cc5aa3"
+   "sha256_16": "5f89f2c058324be6"
   }
  ],
  "results": {
@@ -269,7 +269,7 @@
   "v3_nonhazard_alarm.csv": {
    "bytes": 395,
    "sha256_16": "4ee395b2abeffa28",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-08T17:53:13+00:00"
   },
   "v3_ordinal_actions.csv": {
    "bytes": 1925,
@@ -346,117 +346,117 @@
   "fig_ablation.png": {
    "bytes": 255831,
    "sha256_16": "5a5037311661ca4a",
-   "modified_utc": "2026-10-07T16:55:49+00:00"
+   "modified_utc": "2026-10-08T17:55:09+00:00"
   },
   "fig_actionmatrix.png": {
    "bytes": 587415,
    "sha256_16": "d6fae814f5a29421",
-   "modified_utc": "2026-10-07T16:55:51+00:00"
+   "modified_utc": "2026-10-08T17:55:10+00:00"
   },
   "fig_alarmburden.png": {
    "bytes": 452795,
    "sha256_16": "9b6364413db410ed",
-   "modified_utc": "2026-10-07T16:55:52+00:00"
+   "modified_utc": "2026-10-08T17:55:11+00:00"
   },
   "fig_anomaly.png": {
    "bytes": 285311,
    "sha256_16": "bb91c24c91ca4f67",
-   "modified_utc": "2026-10-07T16:55:53+00:00"
+   "modified_utc": "2026-10-08T17:55:12+00:00"
   },
   "fig_anominfluence.png": {
    "bytes": 519718,
    "sha256_16": "ff2f2cb8d737108a",
-   "modified_utc": "2026-10-07T16:55:54+00:00"
+   "modified_utc": "2026-10-08T17:55:13+00:00"
   },
   "fig_arch_dqn.png": {
    "bytes": 250388,
    "sha256_16": "24e1861ebc228d5e",
-   "modified_utc": "2026-10-07T16:55:54+00:00"
+   "modified_utc": "2026-10-08T17:55:14+00:00"
   },
   "fig_arch_lstm.png": {
    "bytes": 166617,
    "sha256_16": "16ba9a6eab244536",
-   "modified_utc": "2026-10-07T16:55:55+00:00"
+   "modified_utc": "2026-10-08T17:55:14+00:00"
   },
   "fig_arch_yolo.png": {
    "bytes": 462716,
    "sha256_16": "ed496cf5fb902e17",
-   "modified_utc": "2026-10-07T16:55:56+00:00"
+   "modified_utc": "2026-10-08T17:55:15+00:00"
   },
   "fig_calibration.png": {
    "bytes": 552047,
    "sha256_16": "e21c4c3651648e61",
-   "modified_utc": "2026-10-07T16:55:57+00:00"
+   "modified_utc": "2026-10-08T17:55:16+00:00"
   },
   "fig_costsweep.png": {
    "bytes": 258019,
    "sha256_16": "830c4b1610f1461d",
-   "modified_utc": "2026-10-07T16:55:58+00:00"
+   "modified_utc": "2026-10-08T17:55:17+00:00"
   },
   "fig_decisionlogic.png": {
    "bytes": 275016,
    "sha256_16": "cd4d20fdff85b803",
-   "modified_utc": "2026-10-07T16:55:58+00:00"
+   "modified_utc": "2026-10-08T17:55:18+00:00"
   },
   "fig_disposition.png": {
    "bytes": 448643,
    "sha256_16": "96039d18f659497a",
-   "modified_utc": "2026-10-07T16:55:59+00:00"
+   "modified_utc": "2026-10-08T17:55:19+00:00"
   },
   "fig_dissociation.png": {
    "bytes": 362262,
    "sha256_16": "ee9741c8f4f1a43f",
-   "modified_utc": "2026-10-07T16:56:00+00:00"
+   "modified_utc": "2026-10-08T17:55:20+00:00"
   },
   "fig_leakage.png": {
    "bytes": 340317,
    "sha256_16": "1f697c99844de968",
-   "modified_utc": "2026-10-07T16:56:01+00:00"
+   "modified_utc": "2026-10-08T17:55:21+00:00"
   },
   "fig_loco.png": {
    "bytes": 701437,
    "sha256_16": "6d98933f5bad2ea4",
-   "modified_utc": "2026-10-07T16:56:03+00:00"
+   "modified_utc": "2026-10-08T17:55:22+00:00"
   },
   "fig_metricdisagreement.png": {
    "bytes": 442295,
    "sha256_16": "0000e106397c9b9b",
-   "modified_utc": "2026-10-07T16:56:04+00:00"
+   "modified_utc": "2026-10-08T17:55:23+00:00"
   },
   "fig_perception.png": {
    "bytes": 577939,
    "sha256_16": "2cf9aae193588696",
-   "modified_utc": "2026-10-07T16:56:05+00:00"
+   "modified_utc": "2026-10-08T17:55:25+00:00"
   },
   "fig_perturb.png": {
    "bytes": 669482,
    "sha256_16": "cd1c49f89993fb63",
-   "modified_utc": "2026-10-07T16:56:07+00:00"
+   "modified_utc": "2026-10-08T17:55:27+00:00"
   },
   "fig_powered.png": {
    "bytes": 599523,
    "sha256_16": "fd3367f3c7a4d0bc",
-   "modified_utc": "2026-10-07T16:56:08+00:00"
+   "modified_utc": "2026-10-08T17:55:28+00:00"
   },
   "fig_protocol.png": {
    "bytes": 200667,
    "sha256_16": "95f367ebeaf86e70",
-   "modified_utc": "2026-10-07T16:56:09+00:00"
+   "modified_utc": "2026-10-08T17:55:29+00:00"
   },
   "fig_roc.png": {
    "bytes": 375434,
    "sha256_16": "44fc241bf13d6a3e",
-   "modified_utc": "2026-10-07T16:56:10+00:00"
+   "modified_utc": "2026-10-08T17:55:29+00:00"
   },
   "fig_workflow.png": {
    "bytes": 2092499,
    "sha256_16": "e70dfb4d024686d2",
-   "modified_utc": "2026-10-07T16:56:12+00:00"
+   "modified_utc": "2026-10-08T17:55:32+00:00"
   },
   "fig_zoo.png": {
    "bytes": 312677,
    "sha256_16": "381117622740595b",
-   "modified_utc": "2026-10-07T16:56:13+00:00"
+   "modified_utc": "2026-10-08T17:55:33+00:00"
   }
  }
 }

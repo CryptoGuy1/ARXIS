@@ -2,14 +2,14 @@
 
 > ### Reviewers: reproduce from the tag
 >
-> The submitted manuscript is *A Safety-Oriented Benchmark for Learned Gas-Monitoring
-> Models Under Class Exclusion and Sensor Degradation*, submitted to *SPE Journal*,
-> Data Science and Engineering Analytics. The exact state that produced its numbers is
-> the tag `v15-submission`.
+> The manuscript *A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under
+> Class Exclusion and Sensor Degradation* is prepared for *SPE Journal*, Data Science and
+> Engineering Analytics. The exact state that produced its numbers is the tag
+> `v16-submission`.
 >
 > ```bash
-> git checkout v15-submission
-> git rev-parse v15-submission        # the commit the paper's availability statement cites
+> git checkout v16-submission
+> git rev-parse v16-submission^{commit}   # the commit the tag names
 > pip install -r requirements.lock
 > make check                          # every check the paper claims, in one command
 > make all                            # regenerate every reported object from the corpus
@@ -17,7 +17,7 @@
 >
 > `main` may move ahead of the tag. The tag does not. The built `.docx` and `.pdf`
 > are not tracked here, because `make docx` regenerates them from the Markdown
-> sources; they are attached to the tagged release.
+> sources.
 
 **Safety-oriented benchmarking of gas-hazard monitoring models under class exclusion and sensor degradation.**
 
@@ -69,26 +69,27 @@ make all          # every experiment, figure, the manifest and verification
 ```
 
 Individual targets map to manuscript objects. The mapping below is the summary; the
-full provenance table, one row per reported object, is Appendix A of the manuscript.
+full provenance table, one row per reported object, is Supplementary Section S19 of the supporting information.
 
 | Command | Produces |
 |---|---|
-| `make leakage` | Table 7, Fig. 8, the partitioning-protocol experiment |
-| `make final` | Table 8, Fig. 9, the 30-run comparison and the equivalence test |
+| `make leakage` | Table 4, Fig. 3, the partitioning-protocol experiment |
+| `make final` | Table 5, Fig. 4, the 30-run comparison and the equivalence test |
 | `make bayes` | recomputes the posteriors at the corrected ρ without retraining |
 | `make splitcounts` | `v3_split_counts.json`, from which ρ is derived |
-| `make calibration` | Table 9, Fig. 10, Table S3 and Fig. S3, and the ROC curves |
-| `make classdisjoint` | Table 10, Figs. 11 to 13 |
-| `make comparison` | Table 11, Figs. 14 and 16, the ablation and the cost sweep |
-| `make reject` | Table 12 and Table S9, the reject-option baseline |
-| `make rawfaults` | Table 13 and Table S10, faults in raw sensor space |
-| `make episodes` | Table 14, eventized alarm burden |
-| `make hazardepisodes` | Table 15 |
+| `make calibration` | Table S3 and Fig. S3, Table S20 and Fig. S11, and the ROC curves |
+| `make classdisjoint` | Table 6, Fig. 5, the class-disjoint evaluation |
+| `make comparison` | Fig. 6, Table S21, Table S2, Table S6, the ablation and the cost sweep |
+| `make reject` | Tables S9 and S13, the reject-option baseline |
+| `make rawfaults` | Tables S10 and S14, faults in raw sensor space |
+| `make episodes` | Tables S11 and S15, eventized alarm burden |
+| `make hazardepisodes` | Tables S12 and S16, episode-level hazard metrics |
 | `make overlap` | Table S8, the overlap-versus-position control |
 | `make persistence` | Table S7, the persistence-rule sweep |
 | `make rho` / `make rope` | Tables S4 and S5, the two sensitivity sweeps |
 | `make bounds` / `make blockboot` / `make bootstrap` | partition-level bounds; block and paired bootstrap |
-| `make figures` | Figs. 1 to 16 and Figs. S1 to S6 |
+| `make figures` | Figs. 1 to 6 and the supporting-information figures; Figs. S7 to S9 from `make_figs_arch` |
+| `make nonhazard` | Section S27, the nonhazardous alarm rate |
 | `make docx` / `make proof` | build the submission documents, then read the built page |
 | `make verify` | checks every value in the manuscript against the result files |
 | `make selfaudit` / `make test` / `make check` | the audit, the metric unit tests, and all three together |
@@ -133,12 +134,12 @@ Expect several hours on two cores. The autoencoder is retrained once per distinc
 
 ## Layout
 
-Everything the manuscript's Appendix A names is at the path it names.
+Everything Supplementary Section S19 names is at the path it names.
 
 ```
 ARXIS_Manuscript_v15_SPE.md      the manuscript source; `make docx` builds the .docx
 ARXIS_Supporting_Information.md  the supporting information, likewise
-Makefile                         one target per row of Appendix A's provenance table
+Makefile                         one target per row of the provenance table in Supplementary Section S19
 RUN_MANIFEST.json                commit, host, package versions and a hash per file
 requirements.lock                the interpreter that produced the reported results
 requirements.txt                 the wider environment, including the Ultralytics pin
@@ -156,8 +157,9 @@ continuity_v9.json               the figure list carried over from the pre-rewri
 
 data/                            the corpus CSV and the thermal frames the figures use
 figures_v2/                      every figure in the manuscript and the supporting information
-models/                          the autoencoder checkpoint, tracked so the checks run
-                                 from a bare clone; the thermal classifier ships with the release
+models/                          the autoencoder checkpoint, tracked so the checks run from a
+                                 bare clone. No comparator checkpoint is shipped: every model
+                                 in the study refits from the corpus under the listed seeds
 retrain/
   raw_pipeline.py                windowing, partitioning, partition-local anomaly, scaling
   safety_metrics.py              the five-quantity evaluation set and the binomial bounds
@@ -165,7 +167,7 @@ retrain/
   zoo.py comparators.py agent_rl.py rewards.py calibration.py metrics.py
   run_*.py                       the experiment drivers, one per Makefile target
   make_figs_v2.py                the result figures
-  make_figs_arch.py              the component diagrams, Figs. 3 to 5
+  make_figs_arch.py              the component diagrams, Figs. S7 to S9
   spe_style.py spe_flow.py       the drawing primitives those two use
   results_v2/                    every CSV and JSON behind a reported number
 src/                             the running advisory system, which is NOT the evaluated object
@@ -174,7 +176,7 @@ src/                             the running advisory system, which is NOT the e
 Five drivers and one plotting script remain for provenance and produce no number
 in the paper: `retrain/run_exp1_real.py`, `run_exp2_real.py`, `run_exp3_loco.py`,
 `run_exp4_calibration.py`, `run_expzoo.py` and `make_plots.py`. Each carries a
-deprecation notice in its header. Appendix A lists them under *Deprecated paths*.
+deprecation notice in its header. Supplementary Section S19 lists them under *Deprecated paths*.
 
 ---
 
@@ -186,10 +188,12 @@ The 8:1 loss-weight ratio that appeared in earlier versions of this repository w
 
 ## Citing
 
-Nweke, B. C., Ramezan, G., and Saraji, S. A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation. Manuscript submitted to *SPE Journal*, Data Science and Engineering Analytics.
+Nweke, B. C., Ramezan, G., and Saraji, S. A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation. Manuscript prepared for *SPE Journal*, Data Science and Engineering Analytics.
 
-**Archived release.** The version of this repository that produced the submitted
-numbers is tagged `v15-submission`. A Zenodo deposit of that tag carries the DOI; the
+**History.** The commit history of this repository was consolidated on 24 September 2026. Earlier commits are no longer reachable from `main`; the commits after that consolidation are the only ones on `main`.
+
+**Archived release.** The version of this repository that produced the reported
+numbers is tagged `v16-submission`. A Zenodo deposit of that tag carries the DOI; the
 DOI is minted at deposit time and is recorded here and in the manuscript's Data and
 Code Availability statement once it exists. Until then the tag is the citable object,
 and a reviewer reproducing the paper should check out the tag rather than the tip of

@@ -23,7 +23,7 @@ reject option buys and what it costs on this benchmark.
                     set its own threshold in sample.
     sweep           q in {0, 5, 10, 20, 30}; q = 0 recovers the closed-set
                     comparator exactly, so that row reproduces the corresponding
-                    entry of Table 10
+                    entry of Table S13
 
 A rejection is not an action. A facility has to decide what one means, and the
 two defensible extremes bracket every policy in between, so both are reported:
@@ -53,7 +53,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
 from retrain.run_all_v2 import SEEDS, OUT, CACHE
-from retrain.run_final import make          # the same constructor Table 10 uses
+from retrain.run_final import make          # the same constructor the class-disjoint table uses
 from retrain.safety_metrics import evaluate_safety
 
 # Comparators that expose a usable confidence. CUSUM and the depth-3 tree do not
@@ -135,7 +135,7 @@ def main():
                 Xh, gh = rp.to_arrays(held_s)
 
                 # Built exactly as run_final.exp_loco_all builds it, so the
-                # q = 0 row of Table 12 reproduces the corresponding Table 10
+                # q = 0 row of Table S13 reproduces the corresponding Table 6
                 # entry rather than differing by a training-budget accident.
                 m, kw = make(name, s, gtr)
                 if "groups" in inspect.signature(m.fit).parameters:

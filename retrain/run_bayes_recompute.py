@@ -1,7 +1,7 @@
 """Recompute the Bayesian posteriors at the corrected correlation term.
 
 Pre-submission plan item A5, second half. Correcting rho changes every posterior
-probability in Table 8, in the rho sweep and in the ROPE sweep. It does not
+probability in Table 5, in the rho sweep and in the ROPE sweep. It does not
 change a single model fit: the correlated t-test reads only the vector of
 per-run decision accuracies, and those are stored in v3_powered_bayes.json from
 the original 30-run execution. Retraining to change an arithmetic constant would

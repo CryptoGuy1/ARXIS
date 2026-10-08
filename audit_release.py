@@ -2,7 +2,7 @@
 
 Reviewer A3. Data and Code Availability says every artifact needed to reproduce
 the paper is released together. That is a strong claim and it is checkable: this
-script reads the file names out of the manuscript's own Appendix A and Data and
+script reads the file names out of the manuscript's own provenance section and Data and
 Code Availability sections and confirms each one exists on disk, then checks the
 reverse direction, that no result file the drivers produce has been left out of
 the manuscript's listing.
@@ -24,7 +24,10 @@ RESULTS = os.path.join(ROOT, "retrain", "results_v2")
 
 # Files the manuscript names in backticks. Paths are relative to the repository
 # root; a few are expected only in the public release and are listed separately.
-RELEASE_ONLY = {"models/yolov8n_cls_thermal.pt"}
+# Nothing is reserved for the public release any more. The manuscript states that
+# no comparator checkpoint is archived and that every model refits from the corpus,
+# so there is no file the paper names that is deliberately absent from the tree.
+RELEASE_ONLY = set()
 
 
 def named_in(path):
@@ -144,7 +147,7 @@ def audit_target_comments(txt):
 def audit_manifest():
     """The manifest claims a hash for every figure and result file. Check it.
 
-    Appendix A says a disagreement between RUN_MANIFEST.json and this table is a
+    a disagreement between RUN_MANIFEST.json and this table is a
     real disagreement, which only holds if something reads the manifest. Nothing
     did, and it drifted: twenty of twenty-one figure hashes were stale, it still
     listed a retired figure, and it did not know about the three architecture

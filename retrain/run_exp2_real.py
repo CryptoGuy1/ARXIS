@@ -1,4 +1,4 @@
-"""DEPRECATED. Superseded by the drivers listed in Appendix A, Table A-1.
+"""DEPRECATED. Superseded by the drivers listed in Supplementary Section S19.
 
 This script predates the current experiment set and produces no number in the
 manuscript or the supporting information. It is retained for provenance only,

@@ -85,7 +85,8 @@ SUPERSEDED = [
     (" 40 times the best", None, "same"),
     ("7.49", None, "old Smoke/MLP bound from an averaged pseudo-count; now 16.35"),
     ("26.71", None, "old Mixture/tree bound; now 64.51"),
-    ("ten of eleven", None, "eight of eleven hold worst-partition bounds at or below 3.3%"),
+    ("ten of eleven", None, "seven of ten hold worst-partition bounds at or below 3.3%"),
+    ("eight of eleven", None, "superseded: the ordinal objective is not a comparator"),
     ("Ten of eleven", None, "same"),
     ("pass a miss-rate screen", None, "no engineering acceptance threshold exists, so nothing passes"),
     ("between 27 and 29 points", None, "the early/late losses are 41.2, 37.9 and 29.5"),
@@ -117,7 +118,7 @@ if _rho_hits:
 # "effective sample size" is allowed exactly once, in the sentence that denies it
 N[0] += 1
 _ess = TXT.count("effective sample size") + SITXT.count("effective sample size")
-if _ess != 1 or "rather than an effective sample size" not in TXT:
+if _ess != 1 or "rather than an effective sample size" not in (TXT + SITXT):
     bad("A", f"'effective sample size' used {_ess}x; exactly one negating use is allowed")
 
 
@@ -127,8 +128,11 @@ if _ess != 1 or "rather than an effective sample size" not in TXT:
 # have caught the research-question table keeping "40 times" after the headline
 # ratio moved to 86.
 SUMMARY = section(TXT, "## Summary", ["## Introduction"])
-CONCL = section(TXT, "## Conclusions", ["## Nomenclature"])
-RQTABLE = TXT[:TXT.index("Table 6—Research questions")].rstrip().split("\n\n")[-1]
+# The nomenclature moved to the supporting information, so the Conclusions now end
+# at the Acknowledgments. Without this the section ran on into the reference list
+# and read DOI digits as quoted values.
+CONCL = section(TXT, "## Conclusions", ["## Acknowledgments", "## Nomenclature"])
+RQTABLE = TXT[:TXT.index("Table 3—Research questions")].rstrip().split("\n\n")[-1]
 BODY = TXT[TXT.index("## Results"):]
 
 NUM = re.compile(r"(?<![\w.])\d+(?:,\d{3})*(?:\.\d+)?(?![\w])")
@@ -169,9 +173,12 @@ MODEL_NAMES = ["Cost-weighted policy", "Unweighted network", "Multilayer percept
                "Gradient boosting", "Support-vector classifier", "Random forest",
                "Recurrent (LSTM)", "Conservative Q-learning", "k-nearest neighbors",
                "Shallow decision tree", "Ordinal cost objective"]
+# The ordinal cost objective is reported in the supporting information rather than
+# among the comparators, so the name has to appear somewhere in the submission, not
+# necessarily in the main text.
 for m in MODEL_NAMES:
     N[0] += 1
-    if TXT.count(m) < 1:
+    if (TXT + SITXT).count(m) < 1:
         bad("C", f"model name {m!r} never appears; a table may use a different spelling")
 
 # a quantity should not be given as a decimal and a percentage of the same value
@@ -221,7 +228,9 @@ for lbl in sorted(set(re.findall(r"^(Table S\d+|Fig\. S\d+)—", SITXT, re.M))):
 
 
 # ============================ E. notation ============================
-NOM = section(TXT, "## Nomenclature", ["## Acknowledgments"])
+# The nomenclature moved to the supporting information when the main text was cut
+# to the journal's length limit, so it is read from there.
+NOM = section(SITXT, "## S20 Nomenclature", ["## S21", "\n## "])
 sym_rows = re.findall(r"^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$", NOM, re.M)
 declared = [s.strip() for s, _ in sym_rows if s.strip() not in ("Symbol", "---", ":---")]
 rule("E", "the nomenclature has entries", len(declared) > 10, f"{len(declared)} rows")
@@ -310,7 +319,7 @@ rule("F", "no paragraph opens with a bare pronoun and no noun", not vague,
 COHERENCE = [
     ("the held-out-class miss counts", "507 of 7,905", [SUMMARY, RQTABLE, CONCL, BODY]),
     ("the escalation spread", "about 200", [SUMMARY, RQTABLE, CONCL, BODY]),
-    ("the count of models under the 3.3% line", "eight of eleven", [SUMMARY, CONCL, BODY]),
+    ("the count of models under the 3.3% line", "seven of ten", [SUMMARY, CONCL, BODY]),
     ("the protocol effect", "3.23", [SUMMARY, CONCL, BODY]),
     ("the in-distribution accuracy span", "4.43", [SUMMARY, CONCL, BODY]),
 ]

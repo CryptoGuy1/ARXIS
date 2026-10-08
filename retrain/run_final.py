@@ -219,7 +219,7 @@ def scale_with(df, sc, p1, p99):
 
 def exp_loco_all(ds):
     log("\n=== E11  leave-one-class-out, every comparator ===")
-    # Pre-submission plan item A1. The bound column of Table 10 is a per-partition
+    # Pre-submission plan item A1. The bound column of Table 6 is a per-partition
     # quantity, so it has to be computed from the integer miss count each partition
     # actually produced. Averaging the rate across seeds and rounding the product
     # back to a count is not the same thing, and where the seeds disagree it is

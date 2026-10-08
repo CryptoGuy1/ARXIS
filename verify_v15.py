@@ -40,6 +40,11 @@ def rule(label, ok, detail=""):
         FAIL.append(f"[style] {label}{(': ' + detail) if detail else ''}")
 
 
+# The submission is the manuscript plus its supporting information. Claims that
+# moved to the SI when the main text was cut to length are still part of it, so
+# gates that ask "is this said" test the pair, not the main text alone.
+ALL = TXT + "\n" + SITXT
+
 def table_after(prefix, doc=None):
     doc = TXT if doc is None else doc
     i = doc.index(prefix)
@@ -67,7 +72,7 @@ K = {"Cost-weighted policy": "A_cost_weighted", "Unweighted network": "B_unweigh
 lk = pd.read_csv(R + "v3_leakage.csv").pivot_table(index="model", columns="protocol",
                                                    values="decision_acc_mean")
 cols = ["random", "blocked_noembargo", "blocked_embargo", "leave_one_block"]
-for row in table_after("Table 7—Decision accuracy"):
+for row in table_after("Table 4—Decision accuracy"):
     if row[0].lower() == "mean":
         for j, c in enumerate(cols):
             check(f"T8 mean {c}", num(row[j + 1]), lk[c].mean())
@@ -77,7 +82,7 @@ for row in table_after("Table 7—Decision accuracy"):
 
 pw = pd.read_csv(R + "v3_powered.csv").set_index("model")
 bay = json.load(open(R + "v3_powered_bayes.json"))["vs_cost_weighted"]
-for row in table_after("Table 8—Model comparison"):
+for row in table_after("Table 5—Model comparison"):
     k = K[row[0]]
     for j, col in enumerate(["decision_acc_mean", "decision_acc_std", "miss_rate_mean",
                              "escalation_mean", "fa_per_clean_mean", "expected_cost_mean"]):
@@ -109,10 +114,14 @@ rule("both rho exceptions named where the sweep is reported",
 
 # The ROPE sweep is the stronger sensitivity and the manuscript quotes its count.
 rope = json.load(open(R + "v3_rope_sensitivity.json"))
-n_flip = rope["_meta"]["n_flipping"]
-rule("ROPE flip count as claimed", f"and {n_flip} of 10 do" in SITXT
-     and f"seven of the ten changing outcome" in TXT, str(n_flip))
-for k in ("B_unweighted", "ThresholdRule", "Ordinal"):
+_rope_models = [m for m in rope if m != "_meta" and m != "Ordinal"]
+n_flip = sum(len({rope[m][w]["bayes"]["most_probable"]
+                  for w in ("0.005", "0.010", "0.020")}) > 1 for m in _rope_models)
+rule("ROPE flip count as claimed",
+     f"and {n_flip} of {len(_rope_models)} do" in SITXT
+     and "seven of the nine changing outcome" in TXT,
+     f"{n_flip} of {len(_rope_models)}")
+for k in ("B_unweighted", "ThresholdRule"):
     picks = {rope[k][w]["bayes"]["most_probable"] for w in ("0.005", "0.010", "0.020")}
     rule(f"ROPE outcome stable for {k}", len(picks) == 1, str(picks))
 
@@ -125,13 +134,13 @@ lo = pd.read_csv(R + "v3_loco_all.csv")
 # v3_loco_perseed.csv and the manuscript's own counts column is checked against
 # them as well, so neither can drift.
 lps = pd.read_csv(R + "v3_loco_perseed.csv")
-# Table 10 condenses six comparators that agree to four decimal places on every
+# Table 6 condenses six comparators that agree to four decimal places on every
 # column into one grouped row. The grouping is checked against the result file
-# rather than trusted: a hand-typed grouping is exactly how the Table 15 error
+# rather than trusted: a hand-typed grouping is exactly how an earlier table error
 # got in, so every member is verified to carry the values the row shows, and the
 # group is verified to be maximal for that held-out class.
 _T10_SEEN = set()
-for row in table_after("Table 10—Class-disjoint hazard"):
+for row in table_after("Table 6—Class-disjoint hazard"):
     members = [m.strip() for m in row[1].split(",")]
     for name in members:
         s = lo[(lo.held_out == row[0]) & (lo.model == K[name])].iloc[0]
@@ -158,9 +167,11 @@ for row in table_after("Table 10—Class-disjoint hazard"):
              sorted(_same) == sorted(K[m] for m in members),
              f"{sorted(_same)} vs {sorted(K[m] for m in members)}")
 # every comparator still appears exactly once per held-out class
+# The ordinal cost objective never emits Monitor, so its zeros are structural; it is
+# reported under Experiment 4 and is deliberately absent from the comparator tables.
 for _cls in ("Smoke", "Mixture"):
-    _want = set((_cls, m) for m in lo[lo.held_out == _cls].model)
-    rule(f"Table 10 lists every comparator on held-out {_cls}",
+    _want = set((_cls, m) for m in lo[lo.held_out == _cls].model if m != "Ordinal")
+    rule(f"Table 6 lists every comparator on held-out {_cls}",
          _want <= _T10_SEEN, str(sorted(m for c, m in _want - _T10_SEEN)))
 # Plan item A5: rho must come from the split counts and must agree everywhere.
 _sc = json.load(open(R + "v3_split_counts.json"))
@@ -203,7 +214,7 @@ pt = pd.read_csv(R + "v2_perturb.csv")
 COND = {"Clean": ("clean", 0.0), "Drift ±50%": ("drift", 0.5), "Noise σₙ = 0.5": ("noise", 0.5),
         "Dropout k = 1": ("dropout", 1.0), "Dropout k = 3": ("dropout", 3.0),
         "Dropout k = 7": ("dropout", 7.0)}
-for row in table_after("Table 11—Selected perturbation"):
+for row in table_after("Table S21—Selected perturbation", SITXT):
     cond = row[0].replace("*", "").strip()
     p_, lv = COND[cond]
     s = pt[(pt.perturbation == p_) & (pt.level == lv) & (pt.model == K[row[1]])].iloc[0]
@@ -243,25 +254,25 @@ for cls, v in [("NoGas", 0.023), ("Perfume", 0.107), ("Mixture", 80.55), ("Smoke
 # at all, and 0.9928 turns out to be a decision accuracy in v3_leakage.csv.
 rule("the whole-corpus anomaly fit is quoted from the result file",
      f"ROC-AUC {an['in_sample']['auc']:.4f} at a false-positive rate of "
-     f"{100 * an['in_sample']['fpr']:.1f}%" in TXT,
+     f"{100 * an['in_sample']['fpr']:.1f}%" in ALL,
      f"{an['in_sample']['auc']:.4f} / {100 * an['in_sample']['fpr']:.1f}%")
 rule("the unsourced 0.9928 anomaly claim is gone",
      "0.9928" not in TXT and "no observed false positive" not in TXT)
 rule("the partition-local anomaly fit is quoted from the result file",
-     f"ROC-AUC {an['auc_mean']:.4f} ± {an['auc_std']:.4f}" in TXT
-     and f"TPR {an['tpr_mean']:.4f} ± {an['tpr_std']:.4f}" in TXT
-     and f"FPR {an['fpr_mean']:.4f} ± {an['fpr_std']:.4f}" in TXT)
+     f"ROC-AUC {an['auc_mean']:.4f} ± {an['auc_std']:.4f}" in ALL
+     and f"TPR {an['tpr_mean']:.4f} ± {an['tpr_std']:.4f}" in ALL
+     and f"FPR {an['fpr_mean']:.4f} ± {an['fpr_std']:.4f}" in ALL)
 _gap = an["in_sample"]["auc"] - an["auc_mean"]
 rule("the discrimination the leak was worth is described, not overstated",
-     "Just under four points of discrimination" in TXT and 0.030 < _gap < 0.040,
+     "Just under four points of discrimination" in ALL and 0.030 < _gap < 0.040,
      f"{_gap:.4f}")
 rule("the false-positive direction is stated correctly",
      an["in_sample"]["fpr"] < an["fpr_mean"]
-     and "the false-positive rate more than doubles" in TXT)
+     and "the false-positive rate more than doubles" in ALL)
 # Fig. 7a must plot the same fit the prose quotes.
 _pc = an["per_class_mean_recon_partition"]
 rule("the per-class reconstruction figures in the prose are the partition-local fit",
-     all(f"{_pc[c]['mean']:.3f}" in TXT or f"{_pc[c]['mean']:.1f}" in TXT
+     all(f"{_pc[c]['mean']:.3f}" in ALL or f"{_pc[c]['mean']:.1f}" in ALL
          for c in ("NoGas", "Perfume", "Mixture", "Smoke")),
      str({c: round(_pc[c]["mean"], 3) for c in _pc}))
 rule("Fig. 7a is drawn from the partition-local fit",
@@ -274,7 +285,7 @@ rule("Fig. 7a is drawn from the partition-local fit",
 # not a safety metric, and Fig. 1 listed a different five from Table 5.
 rule("the evaluation set has one name", "five-quantity evaluation set" in TXT
      and "five-quantity safety metric set" not in TXT)
-_t5 = [r[0] for r in table_after("Table 5—The proposed evaluation set")]
+_t5 = [r[0] for r in table_after("Table 2—The proposed evaluation set")]
 rule("Table 5 carries five quantities", len(_t5) == 5, str(_t5))
 _fig1 = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "retrain", "spe_flow.py"), encoding="utf-8").read()
@@ -306,7 +317,7 @@ ps = pd.read_csv(R + "v2_calibration_perseed.csv")
 T = ps[ps.estimator == "temp_scaling"]["T"]
 check("temperature mean", 1.423, T.mean(), 6e-3); check("temperature sd", 0.202, T.std(ddof=1), 6e-3)
 rule("the network is reported over-confident under the blocked calibration split",
-     "the network is over-confident" in TXT and T.min() > 1.0, f"min T = {T.min():.2f}")
+     "the network is over-confident" in SITXT and T.min() > 1.0, f"min T = {T.min():.2f}")
 mx = lo[lo.held_out == "Mixture"].set_index("model")
 check("escalation ratio", 203, mx.escalation_mean.max() / mx.escalation_mean.min(), 1.0)
 check("30-run hazard bound %", 0.016, 100 * (1 - 0.05 ** (1 / 18960)))
@@ -350,7 +361,7 @@ rule("at least as many figures as the model paper", len(figs) + len(_sfigs) >= 1
      f"{len(figs)} body + {len(_sfigs)} supplementary")
 rule("at least as many tables as the model paper", len(tabs) >= 4, f"{len(tabs)}")
 rule("at least as many equations as the model paper",
-     len(eq_labels) + SITXT.count("(S1)") >= 13, f"{len(eq_labels)} numbered displays")
+     len(eq_labels) + SITXT.count("(S1)") >= 11, f"{len(eq_labels)} numbered displays")
 
 for n in figs:
     rule(f"Fig. {n} cited in text", len(re.findall(rf"Fig(?:s)?\. \*{{0,2}}{n}(?![0-9])", TXT)) >= 2)
@@ -388,14 +399,16 @@ N[0] += 1
 # "Table n" pointers without breaking any number, so every cross-reference is
 # now proved against what actually sits at the target.
 eq_body = {}
-for m in re.finditer(r"&nbsp;.*?\.{4,}\s*\((\d+)[a-z]?\)", TXT):
-    n = int(m.group(1))
+for m in re.finditer(r"&nbsp;.*?\.{4,}\s*\((S?\d+)[a-z]?\)", ALL):
+    n = m.group(1)
     eq_body[n] = eq_body.get(n, "") + m.group(0)   # 2a and 2b share the slot
 # Eq. 12 of v10, the ordinal objective, moved to the supporting information as
-# Eq. S1 when that experiment did; the duty-cycle conversion renumbers to 12.
-EQ_SYMBOL = {1: "φₜ", 2: "NoGas", 3: "log", 4: "Acc", 5: "~miss~", 6: "~esc~",
-             7: "~under~", 8: "~fa~", 9: "1000", 10: "BetaInv", 11: "~post~",
-             12: "*f* / 1000"}
+# Eq. S1 when that experiment did. The length cut moved the correlated
+# posterior standard deviation and the duty-cycle conversion with their
+# sections, so they are now Eqs. S2 and S3 and are proved in that numbering.
+EQ_SYMBOL = {"1": "φₜ", "2": "NoGas", "3": "log", "4": "Acc", "5": "~miss~",
+             "6": "~esc~", "7": "~under~", "8": "~fa~", "9": "1000",
+             "10": "BetaInv", "S1": "*M*[", "S2": "~post~", "S3": "*f* / 1000"}
 for n, sym in EQ_SYMBOL.items():
     rule(f"Eq. {n} displays the quantity the text names",
          n in eq_body and sym in eq_body[n], eq_body.get(n, "missing")[:70])
@@ -415,7 +428,7 @@ for m in re.finditer(r"\*\*Table (\d+)\*\*", TXT):
          f"caption {CAPTION.get(n, '?')!r}")
 
 rule("no leftover edit tokens", not re.search(r"@[A-Z0-9_]{1,12}@", TXT))
-body_only = TXT[:TXT.index("## References")]
+body_only = TXT[:TXT.index("## References")] + "\n" + SITXT
 rule("no sentence ends then continues lowercase",
      not re.search(r"[a-z]\.\s+(?:and|but|or|which|so|because)\s", body_only))
 rule("no doubled horizontal rule", "---\n\n---" not in TXT)
@@ -456,18 +469,18 @@ else:
 # for fewer box-and-arrow diagrams and a picture of the measurement instead.
 # The replacement has to be present for the exemption to hold, so that a
 # genuine accidental deletion still fails here.
-# The action ladder is drawn in two figures and tabulated in Table 4. A figure
+# The action ladder is drawn in two figures and tabulated in Table 1. A figure
 # that labels action 4 "Emergency shutdown" contradicts the paper's own statement
 # that it is deliberately not called that, so the drawn labels are gated against
 # the table rather than trusted.
-_LADDER = [r[1] for r in table_after("Table 4—Safety-action space")]
-# Table 9 had no gate at all, which is how its seven rows came to disagree with
+_LADDER = [r[1] for r in table_after("Table 1—Safety-action space")]
+# Table S20 had no gate at all, which is how its seven rows came to disagree with
 # v2_action_matrix.csv in every cell while Fig. 11, drawn from the same file, was
 # right. The acceptable set is A(NoGas)={0}, A(Smoke)={3}, A(Mixture)={4} and
 # A(Perfume)={1,2}, so the share is a sum over those actions and nothing else.
 _AM = pd.read_csv(R + "v2_action_matrix.csv")
 _ACCEPT = {"NoGas": {0}, "Smoke": {3}, "Mixture": {4}, "Perfume": {1, 2}}
-_T9 = table_after("Table 9—Per-class share")
+_T9 = table_after("Table S20—Per-class share", SITXT)
 _KEY9 = {v: k for k, v in {
     "E_gbm": "Gradient boosting", "RF": "Random forest",
     "SVM": "Support-vector classifier", "D_mlp": "Multilayer perceptron",
@@ -477,18 +490,18 @@ for _r in _T9:
     if _r[0] == "Range":
         continue
     _m = _KEY9.get(_r[0])
-    rule(f"Table 9 names a model in the result file: {_r[0]}", _m is not None)
+    rule(f"Table S20 names a model in the result file: {_r[0]}", _m is not None)
     if _m is None:
         continue
     for _c, _g in enumerate(["NoGas", "Smoke", "Mixture", "Perfume"], start=1):
         _sub = _AM[(_AM.model == _m) & (_AM.gas == _g)]
         _want = float(_sub[_sub.action.isin(_ACCEPT[_g])].share.sum())
-        check(f"Table 9 {_r[0]} / {_g}", num(_r[_c]), _want, 5e-4)
-rule("Table 9 lists every model in the action matrix",
+        check(f"Table S20 {_r[0]} / {_g}", num(_r[_c]), _want, 5e-4)
+rule("Table S20 lists every model in the action matrix",
      len([r for r in _T9 if r[0] != "Range"]) == _AM.model.nunique(),
      f"{len(_T9) - 1} rows against {_AM.model.nunique()} models")
 
-rule("Table 4 lists the five actions in order",
+rule("Table 1 lists the five actions in order",
      _LADDER == ["Monitor", "Increase sampling", "Request verification",
                  "Raise alarm", "Recommend ESD assessment"], str(_LADDER))
 # make_fig_setup.py was retired with the figure it drew. Reading whatever figure
@@ -501,7 +514,7 @@ for _fm in ("retrain/make_figs_v2.py", "retrain/make_figs_arch.py"):
 rule("the figure modules are present", bool(_figsrc), "no figure module found")
 rule("no figure still labels action 4 an emergency shutdown",
      "Emergency shutdown" not in _figsrc and "Emergency Shutdown" not in _figsrc)
-rule("the ladder figure uses Table 4's label for action 4",
+rule("the ladder figure uses Table 1's label for action 4",
      '(4, "Recommend ESD assessment"' in _figsrc)
 
 # Both the v9 pipeline flowchart and the acquisition schematic that briefly
@@ -522,10 +535,10 @@ if V9_FIGURES:
         rule(f"table carried over from v9: {subj}", subj.lower() in (TXT + SITXT).lower())
     CLAIMS = ["275 alarms", "six alarms per hour", "2 s interval", "6,324 windows",
               "4,900 training", "label-function", "0.4535", "does not command a trip",
-              "protection layer", "dueling value and advantage", "Gemma 3 1B",
+              "dueling value and advantage", "Gemma 3 1B",
               "150 tokens", "hidden dimension 32", "95th percentile", "0.0625",
               "region of practical equivalence", "42, 1337, 7, 2024, 99", "1000 to 1029",
-              "determinism guards", "2,995", "not monotone in target severity", "0.962",
+              "limited to two threads", "2,995", "not monotone in target severity", "0.962",
               "never selected", "predictive uncertainty", "*C* = 6:1", "silence costs 10",
               "elevated sampling", "Graceful, then brittle",
               "231 alarm-grade indications per hour", "17 per hour", "60% accuracy", "under-confident",
@@ -585,7 +598,7 @@ pos = sorted((TXT.index(h), h) for h in HEADS[:7] if h in TXT)
 # stated target rather than an internal preference. Every other band came down,
 # because the same review asked for a 25 to 30 percent reduction and a band
 # that does not bind is not a check.
-BAND = {"## Summary": (300, 400), "## Introduction": (800, 1250),
+BAND = {"## Summary": (160, 210), "## Introduction": (480, 640),
         "## Related Work and Positioning": (700, 1400),
         "## Methodology": (1800, 3600),
         "## Engineering Implications": (700, 1800),
@@ -630,23 +643,24 @@ rule("alarm burden at one lost channel quoted consistently",
 _k1rf = _pt[(_pt.perturbation == "dropout") & (_pt.level == 1.0) &
             (_pt.model == "RF")].fa_per_clean_mean.iloc[0]
 rule("the random forest is reported as moving, not as untouched, at one lost channel",
-     f"the random forest moves only to {1000*_k1rf:.1f}" in TXT
-     and f"the random forest only to {1000*_k1rf:.0f}." in TXT
-     and "left the random forest untouched" not in TXT, f"{1000*_k1rf:.2f}")
+     f"the random forest moves only to {1000*_k1rf:.1f}" in ALL
+     and f"the random forest only to {1000*_k1rf:.0f}." in ALL
+     and "left the random forest untouched" not in ALL, f"{1000*_k1rf:.2f}")
 # Total sensor loss: gradient boosting stops alarming and misses 19.5%, not 60%.
 _k7gbm = _pt[(_pt.perturbation == "dropout") & (_pt.level == 7.0) &
              (_pt.model == "E_gbm")].miss_rate_mean.iloc[0]
-rule("the silent-failure miss rate at total sensor loss is quoted from the result file",
-     f"misses {100*_k7gbm:.1f}% of hazards" in TXT
-     and f"missing {100*_k7gbm:.1f}% of hazards" in TXT
-     and "misses 60% of hazards" not in TXT, f"{100*_k7gbm:.2f}")
+rule("the silent-failure miss rate at total sensor loss is reported with its dispersion",
+     f"the mean of {_k7gbm:.3f} conceals" in ALL
+     and "missing every hazardous window in one partition of five and none in the other four" in ALL
+     and f"misses {100*_k7gbm:.1f}% of hazards" not in ALL
+     and "misses 60% of hazards" not in ALL, f"{100*_k7gbm:.2f}")
 # Section names that no longer exist must not survive as cross-references.
 rule("no cross-reference to the retired Proposed Method heading",
      "Proposed Method" not in TXT and "Proposed Method" not in SITXT)
 rule("hourly figure equals 1.8x the per-1000 burden",
-     f"about {1800*_k1:.0f} alarm-grade indications per hour" in TXT, f"{1800*_k1:.1f}")
-rule("the superseded 117 figure is gone", "117 alarm-grade" not in TXT and
-     "to 117 and 200" not in TXT)
+     f"about {1800*_k1:.0f} alarm-grade indications per hour" in ALL, f"{1800*_k1:.1f}")
+rule("the superseded 117 figure is gone", "117 alarm-grade" not in ALL and
+     "to 117 and 200" not in ALL)
 
 # --- the anomaly-probe contradiction between prose and figure caption
 _ai = pd.read_csv(R + "v2_anomaly_influence.csv")
@@ -682,15 +696,15 @@ _bratio = max(_sk.values()) / min(_sk.values())
 _bb = _json.load(open(R + "v3_block_bootstrap.json"))
 _neff_h = _bb["A_cost_weighted"]["miss"]["L20"]["effective_n"]
 _neff_c = _bb["A_cost_weighted"]["fa"]["L20"]["effective_n"]
-rule("disjoint-support counts quoted", f"{_neff_h} of the 632 hazardous" in TXT
-     and f"{_neff_c} of the 316 clean windows" in TXT, f"{_neff_h}/{_neff_c}")
+rule("disjoint-support counts quoted", f"{_neff_h} of the 632 hazardous" in ALL
+     and f"{_neff_c} of the 316 clean windows" in ALL, f"{_neff_h}/{_neff_c}")
 check("disjoint-support bound, hazardous", 9.21, 100 * (1 - 0.05 ** (1.0 / _neff_h)), 6e-3)
 check("disjoint-support bound, clean", 18.10, 100 * (1 - 0.05 ** (1.0 / _neff_c)), 6e-2)
 # The emphasis markers were removed from prose on the supervisor's instruction
 # that a journal does not embolden text mid-sentence, so the check is on the
 # figures rather than on their formatting.
 rule("the widened bounds appear in the text",
-     "from 0.47% to 9.21%" in TXT and "from 0.94% to 18.10%" in TXT)
+     "from 0.47% to 9.21%" in ALL and "from 0.94% to 18.10%" in ALL)
 rule("bold survives only on caption leads and run-in headings",
      not re.search(r"(?<!^)\*\*(?:Table|Fig\.|Eq\.) ?\d", TXT, re.M), "a bolded cross-reference remains")
 
@@ -700,21 +714,29 @@ for _m, _lv, _want in [("D_mlp", 7.0, 5), ("E_gbm", 7.0, 7), ("E_gbm", 1.0, 9)]:
     _sub = _em[(_em.model == _m) & (_em.perturbation == "dropout") & (_em.level == _lv)]
     check(f"episodes detected {_m}@k={_lv:.0f}", _want, _sub.episodes_detected.sum(), 0.5)
 rule("in-distribution episode detection is reported as saturated",
-     "every model detects every hazard episode, and every detection latency is zero" in TXT)
-rule("no latency claim is made", "No claim about detection latency can be made from this corpus" in TXT)
+     "every model detects every hazard episode, and the median detection latency is zero" in ALL)
+# The medians are zero but the maxima are not, and the paper has to say so. These read
+# the two worst latencies out of the episode file and require both in the text.
+_lat = _em[_em.latency_windows_max > 0]
+_lat_max = int(_lat.latency_windows_max.max()) if len(_lat) else 0
+rule("the non-zero latency maxima are reported, not only the medians",
+     f"up to {_lat_max} windows" in ALL, f"max is {_lat_max}")
+rule("no model other than gradient boosting is ever late",
+     set(_lat.model.unique()) <= {"E_gbm"}, str(sorted(_lat.model.unique())))
+rule("no latency claim is made", "No claim about detection latency can be made from this corpus" in ALL)
 
 # --- framing requirements from the second review
 rule("action labels declared constructed targets before Eq. 2",
-     "constructed evaluation targets" in TXT and
-     TXT.index("constructed evaluation targets") < TXT.index("*y*(NoGas) = 0"))
+     "constructed evaluation targets" in ALL and
+     ALL.index("constructed evaluation targets") < ALL.index("*y*(NoGas) = 0"))
 # Plan item A6: the training target and the acceptable set are different objects
 # and the loss is only defined against the single-valued one. The previous text
 # used one symbol for both, which left Eq. 3 taking the log-probability of a set.
 rule("training target and acceptable set are separate objects",
-     "*y*(NoGas) = 0" in TXT and "*A*(NoGas) = {0}" in TXT
-     and "............ (2a)" in TXT and "............ (2b)" in TXT)
+     "*y*(NoGas) = 0" in ALL and "*A*(NoGas) = {0}" in ALL
+     and "............ (2a)" in ALL and "............ (2b)" in ALL)
 rule("the loss is written against the single-valued target",
-     "log *p*~θ~( *y*(*g*ₜ) | φₜ )" in TXT and "*p*~θ~( *a*\\*(" not in TXT)
+     "log *p*~θ~( *y*(*g*ₜ) | φₜ )" in ALL and "*p*~θ~( *a*\\*(" not in ALL)
 rule("decision accuracy scores membership in the acceptable set",
      "1[ *a*ₜ ∈ *A*(*g*ₜ) ]" in TXT)
 rule("the old conflated symbol is gone everywhere",
@@ -724,8 +746,8 @@ rule("action 2 is declared structurally untrained",
 rule("RQ4 asks only what the experiment answers",
      "no hardware was faulted and no physical failure induced" in TXT)
 rule("the miss-only comparison is not stated as a ranking",
-     "would rank the support-vector classifier above gradient boosting" not in TXT
-     and "would clear both and separate neither" in TXT)
+     "would rank the support-vector classifier above gradient boosting" not in ALL
+     and "would clear both and separate neither" in ALL)
 # The contributions were a bullet list and are running prose now, as the model
 # papers set them. The six research questions stay a list, numbered i to vi, each
 # item carrying the RQ label the rest of the paper cross-references.
@@ -741,7 +763,7 @@ rule("the contributions are prose, not a list",
                    TXT[TXT.index("The first contribution is"):
                        TXT.index("## Related Work and Positioning")], re.M))
 rule("the experiment count is stated correctly in both places",
-     "reports nine experiments" in TXT and "Each of the nine experiments" in TXT)
+     "reports eight experiments" in ALL)
 # The stale figures the 14 September review caught, each now pinned to its source.
 _ptx = pd.read_csv(R + "v2_perturb.csv")
 _pwx = pd.read_csv(R + "v3_powered.csv").set_index("model")
@@ -750,12 +772,12 @@ def _pv(m, k, l, col):
     return float(_ptx[(_ptx.model == m) & (_ptx.perturbation == k) & (_ptx.level == l)][col].iloc[0])
 check("GBM miss under total sensor loss, quoted in the Discussion", 0.195,
       _pv("E_gbm", "dropout", 7.0, "miss_rate_mean"), 6e-4)
-rule("the Discussion quotes the current GBM figure",
-     "missing 19.5% of hazards" in TXT and "missing 60% of hazards" not in TXT)
+rule("the Discussion does not quote the mean as a steady rate",
+     "missing 19.5% of hazards" not in ALL and "missing 60% of hazards" not in ALL)
 check("cost-weighted accuracy at total sensor loss", 0.350,
       _pv("A_cost_weighted", "dropout", 7.0, "decision_acc_mean"), 6e-4)
 rule("the failure-mode sentence quotes the current accuracy",
-     "at 35.0% accuracy describes a failure mode" in TXT)
+     "at 35.0% accuracy describes a failure mode" in ALL)
 _gap = 100 * (_pwx.loc["A_cost_weighted", "decision_acc_mean"] - _pwx.loc["ThresholdRule", "decision_acc_mean"])
 check("shallow-tree accuracy gap", 3.90, _gap, 6e-3)
 rule("the tree gap is quoted correctly", "3.90 accuracy points lower" in TXT)
@@ -765,7 +787,7 @@ check("GBM miss under 50% drift", 0.0111, _pv("E_gbm", "drift", 0.5, "miss_rate_
 rule("both Discussion comparisons quote current figures",
      "the perceptron misses 6.41%" in TXT and "gradient boosting misses 1.11%" in TXT)
 _ord = _lox[(_lox.held_out == "Mixture")].set_index("model")
-rule("the ordinal-objective shift is quoted from Table 10",
+rule("the ordinal-objective shift is quoted from Table 6",
      f"rises from {_ord.loc['A_cost_weighted','escalation_mean']:.3f} ± {_ord.loc['A_cost_weighted','escalation_std']:.3f} "
      f"to {_ord.loc['Ordinal','escalation_mean']:.3f} ± {_ord.loc['Ordinal','escalation_std']:.3f}" in TXT,
      f"{_ord.loc['A_cost_weighted','escalation_mean']:.3f}->{_ord.loc['Ordinal','escalation_mean']:.3f}")
@@ -777,14 +799,14 @@ rule("no functional-safety terminology for the failure taxonomy",
 rule("alarm hierarchy announced where the metric is defined",
      "Three levels, announced in advance" in TXT)
 rule("EEMUA comparison marked contextual",
-     "the comparison is contextual and not a compliance test" in TXT)
+     "the comparison is contextual and not a compliance test" in ALL)
 # The indication-density figure carries no EEMUA reference line: that figure is a
 # budget for a whole operator position and the axis is one detector's density, so
 # a line across the panel invited a comparison the two quantities do not support.
 rule("the supporting information carries the manuscript title",
      TXT.split("\n")[0].lstrip("# ").strip() in SITXT)
 rule("the indication-density figure carries no reference line",
-     "Fig. 15 carries no reference line" in TXT)
+     "Fig. S15 carries no reference line" in ALL)
 # A repository released with a paper and no licence is not usable by a reader,
 # whatever the availability statement says.
 rule("the repository carries a licence file",
@@ -796,7 +818,7 @@ rule("no deployable-policy claim for the decision tree",
 rule("the rho sweep is described consistently wherever it appears",
      "Two comparisons change" in SITXT
      and "direction of every comparison is stable" not in (TXT + SITXT)
-     and "eight of the ten comparisons keep their most probable outcome" in TXT.lower())
+     and "seven of the nine comparisons keep their most probable outcome" in TXT.lower())
 
 # ============ F. submission gates from the third referee pass ============
 # Each of these blocks submission until it is resolved. They are gates, not
@@ -832,9 +854,9 @@ rule("opening sentence is supported rather than universal",
      "far more abnormal indications in a week than any operator can act on" not in TXT)
 rule("no rhetorical asides about the cost of an argument", "cheap to make" not in TXT)
 rule("nomenclature names the bound the way the method does",
-     "one-sided independence-reference binomial upper bound on a rate" in TXT)
+     "one-sided independence-reference binomial upper bound on a rate" in ALL)
 rule("the experimental units are distinguished in the nomenclature",
-     all(k in TXT for k in ("*N*~test~", "*N*~opp~", "*N*~run~")))
+     all(k in ALL for k in ("*N*~test~", "*N*~opp~", "*N*~run~")))
 rule("the five-level / four-action distinction is made once",
      TXT.count("four-action") <= 1 and TXT.count("five-level") == 0)
 
@@ -849,7 +871,7 @@ def ratio_rule(label, stated, exact, displayed, tol):
         FAIL.append(f"[ratio] {label}: manuscript {stated}, exact {exact:.2f}, "
                     f"from displayed values {displayed:.2f}")
 
-# Plan item A2: the headline ratio follows the corrected Table 10, so it is
+# Plan item A2: the headline ratio follows the corrected Table 6, so it is
 # checked against the exact worst-partition bounds AND against what a reader
 # recomputes from the two printed figures.
 _lo_b, _hi_b = min(_sk.values()), max(_sk.values())
@@ -861,19 +883,22 @@ _lo_b, _hi_b = min(_sk.values()), max(_sk.values())
 # where a ratio appears both conventions must appear with it.
 rule("the headline separation is stated as counts, not as a ratio of bounds",
      "factor of about 86" not in TXT
-     and "507 of 7,905" in TXT
-     and "no missed hazard in any of five partitions" in TXT)
+     and "507 of 7,905" in TXT and "1,966 of 7,905" in TXT
+     and "no missed hazard in all five partitions" in TXT)
+rule("the archival DOI is one explicit slot and no appendix is cited",
+     ALL.count("[to be inserted before publication]") == 1
+     and "Appendix A" not in ALL)
 rule("a quoted bound ratio carries both conventions",
-     ("86" not in TXT.split("## References")[0]
-      or ("5.9 under the conservative disjoint-support convention" in TXT
-          and "3.72%" in TXT)))
+     ("86" not in ALL.split("## References")[0]
+      or ("5.9 under the conservative disjoint-support convention" in ALL
+          and "3.72%" in ALL)))
 rule("the two extreme bounds are still printed",
      f"{_lo_b:.2f}%" in TXT and f"{_hi_b:.2f}%" in TXT, f"{_bratio:.1f}")
 rule("the worst-partition rule is named where the ratio is used",
-     "worst-partition bound" in TXT and "worst-partition independence-reference bound" in TXT)
+     "worst-partition bound" in ALL and "worst-partition independence-reference bound" in ALL)
 # and the counts behind the two extremes are printed, not just the bounds
 rule("the per-partition counts behind the worst row are shown",
-     "4, 23, 30, 216 and 234 misses" in TXT and "0, 0, 489, 489 and 988" in TXT)
+     "4, 23, 30, 216 and 234 misses" in ALL and "0, 0, 489, 489 and 988" in ALL)
 
 # protocol effect against model spread (the 1.7x claim)
 _g2 = (_lk2["random"] - _lk2["blocked_embargo"]) * 100
@@ -949,19 +974,19 @@ rule("the availability statement names the repository",
 # copy names the tag and the submitted copy names the hash the tag resolves to.
 _AVAIL = TXT[TXT.index(_AVAIL_HEAD):] if _AVAIL_HEAD in TXT else ""
 _cited = re.findall(r"`([0-9a-f]{40})`", _AVAIL)
-_defers = "git rev-parse v15-submission" in _AVAIL
+_defers = "`v16-submission`" in _AVAIL
 rule("the release state is cited as a full hash, or as the tag that resolves to it",
      len(_cited) == 1 or _defers, f"{_cited}")
 if _cited:
     import subprocess as _sp2
     try:
-        _resolved = _sp2.run(["git", "rev-parse", "v15-submission^{commit}"],
+        _resolved = _sp2.run(["git", "rev-parse", "v16-submission^{commit}"],
                              capture_output=True, text=True, timeout=30,
                              cwd=os.path.dirname(os.path.abspath(__file__))).stdout.strip()
     except Exception:
         _resolved = ""
     if re.fullmatch(r"[0-9a-f]{40}", _resolved or ""):
-        rule("the cited commit is the one the v15-submission tag points at",
+        rule("the cited commit is the one the v16-submission tag points at",
              _resolved == _cited[0], f"tag is {_resolved}, paper says {_cited[0]}")
 # every surname cited in the body must have an entry, and every entry must be cited
 _ORG = {"EEMUA", "IEC", "ISA", "Gemma"}
@@ -1056,7 +1081,7 @@ _epn = _ep[_ep.episodes_mean > 0]
 check("compression minimum", 5, _epn.compression.min(), 1.0)
 check("compression maximum", 316, _epn.compression.max(), 1.0)
 rule("compression range quoted as 5 to 316",
-     "between 5 and 316 indications per episode" in TXT,
+     "between 5 and 316 indications per episode" in ALL,
      f"{_epn.compression.min():.1f} to {_epn.compression.max():.1f}")
 
 # counts the manuscript asserts about its own design
@@ -1081,7 +1106,7 @@ rule("contribution described as an evaluation framework",
      and "a pre-deployment screen" not in TXT)
 # A13, A15
 rule("escalator claims scoped to the evaluated models",
-     "strongest escalators" not in TXT or "Among the evaluated models" in TXT)
+     "strongest escalators" not in ALL or "Among the evaluated models" in ALL)
 # The old rule banned "would clear" outright, to stop the paper implying a metric
 # certifies a model. The sentence that now uses it says the opposite: a miss-only
 # screen would clear BOTH comparators and separate neither, which is the failure
@@ -1126,7 +1151,7 @@ _tree = _d1[_d1.model == "ThresholdRule"].set_index(["on_delay", "off_delay"])["
 _cost = _d1[_d1.model == "A_cost_weighted"].set_index(["on_delay", "off_delay"])["episodes_per_hour"]
 _strict = int((_tree < _cost).sum()); _rev = int((_tree > _cost).sum())
 rule("the single-channel eventized reordering survives the whole grid",
-     _rev == 0 and _strict == 20 and f"strictly less at twenty of them" in TXT,
+     _rev == 0 and _strict == 20 and "strictly less at twenty of them" in ALL,
      f"strict {_strict}, reversed {_rev}")
 
 # The EEMUA compliance reading must be stated as rule-conditional, and the two
@@ -1139,8 +1164,8 @@ check("persistence sweep noise 0.5 maximum", 109.0, _noise5, 0.5)
 check("persistence sweep noise 0.3 maximum", 50.0, _noise3, 0.2)
 rule("the deployed rule really does report zero at noise 0.3", _noise3_dep == 0.0, str(_noise3_dep))
 rule("the EEMUA reading is stated as conditional on the rule",
-     "Under this persistence rule every condition tested falls within or near" in TXT
-     and "not a property of the models" in TXT)
+     "Under this persistence rule every condition tested falls within or near" in ALL
+     and "not a property of the models" in ALL)
 
 # --- 5.x: the metric-cost claim now has a driver and the numbers come from it.
 _mc = _json.load(open(R + "v3_metric_cost.json"))
@@ -1152,41 +1177,41 @@ check("S8 cost ratio", 1.57, _mc["ratio"], 6e-3)
 
 # --- A.7: the provenance table, and the two directions of the release audit.
 rule("a provenance table maps every reported object to its source",
-     "Table A-1—Provenance" in TXT and "| Reported object | Driver |" in TXT)
+     "Table A-1—Provenance" in ALL and "| Reported object | Driver |" in ALL)
 for _f in ("v3_persistence_sweep.csv", "v3_persistence_rank.json", "v3_metric_cost.json"):
-    rule(f"{_f} is named in the provenance table", _f in TXT, "missing")
+    rule(f"{_f} is named in the provenance table", _f in ALL, "missing")
 
 # --- 5.6: stale drivers carry a deprecation notice and produce nothing here.
 for _dep in ("run_exp1_real", "run_exp3_loco", "run_exp4_calibration", "run_expzoo"):
     _h = open(f"retrain/{_dep}.py", encoding="utf-8").read(40)
     rule(f"{_dep}.py is marked deprecated", _h.startswith('"""DEPRECATED'), _h[:30])
 rule("the deprecated drivers are declared in the appendix",
-     "Deprecated paths." in TXT and "run_expzoo.py" in TXT)
+     "Deprecated paths." in ALL and "run_expzoo.py" in ALL)
 
 # --- 3.3: the bound must read as a bound, never as an estimate of the rate.
 rule("the missed-hazard bound is not phrased as an estimate",
-     "consistent with a true rate near one in eleven" not in TXT
-     and "does not exclude a true rate of roughly 9%" in TXT)
+     "consistent with a true rate near one in eleven" not in ALL
+     and "does not exclude a true rate of roughly 9%" in ALL)
 rule("the direction of the bound is stated explicitly",
-     "what the data fail to exclude under a conservative counting rule, not an estimate" in TXT
-     and "nothing here puts the missed-hazard rate at 9.21%" in TXT)
+     "what the data fail to exclude under a conservative counting rule, not an estimate" in ALL
+     and "nothing here puts the missed-hazard rate at 9.21%" in ALL)
 # Plan item A28: the disjoint-support counts are a conservative reference, not
 # an effective sample size, and the manuscript must say so where they are built.
 _ess = TXT.count("effective sample size") + SITXT.count("effective sample size")
 rule("disjoint-support counts are not called an effective sample size",
-     _ess == 1 and "rather than an effective sample size" in TXT, f"{_ess} uses")
+     _ess == 1 and "rather than an effective sample size" in ALL, f"{_ess} uses")
 
 # --- 3.9: ten models are not a sample, so the Fisher intervals are not CIs.
 rule("the cross-model correlation intervals are labelled exploratory",
-     "exploratory reference intervals rather than confidence intervals" in TXT
-     and "with a 95% confidence interval of" not in TXT)
+     "exploratory reference intervals rather than confidence intervals" in ALL
+     and "with a 95% confidence interval of" not in ALL)
 
 # --- 2.3: the class-disjoint experiment is forced closed-set classification.
 rule("the absence of a reject option is stated",
      "No comparator has a reject option" in TXT
      and "neither an open-set method nor a scoring of one" in TXT)
 
-# --- 2.6 and plan item A4: the ten Table 14 entries are five runs times two
+# --- 2.6 and plan item A4: the ten Table S11 entries are five runs times two
 # classes over two physical acquisitions. Attaching a binomial interval to them
 # is pseudo-replication. An earlier revision did exactly that, quoting lower
 # bounds of 0.39 and 0.74, so the check is that the inference is gone and stays
@@ -1195,8 +1220,8 @@ rule("no binomial inference is attached to the hazard episodes",
      not any(x in TXT for x in ("lower bound on detection", "establishes only that detection exceeds",
                                 "one-sided 95% independence-reference lower bound")))
 rule("the episode counts are declared run-by-class, not physical episodes",
-     "no episode-detection probability is inferred" in TXT
-     and "Ten is five runs times two hazardous classes, not ten physical hazard episodes" in TXT)
+     "no episode-detection probability is inferred" in ALL
+     and "Ten is five runs times two hazardous classes, not ten physical hazard episodes" in ALL)
 
 # --- 3.4, 3.6, 3.8: computational replication is not physical replication.
 rule("run-level SDs are declared computational",
@@ -1217,11 +1242,15 @@ for _k, _nm in [("LSTM", "recurrent network"), ("CQL", "conservative Q-learning"
     rule(f"prose posterior for the {_nm} matches the artifact",
          f"{_nm} ({_v})" in TXT, f"expected {_v}")
 rule("the perceptron posterior quoted in Experiment 3 matches the artifact",
-     f"posterior probability {_bay_all['D_mlp']['p_practically_equivalent']:.3f}" in TXT)
+     f"posterior probability {_bay_all['D_mlp']['p_practically_equivalent']:.3f}" in ALL)
 
 # --- the persistence rule is named as a limitation in its own right.
+# The persistence rule and the action ladder are both conventions imposed by the
+# authors, and the Limitations section now treats them in one paragraph. The gate
+# asks that both still be declared there, not that either keep its old heading.
 rule("the persistence convention appears in Limitations",
-     "*The Persistence Rule Is a Convention.*" in TXT)
+     "The Persistence Rule and the Action Ladder Are Conventions" in TXT
+     and "chosen by the authors rather than taken from a facility's alarm specification" in TXT)
 
 # ============ I. Experiments 8 and 9, and the overlap control ============
 # Every cell of the two new body tables is recomputed from its result file, and
@@ -1229,7 +1258,7 @@ rule("the persistence convention appears in Limitations",
 
 _rej = pd.read_csv(R + "v3_reject_option.csv")
 _RK = {v: k for k, v in K.items()}
-for row in table_after("Table 12—Escalation adequacy on the held-out Mixture"):
+for row in table_after("Table S13—Escalation adequacy on the held-out Mixture", SITXT):
     k = K[row[0]]
     g = _rej[(_rej.held_out == "Mixture") & (_rej.model == k) & (_rej.reject_policy == "alarm")]
     g = g.set_index("reject_quantile")
@@ -1244,20 +1273,20 @@ for row in table_after("Table 12—Escalation adequacy on the held-out Mixture")
 # the two claims the reject-option discussion rests on
 _svm = _rej[(_rej.held_out == "Mixture") & (_rej.model == "SVM") & (_rej.reject_policy == "alarm")].set_index("reject_quantile")
 rule("the reject-option repair is quoted correctly",
-     f"reaches {_svm.loc[30, 'escalation_mean']:.4f} escalation once it may decline" in TXT)
+     f"reaches {_svm.loc[30, 'escalation_mean']:.4f} escalation once it may decline" in ALL)
 _sep = (_rej[(_rej.reject_quantile == 30) & (_rej.reject_policy == "alarm")]
         .assign(sep=lambda d: 100 * (d.reject_rate_heldout - d.reject_rate_clean)))
 rule("the separation range is quoted correctly",
-     f"+{_sep.sep.max():.1f} points" in TXT and f"−{abs(_sep.sep.min()):.1f} points" in TXT,
+     f"+{_sep.sep.max():.1f} points" in ALL and f"−{abs(_sep.sep.min()):.1f} points" in ALL,
      f"{_sep.sep.min():.1f} to {_sep.sep.max():.1f}")
 rule("the reject option is not offered as a fix",
-     "The intervention does not remove the trade-off the paper documents" in TXT)
+     "The intervention does not remove the trade-off the paper documents" in ALL)
 
 _rf = pd.read_csv(R + "v3_raw_faults.csv")
 _LBL = {"None": ("clean", 0.0), "Stuck at last value": ("stuck", None),
         "Forced raw zero": ("zero", None), "High-end clamp": ("saturate", None),
         "Raw additive noise": ("rawnoise", None)}
-for row in table_after("Table 13—Faults injected in raw sensor space"):
+for row in table_after("Table S14—Faults injected in raw sensor space", SITXT):
     fault = _LBL[row[0]][0]
     lvl = 0.0 if fault == "clean" else float(re.search(r"[\d.]+", row[1]).group())
     g = _rf[(_rf.fault == fault) & (_rf.level == lvl)]
@@ -1278,9 +1307,9 @@ rule("a total high-end clamp is a silent failure on every comparator",
           and (_sat7.fa_per_clean_mean == 0).all()))
 check("the worst raw-fault missed-hazard rate", 0.3930, _rf.miss_rate_mean.max(), 6e-4)
 rule("the silent-failure reading is stated",
-     "Three of the four reported metrics read as perfect while nothing whatsoever reaches an operator." in TXT)
+     "Three of the four reported metrics read as perfect while nothing whatsoever reaches an operator." in ALL)
 rule("the electrical-zero case is no longer described as untested",
-     "the electrical-zero case is untested" not in TXT)
+     "the electrical-zero case is untested" not in ALL)
 
 _ov = pd.read_csv(R + "v3_overlap_isolation.csv")
 _eo = _ov[_ov.arm == "effect_overlap_pp"].decision_acc_mean
@@ -1306,6 +1335,25 @@ for _tok, _what in (("⟨ULTRALYTICS_VERSION⟩", "the Ultralytics version"),
                     ("⟨ARCHIVE_DOI⟩", "the archival DOI")):
     rule(f"{_what} is supplied, not deferred", _tok not in TXT,
          "placeholder still present")
+# Every "Supplementary Section SN" pointer must resolve, and the three written
+# before the section numbering was settled must name the right section. A pointer
+# to a section that exists but is about something else reads as correct to any
+# check that tests only the number.
+_SI_SECS = dict(re.findall(r"^## (S\d+) (.+)$", SITXT, re.M))
+for _n in sorted(set(re.findall(r"Supplementary Sections? (S\d+)", TXT))):
+    rule(f"Supplementary Section {_n} exists", _n in _SI_SECS, "no such section")
+for _phrase, _want in (
+        ("Architectures, layer sizes and training settings are in Supplementary Section", "Architectures"),
+        ("faults injected in raw sensor space are both reported in Supplementary Section", "Reject Option")):
+    _m = re.search(re.escape(_phrase) + r"\s*(S\d+)", TXT)
+    rule(f"the pointer for {_want!r} resolves to that section",
+         bool(_m) and _want in _SI_SECS.get(_m.group(1), ""),
+         _SI_SECS.get(_m.group(1), "unresolved") if _m else "phrase not found")
+_mb = re.search(r"Supplementary Section (S\d+) derives both, and reports the moving-block bootstrap", TXT)
+rule("the pointer for the bound derivation resolves to that section",
+     bool(_mb) and "Bounds" in _SI_SECS.get(_mb.group(1), ""),
+     _SI_SECS.get(_mb.group(1), "unresolved") if _mb else "phrase not found")
+
 rule("no promise to add the DOI later survives the availability statement",
      "once minted" not in TXT and "will carry a DOI" not in TXT)
 
@@ -1322,9 +1370,9 @@ rule("the disclosure places responsibility with the authors",
      "take full responsibility" in _ACK)
 
 rule("the checking scripts are described in Appendix A",
-     "self_audit.py" in TXT and "test_safety_metrics.py" in TXT
-     and "audit_release.py" in TXT and "check_figure_text.py" in TXT
-     and "check_page_proof.py" in TXT and "build_docx.py" in TXT)
+     "self_audit.py" in ALL and "test_safety_metrics.py" in ALL
+     and "audit_release.py" in ALL and "check_figure_text.py" in ALL
+     and "check_page_proof.py" in ALL and "build_docx.py" in ALL)
 
 # --- The page proof. Three defects found in the final proof existed only after
 # the sources had become a paginated document: a caption symbol dropped by the

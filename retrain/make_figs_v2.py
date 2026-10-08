@@ -21,7 +21,8 @@ FIG = os.path.join(ROOT, "figures_v2")
 os.makedirs(FIG, exist_ok=True)
 
 BLUE, ORANGE, GREEN, PURPLE, OLIVE = "#2f6f9f", "#c8642f", "#1f8f5f", "#8f4f9f", "#8a7a1a"
-CAT = [BLUE, ORANGE, GREEN, PURPLE, OLIVE]
+ROSE = "#a8325f"
+CAT = [BLUE, ORANGE, GREEN, PURPLE, OLIVE, ROSE]
 SURFACE = "#fcfcfb"
 INK, INK2, MUTED = "#1a1a1a", "#4a4a4a", "#8a8a8a"
 
@@ -161,7 +162,7 @@ def fig_loco():
                handlelength=1.4, columnspacing=1.4)
     fig.tight_layout(rect=(0, 0.115, 1, 0.945), h_pad=1.2)
     note(fig, "Bars drawn at the floor of panel (a) are exactly zero. "
-              "Ten of eleven models bound their missed-hazard rate on unseen Mixture at or below 3.3%, "
+              "Seven of ten models bound their missed-hazard rate on a held-out Mixture class at or below 3.3%, "
               "yet escalate between 0.5% and 100% of the same windows.", y=0.095)
     fig.savefig(os.path.join(FIG, "fig_loco.png"), dpi=600)
     plt.close(fig)
@@ -250,8 +251,8 @@ def fig_perturb():
     metrics = [("decision_acc_mean", "Decision\naccuracy"),
                ("escalation_mean", "Escalation\nadequacy"),
                ("fa_per_clean_mean", "High-severity\nfalse-alarm rate")]
-    models = [m for m in ["A_cost_weighted", "D_mlp", "E_gbm", "RF", "ThresholdRule"]
-              if m in set(df.model)]          # 5 series: hues assigned, never cycled
+    models = [m for m in ["A_cost_weighted", "B_unweighted", "D_mlp", "E_gbm", "RF", "ThresholdRule"]
+              if m in set(df.model)]          # 6 series: hues assigned, never cycled
     fig, axes = plt.subplots(3, 3, figsize=(6.90, 6.04), sharex="col")
     for r, (mk, mlabel) in enumerate(metrics):
         for c, (kind, klabel) in enumerate(kinds):
@@ -270,15 +271,19 @@ def fig_perturb():
                 ax.set_xlabel(klabel, fontsize=9.8, labelpad=2.0)
             if c == 0:
                 ax.set_ylabel(mlabel, labelpad=2.0, linespacing=1.25)
-    axes[2, 1].text(0.5, 0.62, "peak false-alarm rate\nunder drift is 0.06%",
+    _peak = df[df.perturbation == "drift"].fa_per_clean_mean.max()
+    axes[2, 1].text(0.5, 0.62, f"peak false-alarm rate\nunder drift is {_peak * 100:.2f}%",
                     transform=axes[2, 1].transAxes, ha="center", fontsize=9.5,
                     color=MUTED, style="italic", linespacing=1.3)
     h, l = axes[0, 0].get_legend_handles_labels()
-    fig.legend(h, l, ncol=5, loc="upper center", bbox_to_anchor=(0.5, 0.985),
-               fontsize=10.2, columnspacing=1.5, handlelength=1.6)
+    # Six series now, so the legend is given its own band and the panels are
+    # pushed down to clear it; at ncol=5 the sixth entry wrapped onto the
+    # panel row and landed on the (a) label.
+    fig.legend(h, l, ncol=6, loc="upper center", bbox_to_anchor=(0.5, 0.995),
+               fontsize=9.2, columnspacing=0.9, handlelength=1.3)
     # figure title removed: journals carry the statement in the caption
     # A right margin: the widest column label runs past the last panel.
-    fig.tight_layout(rect=(0, 0, 0.995, 0.945), h_pad=1.1, w_pad=2.2)
+    fig.tight_layout(rect=(0, 0, 0.995, 0.925), h_pad=1.1, w_pad=2.2)
     fig.savefig(os.path.join(FIG, "fig_perturb.png"), dpi=600)
     plt.close(fig)
     print("wrote fig_perturb.png")
@@ -409,7 +414,7 @@ def fig_protocol():
 
 def fig_dissociation():
     """In-distribution accuracy against out-of-distribution safety."""
-    # In-distribution accuracy is the 30-run figure reported in Table 6, so the
+    # In-distribution accuracy is the 30-run figure reported in Table 5, so the
     # scatter matches the table a reader is comparing it against. The ordinal
     # cost objective is left out: it was built to trade accuracy for escalation,
     # so including it would answer the question by construction.
@@ -550,7 +555,7 @@ def fig_disposition():
 def fig_alarmburden():
     """False-alarm rate expressed as alarms per hour per detector."""
     p = pd.read_csv(os.path.join(RES, "v2_perturb.csv"))
-    models = [m for m in ["A_cost_weighted", "D_mlp", "E_gbm", "RF", "ThresholdRule"] if m in set(p.model)]
+    models = [m for m in ["A_cost_weighted", "B_unweighted", "D_mlp", "E_gbm", "RF", "ThresholdRule"] if m in set(p.model)]
     fig, ax = plt.subplots(figsize=(6.90, 3.54))
     for i, m in enumerate(models):
         sub = p[(p.model == m) & (p.perturbation.isin(["dropout", "clean"]))].sort_values("level")
@@ -883,7 +888,10 @@ def fig_leakage():
                error_kw=dict(ecolor=INK2, elinewidth=0.8, capsize=1.8), label=PROTO_LABEL[pr].replace("\n", " "))
     ax.set_xticks(np.arange(len(models)))
     ax.set_xticklabels([PRETTY[m] for m in models], rotation=26, ha="right")
-    ax.set_ylim(0.55, 1.05); ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+    # The floor is read from the data so that no bar can fall below the axis and
+    # disappear, as the random forest at 0.5409 did under a hard-coded 0.55.
+    _floor = min(0.50, float(np.nanmin(piv.values)) - 0.04)
+    ax.set_ylim(_floor, 1.05); ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_ylabel("Decision accuracy")
     ax.set_title("(a)", loc="left")
     ax.grid(axis="y", zorder=0)
@@ -1204,9 +1212,13 @@ def fig_metricdisagreement():
               best(pw, "escalation_mean", True), best(pw, "fa_per_clean_mean", False)])]
     for cls in ("Smoke", "Mixture"):
         s = lo[lo.held_out == cls].set_index("model").drop(index="Ordinal", errors="ignore")
-        acc = pw.reindex(s.index).decision_acc_mean.dropna()
-        rows.append((f"Unseen {cls}",
-                     [(PRETTY[acc.idxmax()], [acc.idxmax()]), best(s, "miss_rate_mean", False),
+        # Decision accuracy is not defined on a class withheld from training: the
+        # target action cannot be produced by a model that never saw the class, so
+        # accuracy is zero by construction for every model. Naming a winner here
+        # would be reading a ranking out of in-distribution accuracy, which is the
+        # error this very figure exists to expose. The cell is left unfilled.
+        rows.append((f"Held-out {cls}",
+                     [(None, []), best(s, "miss_rate_mean", False),
                       best(s, "escalation_mean", True), (None, [])]))
     for cond, lv, name in (("drift", 0.5, "Drift ±50%"), ("dropout", 1.0, "Dropout k = 1"),
                            ("dropout", 7.0, "Dropout k = 7")):

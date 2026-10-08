@@ -22,19 +22,19 @@ FIGS := figures_v2
 
 ## ---------------------------------------------------------------- experiments
 
-# Table 11; Figs. 14 and 16; the in-distribution comparator set; Tables S2 and S6
+# the five-seed comparator grid: the in-distribution set, Table S2, Table S6, Fig. 6
 comparison:
 	$(PY) -m retrain.run_all_v2
 
-# Table 10; Figs. 11 to 13
+# Table 6 and Fig. 5
 classdisjoint: comparison
 	$(PY) -m retrain.run_loco_v3
 
-# Table 7; Fig. 8
+# Table 4 and Fig. 3
 leakage: comparison
 	$(PY) -m retrain.run_leakage
 
-# Table 9; Fig. 10; Table S3 and Fig. S3; the ROC curves
+# Table S3, Fig. S3, the action matrix of Table S20, and the ROC curves of Fig. S6
 calibration: comparison
 	$(PY) -m retrain.run_calib_actions_v2
 
@@ -42,11 +42,11 @@ calibration: comparison
 anomaly: comparison
 	$(PY) -m retrain.run_anomaly_influence
 
-# Table 14 (eventized alarm burden)
+# Tables S11 and S15 (eventized alarm burden)
 episodes: comparison
 	$(PY) -m retrain.run_alarm_episodes
 
-# Table 15 (episode-level hazard metrics and detection latency)
+# Tables S12 and S16 (episode-level hazard metrics and detection latency)
 hazardepisodes: comparison
 	$(PY) -m retrain.run_episode_metrics
 
@@ -55,7 +55,7 @@ hazardepisodes: comparison
 blockboot: comparison
 	$(PY) -m retrain.run_block_bootstrap
 
-# Table 8 and Fig. 9; the 30-run protocol and the equivalence test
+# Table 5 and Fig. 4; the 30-run protocol and the equivalence test
 final: comparison
 	$(PY) -m retrain.run_final
 
@@ -75,7 +75,7 @@ bounds: comparison classdisjoint final
 bootstrap: final
 	$(PY) retrain/run_paired_bootstrap.py
 
-# Fig. 7: per-class reconstruction error under the partition-local anomaly path
+# Fig. S10: per-class reconstruction error under the partition-local anomaly path
 anomalyclass: comparison
 	$(PY) -m retrain.run_anomaly_by_class
 
@@ -83,7 +83,7 @@ anomalyclass: comparison
 metriccost: comparison
 	$(PY) -m retrain.run_metric_cost
 
-# the correlation term of Eq. 11, read from the partition rather than hard-coded
+# the correlation term of Eq. S2, read from the partition rather than hard-coded
 splitcounts:
 	$(PY) -m retrain.run_split_counts
 
@@ -91,11 +91,11 @@ splitcounts:
 bayes: splitcounts
 	$(PY) -m retrain.run_bayes_recompute
 
-# Table 12 and Table S9: what a confidence-threshold reject option buys and costs
+# Tables S9 and S13: what a confidence-threshold reject option buys and costs
 reject: comparison
 	$(PY) -m retrain.run_reject_option
 
-# Table 13 and Table S10: faults injected in raw sensor space, anomaly recomputed
+# Tables S10 and S14: faults injected in raw sensor space, anomaly recomputed
 rawfaults: comparison
 	$(PY) -m retrain.run_raw_faults
 
@@ -107,6 +107,9 @@ overlap: comparison
 # action vocabulary: both raised in review, both answered by counting
 weighting: comparison
 	$(PY) -m retrain.run_weighting_probe
+# Supplementary Section S27: the nonhazardous alarm rate over NoGas and Perfume
+nonhazard: calibration
+	$(PY) -m retrain.run_nonhazard_alarm
 
 # Table S7: does the eventized result depend on the persistence rule?
 persistence: comparison
@@ -114,7 +117,7 @@ persistence: comparison
 
 ## ------------------------------------------------------------------- products
 
-# Figs. 1 to 16, and Figs. S1 to S6 in the supporting information
+# Figs. 1 to 6 and Figs. S1 to S6, S11 to S16; Figs. S7 to S9 come from make_figs_arch
 figures: comparison classdisjoint leakage calibration anomaly final
 	$(PY) -m retrain.make_figs_v2
 	$(PY) -m retrain.make_figs_arch
@@ -153,7 +156,7 @@ manifest:
 
 all: comparison classdisjoint leakage calibration anomaly episodes hazardepisodes \
      blockboot anomalyclass metriccost persistence reject rawfaults overlap \
-     final splitcounts bayes rho rope bounds bootstrap weighting \
+     final splitcounts bayes rho rope bounds bootstrap weighting nonhazard \
      figures manifest check
 
 ## ----------------------------------------------------------------- housekeeping

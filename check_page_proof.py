@@ -36,8 +36,13 @@ SI = os.path.join(ROOT, "ARXIS_Supporting_Information.md")
 
 FIG_IN = 6.50
 EMU_PER_IN = 914400
-N_FIGS = 16
-N_TABLES = 16
+# Counts follow the sources rather than being pinned here, so that moving an
+# object between the manuscript and the supporting information cannot leave
+# this check asserting a layout the documents no longer have.
+import re as _re
+_MS = open('ARXIS_Manuscript_v15_SPE.md', encoding='utf-8').read()
+N_FIGS = len(_re.findall(r'^Fig\. \d+—', _MS, _re.M))
+N_TABLES = len(_re.findall(r'^Table \d+—', _MS, _re.M))
 
 # Tokens the PDF text layer joins from a base and a subscript, so they are not in
 # the source as one word. They are not broken words.

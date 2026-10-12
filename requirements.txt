@@ -17,7 +17,8 @@ torch==2.14.0
 torchvision==0.29.0
 # ultralytics is not used by the sensor results (see requirements.lock). It is
 # needed only for the thermal perception classifier, which is not reproduced here.
-ultralytics==8.4.136
+# 8.4.14 is the version recorded in the trained checkpoint.
+ultralytics==8.4.14
 opencv-python==5.0.0.93
 pillow==12.3.0
 

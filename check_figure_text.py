@@ -229,7 +229,15 @@ def run(only=None):
     original = mfig.Figure.savefig
     state = {"name": None}
 
+    # The drivers save into figures_v2/. This check only audits the drawn text,
+    # so every file is written to a scratch directory and the released figures
+    # are left byte-for-byte as committed.
+    import tempfile
+    scratch = tempfile.mkdtemp(prefix="figtext_")
+
     def patched(self, fname, *a, **k):
+        if isinstance(fname, (str, os.PathLike)):
+            fname = os.path.join(scratch, os.path.basename(os.fspath(fname)))
         out = original(self, fname, *a, **k)
         try:
             audit(self, state["name"] or os.path.basename(str(fname)))

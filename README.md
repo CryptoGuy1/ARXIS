@@ -5,11 +5,11 @@
 > The manuscript *A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under
 > Class Exclusion and Sensor Degradation* is prepared for *SPE Journal*, Data Science and
 > Engineering Analytics. The exact state that produced its numbers is the tag
-> `v16-submission`.
+> `v17-submission`.
 >
 > ```bash
-> git checkout v16-submission
-> git rev-parse v16-submission^{commit}   # the commit the tag names
+> git checkout v17-submission
+> git rev-parse v17-submission^{commit}   # the commit the tag names
 > pip install -r requirements.lock
 > make check                          # every check the paper claims, in one command
 > make all                            # regenerate every reported object from the corpus
@@ -193,7 +193,7 @@ Nweke, B. C., Ramezan, G., and Saraji, S. A Safety-Oriented Benchmark for Learne
 **History.** The commit history of this repository was consolidated on 24 September 2026. Earlier commits are no longer reachable from `main`; the commits after that consolidation are the only ones on `main`.
 
 **Archived release.** The version of this repository that produced the reported
-numbers is tagged `v16-submission`. A Zenodo deposit of that tag carries the DOI; the
+numbers is tagged `v17-submission`. A Zenodo deposit of that tag carries the DOI; the
 DOI is minted at deposit time and is recorded here and in the manuscript's Data and
 Code Availability statement once it exists. Until then the tag is the citable object,
 and a reviewer reproducing the paper should check out the tag rather than the tip of

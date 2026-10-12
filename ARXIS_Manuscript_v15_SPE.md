@@ -383,7 +383,7 @@ One scope statement belongs at the end, where over-reading is likeliest. This is
 
 This work was supported by the Subsurface Energy and Digital Innovation Center at the University of Wyoming. The MultimodalGasData corpus is used under CC BY 4.0, and we thank Narkhede et al. for placing it in the public domain.
 
-*Use of artificial intelligence.* A generative AI assistant (Anthropic Claude) was used in preparing this work: to draft and edit manuscript text, to write the figure-drawing and verification scripts released with it, and to review the manuscript against its own result files. It was not used to generate data, results or references. Every number reported here is produced by the released code from the released result files and is re-checked by `verify_v15.py`, and every cited source was checked against the publisher's record. The authors directed the work, verified the output and take full responsibility for the content.
+*Use of artificial intelligence.* A generative AI assistant (Anthropic Claude) was used in preparing this work: to draft and edit manuscript text, to write the figure-drawing and verification scripts released with it, and to review the manuscript against its own result files. It was not used to generate data, results or references. Every number reported here is produced by the released code from the released result files and is re-checked by `verify_v15.py`, and bibliographic details were checked against publisher and DOI records where those could be accessed. The authors directed the work, verified the output and take full responsibility for the content.
 
 ## Author Contributions
 
@@ -395,7 +395,7 @@ The authors declare no known competing financial interests or personal relations
 
 ## Data and Code Availability
 
-The MultimodalGasData corpus is publicly available (Narkhede et al. 2022) under CC BY 4.0. Every artifact needed to reproduce the paper is released together, namely the experiment drivers, the pipeline and safety-metric modules, the additional baselines, and the result files behind every table and figure in the manuscript and the supporting information. The release also carries a `Makefile`, a run manifest, and `verify_v15.py`, which re-checks every quoted value against the stored results. No trained comparator is archived: every model is refitted inside each run under the seeds listed in Supplementary Section S19. The autoencoder used by the anomaly path is in the repository tree; the thermal classifier's weights are not, and no reported number depends on them. The repository is at https://github.com/CryptoGuy1/ARXIS. The state that produced the numbers reported here is the tag `v16-submission`, and that tag, rather than the tip of the default branch, reproduces the paper. An archival deposit of that tag is pending. Archival DOI: [to be inserted before publication]. Until the deposit is made, the tagged commit is the citable snapshot. Supplementary Section S19 gives the file-by-file listing.
+The MultimodalGasData corpus is publicly available (Narkhede et al. 2022) under CC BY 4.0. Every artifact needed to reproduce the paper is released together, namely the experiment drivers, the pipeline and safety-metric modules, the additional baselines, and the result files behind every table and figure in the manuscript and the supporting information. The release also carries a `Makefile`, a run manifest, and `verify_v15.py`, which re-checks every quoted value against the stored results. No trained comparator is archived: every model is refitted inside each run under the seeds listed in Supplementary Section S19. The autoencoder used by the anomaly path is in the repository tree; the thermal classifier's weights are not, and no reported number depends on them. The repository is at https://github.com/CryptoGuy1/ARXIS. The state that produced the numbers reported here is the tag `v17-submission`, and that tag, rather than the tip of the default branch, reproduces the paper. An archival deposit of that tag is pending, and its DOI will be supplied to the journal before publication. Until the deposit is made, the tagged commit is the citable snapshot. Supplementary Section S19 gives the file-by-file listing.
 
 ---
 
@@ -431,7 +431,7 @@ Gemma Team, Google DeepMind. 2025. Gemma 3 Technical Report. arXiv:2503.19786 (p
 
 Goel, P., Datta, A., and Mannan, M. S. 2017. Industrial Alarm Systems: Challenges and Opportunities. *Journal of Loss Prevention in the Process Industries* 50: 23–36. https://doi.org/10.1016/j.jlp.2017.09.001.
 
-Han, P. and Kim, M. 2014. Optimizing Leak Detection Performance. Paper presented at the PSIG Annual Meeting, Baltimore, Maryland, 6–9 May. PSIG-1407.
+Han, P. and Kim, M. 2014. Optimizing Leak Detection Performance by Combining Statistical and Pressure Wave Leak Detection Technologies. Paper presented at the PSIG Annual Meeting, Baltimore, Maryland.
 
 IEC. 2016. *Functional Safety: Safety Instrumented Systems for the Process Industry Sector, Part 1: Framework, Definitions, System, Hardware and Application Programming Requirements*, IEC 61511-1:2016 with Amendment 1:2017. Geneva: International Electrotechnical Commission.
 
@@ -439,17 +439,17 @@ ISA. 2016. *Management of Alarm Systems for the Process Industries*, ANSI/ISA-18
 
 Jessen, H. and Roshchin, M. 2025. Agentic AI Revolution Across O&G Value Streams: New Strategy Through ENERGYai Examples. Paper SPE-229240-MS presented at the Abu Dhabi International Petroleum Exhibition and Conference, Abu Dhabi, UAE, 3–6 November.
 
-Jocher, G., Chaurasia, A., and Qiu, J. 2023. YOLOv8 by Ultralytics. https://github.com/ultralytics/ultralytics.
+Jocher, G., Qiu, J., and Chaurasia, A. 2023. Ultralytics YOLO. https://github.com/ultralytics/ultralytics.
 
 Korjani, M., Conley, D., and Smith, M. 2024. Temporal Deep Learning Image Processing Model for Natural Gas Leak Detection Using OGI Camera. Paper OTC-34756-MS presented at the Offshore Technology Conference Asia, Kuala Lumpur, Malaysia, 27 February–1 March.
 
 Kumar, G., Singh, V. P., and Pandey, S. K. 2024. Assessing Gas Leakage Detection Performance Using Machine Learning with Different Modalities. *Transactions on Electrical and Electronic Materials* 25 (5): 653–664. https://doi.org/10.1007/s42341-024-00545-0.
 
-Laberge, J. C., Bullemer, P., Tolsma, M. et al. 2014. Addressing Alarm Flood Situations in the Process Industries Through Alarm Summary Display Design and Alarm Response Strategy. *International Journal of Industrial Ergonomics* 44 (3): 395–406. https://doi.org/10.1016/j.ergon.2013.11.008.
+Laberge, J. C., Bullemer, P., Tolsma, M., and Reising, D. V. C. 2014. Addressing Alarm Flood Situations in the Process Industries Through Alarm Summary Display Design and Alarm Response Strategy. *International Journal of Industrial Ergonomics* 44 (3): 395–406. https://doi.org/10.1016/j.ergon.2013.11.008.
 
 Liang, J., Liang, S., Zhang, H. et al. 2023. Leak Detection in Natural Gas Pipelines Based on Unsupervised Reconstruction of Healthy Flow Data. *SPE Prod & Oper* 38 (3): 513–526. SPE-214686-PA. https://doi.org/10.2118/214686-PA.
 
-Lima, F. de A., Copetti, A., Bertini, L. et al. 2026. Autoencoders for Early Kick Detection: Improving Safety in Offshore Oilwell Drilling. *SPE J.* (published online 10 June 2026). SPE-231854-PA. https://doi.org/10.2118/231854-PA.
+Lima, F. de A., Copetti, A., Bertini, L. et al. 2026. Autoencoders for Early Kick Detection: Improving Safety in Offshore Oilwell Drilling. *SPE J.* 31 (06): 3545–3563. SPE-231854-PA. https://doi.org/10.2118/231854-PA.
 
 Lin, J. and Zhan, X. 2026. Sensor-Drift Compensation in Electronic-Nose-Based Gas Recognition Using Knowledge Distillation. *Informatics* 13 (1): 15. https://doi.org/10.3390/informatics13010015.
 
@@ -481,7 +481,7 @@ Wang, J., Yang, F., Chen, T. et al. 2016. An Overview of Industrial Alarm System
 
 Wang, Z., Schaul, T., Hessel, M. et al. 2016. Dueling Network Architectures for Deep Reinforcement Learning. *Proc., 33rd International Conference on Machine Learning (ICML)*, New York City, New York, 19–24 June 2016, 1995–2003.
 
-Yao, Y., Chen, B., Feng, C. et al. 2024. Open-Set Adversarial Domain Match for Electronic Nose Drift Compensation and Unknown Gas Recognition. *Expert Systems with Applications*, article 123757. https://doi.org/10.1016/j.eswa.2024.123757.
+Yao, Y., Chen, B., Liu, C. et al. 2024. Open-Set Adversarial Domain Match for Electronic Nose Drift Compensation and Unknown Gas Recognition. *Expert Systems with Applications* 250: article 123757. https://doi.org/10.1016/j.eswa.2024.123757.
 
 Zhang, Eddie and Zhang, Evan. 2025. Gas Pipeline Leakage Detection Based on Multiple Multimodal Deep Feature Selections and Optimized Deep Forest Classifier. *Frontiers in Environmental Science* 13: 1569621. https://doi.org/10.3389/fenvs.2025.1569621.
 

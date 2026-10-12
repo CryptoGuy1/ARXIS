@@ -125,7 +125,7 @@ def mc_dropout_probs(model, X, passes=20, seed=0):
 
 def exp_calibration(ds):
     print("\n=== E7  calibration, corrected pipeline ===", flush=True)
-    rows, sweep_rows = [], []
+    rows, sweep_rows, bin_rows = [], [], []
     for s in SEEDS:
         tr_df, te_df = rp.block_wise_holdout(ds, seed=s)
         tr_df, te_df, _, _ = rp.prepare(tr_df, te_df, anomaly_seed=s)
@@ -186,6 +186,14 @@ def exp_calibration(ds):
             for nb in (5, 10, 15, 20, 30):
                 sweep_rows.append(dict(seed=s, estimator=name, n_bins=nb,
                                        ece=ece_equal_mass(conf, corr, nb)))
+            # reliability diagram data: the same 15 equal-mass bins that define ECE
+            order = np.argsort(conf)
+            for bi, b in enumerate(np.array_split(order, 15)):
+                if len(b) == 0:
+                    continue
+                bin_rows.append(dict(seed=s, estimator=name, bin=bi, n=len(b),
+                                     conf_mean=float(conf[b].mean()),
+                                     acc_mean=float(corr[b].mean())))
         print(f"  seed {s} done (T={T:.2f})", flush=True)
 
     df = pd.DataFrame(rows)
@@ -198,6 +206,7 @@ def exp_calibration(ds):
     df.to_csv(os.path.join(OUT, "v2_calibration_perseed.csv"), index=False)
     agg.to_csv(os.path.join(OUT, "v2_calibration.csv"), index=False)
     pd.DataFrame(sweep_rows).to_csv(os.path.join(OUT, "v2_calibration_binsweep.csv"), index=False)
+    pd.DataFrame(bin_rows).to_csv(os.path.join(OUT, "v2_calibration_reliability.csv"), index=False)
     print(agg.round(4).to_string(index=False), flush=True)
     return agg
 

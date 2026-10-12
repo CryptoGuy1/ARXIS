@@ -756,7 +756,7 @@ def fig_calibration():
     gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.92], hspace=0.95, wspace=0.34,
                           top=0.90, bottom=0.075, left=0.105, right=0.985)
     axes = [fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1]),
-            fig.add_subplot(gs[1, :])]
+            fig.add_subplot(gs[1, 0]), fig.add_subplot(gs[1, 1])]
     ELAB = "Expected calibration\nerror"
     ax = axes[0]
     x = np.arange(len(a))
@@ -812,6 +812,32 @@ def fig_calibration():
     ax.set_xlabel("Number of bins")
     ax.set_ylabel(ELAB, fontsize=10.2, labelpad=2.0, linespacing=1.25)
     ax.set_title("(c)", loc="left", fontsize=11.9)
+    ax.grid(zorder=0)
+
+    # (d) Reliability. Confidence piles up near 1, so on a linear axis every bin
+    # above 0.99 sits in one corner. Both axes are therefore plotted as
+    # -log10(1 - p): a diagonal stays a diagonal, and each decade of residual
+    # error gets equal length. Bins with no errors sit at the top of the axis.
+    rb = pd.read_csv(os.path.join(RES, "v2_calibration_reliability.csv"))
+    ax = axes[3]
+    def tl(p):
+        return -np.log10(np.clip(1.0 - np.asarray(p, float), 1e-4, 1.0))
+    FLOOR = 4.0
+    ax.plot([0, FLOOR], [0, FLOOR], color=INK2, lw=0.9, ls=(0, (3, 2)), zorder=2)
+    for i, e in enumerate(order):
+        g = (rb[rb.estimator == e].groupby("bin")
+             .agg(conf=("conf_mean", "mean"), acc=("acc_mean", "mean")).reset_index())
+        ax.plot(tl(g.conf), np.minimum(tl(g.acc), FLOOR), "-o", ms=3.6, lw=1.5,
+                color=CAT[i], zorder=3)
+    ticks = [0.5, 0.9, 0.99, 0.999, 0.9999]
+    ax.set_xticks(tl(ticks)); ax.set_xticklabels(["0.5", "0.9", "0.99", "0.999", "0.9999"],
+                                                fontsize=8.0, rotation=34, ha="right")
+    ax.set_yticks(tl(ticks)); ax.set_yticklabels(["0.5", "0.9", "0.99", "0.999", "0.9999"],
+                                                 fontsize=8.0)
+    ax.set_xlim(0, FLOOR); ax.set_ylim(0, FLOOR)
+    ax.set_xlabel("Mean confidence in bin", fontsize=10.0, labelpad=2.0)
+    ax.set_ylabel("Accuracy in bin", fontsize=10.2, labelpad=2.0)
+    ax.set_title("(d)", loc="left", fontsize=11.9)
     ax.grid(zorder=0)
     fig.savefig(os.path.join(FIG, "fig_calibration.png"), dpi=600); plt.close(fig)
     print("wrote fig_calibration.png")

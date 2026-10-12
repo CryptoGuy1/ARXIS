@@ -1,19 +1,19 @@
 {
- "generated_utc": "2026-10-08T17:57:00+00:00",
+ "generated_utc": "2026-10-12T13:36:47+00:00",
  "git": {
-  "commit": "96bb97df85c450e7ab8d7e23d388727da22fc3f1",
-  "branch": "main",
-  "describe": "v15-submission-2-g96bb97d",
-  "dirty": false,
-  "remote": "https://github.com/CryptoGuy1/ARXIS.git"
+  "commit": "74b8ab8cad61e29ffa5c2146eda7da02c46144dc",
+  "branch": "HEAD",
+  "describe": "v17-submission-dirty",
+  "dirty": true,
+  "remote": "/mnt/user-data/outputs/ARXIS-v16-submission.bundle"
  },
  "host": {
-  "platform": "Linux-6.18.44-fc-v80-x86_64-with-glibc2.39",
+  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
   "machine": "x86_64",
   "processor": "x86_64",
   "node": "vm",
   "cpu_count": 2,
-  "python": "3.11.15",
+  "python": "3.11.17",
   "python_implementation": "CPython"
  },
  "packages": {
@@ -97,7 +97,7 @@
   {
    "path": "retrain/run_calib_actions_v2.py",
    "purpose": "calibration, action matrices, ROC curves",
-   "sha256_16": "cd422f77acb0c0ef"
+   "sha256_16": "7e4a0a4fa45b872f"
   },
   {
    "path": "retrain/run_anomaly_influence.py",
@@ -152,311 +152,316 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "5f89f2c058324be6"
+   "sha256_16": "359f8dc4723462f0"
   }
  ],
  "results": {
   "v2_ablation.csv": {
    "bytes": 1647,
    "sha256_16": "4fe89396e5211599",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T12:13:10+00:00"
   },
   "v2_action_matrix.csv": {
    "bytes": 3463,
    "sha256_16": "9c30603980ac3842",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:32:07+00:00"
   },
   "v2_anomaly.json": {
    "bytes": 2371,
    "sha256_16": "40281b059e1377ae",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:04:00+00:00"
   },
   "v2_anomaly_influence.csv": {
    "bytes": 3947,
    "sha256_16": "a7303e07e16b3158",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:43:36+00:00"
   },
   "v2_calibration.csv": {
    "bytes": 991,
    "sha256_16": "ab4cc2cb9d3bfadf",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T13:26:19+00:00"
   },
   "v2_calibration_binsweep.csv": {
    "bytes": 4080,
    "sha256_16": "a7e668630092ffa5",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T13:26:19+00:00"
   },
   "v2_calibration_perseed.csv": {
    "bytes": 3347,
    "sha256_16": "9db3dd180a9ece5e",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T13:26:19+00:00"
+  },
+  "v2_calibration_reliability.csv": {
+   "bytes": 15370,
+   "sha256_16": "a10bfc0b761df051",
+   "modified_utc": "2026-10-12T13:26:19+00:00"
   },
   "v2_costsweep.csv": {
    "bytes": 1817,
    "sha256_16": "5e878b67dd1c3ef1",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T12:34:44+00:00"
   },
   "v2_loco.csv": {
    "bytes": 3408,
    "sha256_16": "1bb335a2ec8d6c9b",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T12:58:43+00:00"
   },
   "v2_perturb.csv": {
    "bytes": 25401,
    "sha256_16": "df31c1d0a7ccf86d",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T12:49:37+00:00"
   },
   "v2_roc.json": {
    "bytes": 175447,
    "sha256_16": "a506a8a09e68682e",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:27:33+00:00"
   },
   "v2_zoo.csv": {
    "bytes": 2198,
    "sha256_16": "360d82ff23150efb",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T12:22:05+00:00"
   },
   "v2_zoo_sig.json": {
    "bytes": 9627,
    "sha256_16": "ef1242d599458795",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T12:22:05+00:00"
   },
   "v3_alarm_episodes.csv": {
    "bytes": 4892,
    "sha256_16": "fc910c9ef279d520",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:49:52+00:00"
   },
   "v3_block_bootstrap.json": {
    "bytes": 4838,
    "sha256_16": "5ae52e161f4729f9",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:03:25+00:00"
   },
   "v3_cost_blocked_validation.csv": {
    "bytes": 995,
    "sha256_16": "76b810ac9bdd9c6e",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:27:03+00:00"
   },
   "v3_cost_validation.csv": {
    "bytes": 994,
    "sha256_16": "efdb3ad829047cd1",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:03:07+00:00"
   },
   "v3_episode_metrics.csv": {
    "bytes": 5596,
    "sha256_16": "6bb64bb94aa00778",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:56:27+00:00"
   },
   "v3_leakage.csv": {
    "bytes": 4989,
    "sha256_16": "e7b841a4d6d6316e",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T13:16:55+00:00"
   },
   "v3_loco_all.csv": {
    "bytes": 4466,
    "sha256_16": "aa4114335da5aed1",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:11:53+00:00"
   },
   "v3_loco_perseed.csv": {
    "bytes": 7733,
    "sha256_16": "9af4827b3467d008",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:11:53+00:00"
   },
   "v3_metric_cost.json": {
    "bytes": 166,
    "sha256_16": "9d87be0e0a87eb6d",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T11:08:08+00:00"
   },
   "v3_nonhazard_alarm.csv": {
    "bytes": 395,
    "sha256_16": "4ee395b2abeffa28",
-   "modified_utc": "2026-10-08T17:53:13+00:00"
+   "modified_utc": "2026-10-12T10:54:26+00:00"
   },
   "v3_ordinal_actions.csv": {
    "bytes": 1925,
    "sha256_16": "63ee08da2b5a8fe3",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:54:22+00:00"
   },
   "v3_overlap_isolation.csv": {
    "bytes": 2224,
    "sha256_16": "6e3254bcd4a70e30",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:29:11+00:00"
   },
   "v3_paired_bootstrap.json": {
    "bytes": 1961,
    "sha256_16": "3c3f5faaaae74d4d",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:49:05+00:00"
   },
   "v3_partition_bounds.json": {
    "bytes": 7473,
    "sha256_16": "304dddeb1d52c624",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:49:04+00:00"
   },
   "v3_persistence_rank.json": {
    "bytes": 9931,
    "sha256_16": "6ee074e32cabe8e2",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:10:43+00:00"
   },
   "v3_persistence_sweep.csv": {
    "bytes": 84384,
    "sha256_16": "5e7bc62672342a12",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:10:43+00:00"
   },
   "v3_powered.csv": {
    "bytes": 2915,
    "sha256_16": "305440fed7e5df0b",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:48:38+00:00"
   },
   "v3_powered_bayes.json": {
    "bytes": 10685,
    "sha256_16": "84ebefa59f8d3564",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T11:08:35+00:00"
   },
   "v3_raw_faults.csv": {
    "bytes": 13874,
    "sha256_16": "d8529fde72f2542c",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:27:08+00:00"
   },
   "v3_reject_option.csv": {
    "bytes": 18366,
    "sha256_16": "aab50596740f073c",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-10T14:17:57+00:00"
   },
   "v3_rho_sensitivity.json": {
    "bytes": 11287,
    "sha256_16": "fc89c11291f72c38",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T11:08:39+00:00"
   },
   "v3_rope_sensitivity.json": {
    "bytes": 10502,
    "sha256_16": "10bb312d1322b75a",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T11:08:42+00:00"
   },
   "v3_split_counts.json": {
    "bytes": 166,
    "sha256_16": "d3ddb3a6459b1954",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:48:53+00:00"
   },
   "v3_weighting_probe.csv": {
    "bytes": 4602,
    "sha256_16": "57decc5bd196100c",
-   "modified_utc": "2026-09-24T19:39:50+00:00"
+   "modified_utc": "2026-10-12T10:54:22+00:00"
   }
  },
  "figures": {
   "fig_ablation.png": {
    "bytes": 255831,
    "sha256_16": "5a5037311661ca4a",
-   "modified_utc": "2026-10-08T17:55:09+00:00"
+   "modified_utc": "2026-10-12T13:34:14+00:00"
   },
   "fig_actionmatrix.png": {
    "bytes": 587415,
    "sha256_16": "d6fae814f5a29421",
-   "modified_utc": "2026-10-08T17:55:10+00:00"
+   "modified_utc": "2026-10-12T13:34:15+00:00"
   },
   "fig_alarmburden.png": {
    "bytes": 452795,
    "sha256_16": "9b6364413db410ed",
-   "modified_utc": "2026-10-08T17:55:11+00:00"
+   "modified_utc": "2026-10-12T13:34:16+00:00"
   },
   "fig_anomaly.png": {
    "bytes": 285311,
    "sha256_16": "bb91c24c91ca4f67",
-   "modified_utc": "2026-10-08T17:55:12+00:00"
+   "modified_utc": "2026-10-12T13:34:17+00:00"
   },
   "fig_anominfluence.png": {
    "bytes": 519718,
    "sha256_16": "ff2f2cb8d737108a",
-   "modified_utc": "2026-10-08T17:55:13+00:00"
+   "modified_utc": "2026-10-12T13:34:18+00:00"
   },
   "fig_arch_dqn.png": {
    "bytes": 250388,
    "sha256_16": "24e1861ebc228d5e",
-   "modified_utc": "2026-10-08T17:55:14+00:00"
+   "modified_utc": "2026-10-12T13:34:19+00:00"
   },
   "fig_arch_lstm.png": {
    "bytes": 166617,
    "sha256_16": "16ba9a6eab244536",
-   "modified_utc": "2026-10-08T17:55:14+00:00"
+   "modified_utc": "2026-10-12T13:34:19+00:00"
   },
   "fig_arch_yolo.png": {
    "bytes": 462716,
    "sha256_16": "ed496cf5fb902e17",
-   "modified_utc": "2026-10-08T17:55:15+00:00"
+   "modified_utc": "2026-10-12T13:34:20+00:00"
   },
   "fig_calibration.png": {
-   "bytes": 552047,
-   "sha256_16": "e21c4c3651648e61",
-   "modified_utc": "2026-10-08T17:55:16+00:00"
+   "bytes": 774594,
+   "sha256_16": "59b0bd0b7be429a5",
+   "modified_utc": "2026-10-12T13:34:21+00:00"
   },
   "fig_costsweep.png": {
    "bytes": 258019,
    "sha256_16": "830c4b1610f1461d",
-   "modified_utc": "2026-10-08T17:55:17+00:00"
+   "modified_utc": "2026-10-12T13:34:21+00:00"
   },
   "fig_decisionlogic.png": {
    "bytes": 275016,
    "sha256_16": "cd4d20fdff85b803",
-   "modified_utc": "2026-10-08T17:55:18+00:00"
+   "modified_utc": "2026-10-12T13:34:22+00:00"
   },
   "fig_disposition.png": {
    "bytes": 448643,
    "sha256_16": "96039d18f659497a",
-   "modified_utc": "2026-10-08T17:55:19+00:00"
+   "modified_utc": "2026-10-12T13:34:23+00:00"
   },
   "fig_dissociation.png": {
    "bytes": 362262,
    "sha256_16": "ee9741c8f4f1a43f",
-   "modified_utc": "2026-10-08T17:55:20+00:00"
+   "modified_utc": "2026-10-12T13:34:24+00:00"
   },
   "fig_leakage.png": {
    "bytes": 340317,
    "sha256_16": "1f697c99844de968",
-   "modified_utc": "2026-10-08T17:55:21+00:00"
+   "modified_utc": "2026-10-12T13:34:25+00:00"
   },
   "fig_loco.png": {
    "bytes": 701437,
    "sha256_16": "6d98933f5bad2ea4",
-   "modified_utc": "2026-10-08T17:55:22+00:00"
+   "modified_utc": "2026-10-12T13:34:26+00:00"
   },
   "fig_metricdisagreement.png": {
    "bytes": 442295,
    "sha256_16": "0000e106397c9b9b",
-   "modified_utc": "2026-10-08T17:55:23+00:00"
+   "modified_utc": "2026-10-12T13:34:27+00:00"
   },
   "fig_perception.png": {
    "bytes": 577939,
    "sha256_16": "2cf9aae193588696",
-   "modified_utc": "2026-10-08T17:55:25+00:00"
+   "modified_utc": "2026-10-12T13:34:28+00:00"
   },
   "fig_perturb.png": {
    "bytes": 669482,
    "sha256_16": "cd1c49f89993fb63",
-   "modified_utc": "2026-10-08T17:55:27+00:00"
+   "modified_utc": "2026-10-12T13:34:30+00:00"
   },
   "fig_powered.png": {
    "bytes": 599523,
    "sha256_16": "fd3367f3c7a4d0bc",
-   "modified_utc": "2026-10-08T17:55:28+00:00"
+   "modified_utc": "2026-10-12T13:34:31+00:00"
   },
   "fig_protocol.png": {
    "bytes": 200667,
    "sha256_16": "95f367ebeaf86e70",
-   "modified_utc": "2026-10-08T17:55:29+00:00"
+   "modified_utc": "2026-10-12T13:34:31+00:00"
   },
   "fig_roc.png": {
    "bytes": 375434,
    "sha256_16": "44fc241bf13d6a3e",
-   "modified_utc": "2026-10-08T17:55:29+00:00"
+   "modified_utc": "2026-10-12T13:34:32+00:00"
   },
   "fig_workflow.png": {
    "bytes": 2092499,
    "sha256_16": "e70dfb4d024686d2",
-   "modified_utc": "2026-10-08T17:55:32+00:00"
+   "modified_utc": "2026-10-12T13:34:34+00:00"
   },
   "fig_zoo.png": {
    "bytes": 312677,
    "sha256_16": "381117622740595b",
-   "modified_utc": "2026-10-08T17:55:33+00:00"
+   "modified_utc": "2026-10-12T13:34:35+00:00"
   }
  }
 }

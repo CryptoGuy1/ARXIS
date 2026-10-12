@@ -885,9 +885,20 @@ rule("the headline separation is stated as counts, not as a ratio of bounds",
      "factor of about 86" not in TXT
      and "507 of 7,905" in TXT and "1,966 of 7,905" in TXT
      and "no missed hazard in all five partitions" in TXT)
-rule("the archival DOI is one explicit slot and no appendix is cited",
-     ALL.count("[to be inserted before publication]") == 1
-     and "Appendix A" not in ALL)
+# The archival DOI may legitimately not exist yet. The manuscript must then say so
+# in the one agreed sentence and print no bracketed slot, since a bracket is a
+# placeholder. Once a deposit exists, a real Zenodo DOI replaces the sentence. Only
+# one of the two states is allowed, and each run reports which it found.
+_PENDING = ("An archival deposit of that tag is pending, and its DOI will be supplied "
+            "to the journal before publication.")
+_AVAIL = ALL.split("## Data and Code Availability", 1)[-1].split("\n## ", 1)[0]
+_ZEN = re.findall(r"10\.5281/zenodo\.\d+", _AVAIL)
+rule("the archival DOI is either a real deposit or the agreed pending sentence, never both or a bracket",
+     "[to be inserted" not in ALL
+     and "Appendix A" not in ALL
+     and ((len(_ZEN) == 1 and _PENDING not in _AVAIL)
+          or (len(_ZEN) == 0 and _AVAIL.count(_PENDING) == 1)))
+print("note archival deposit:", "real DOI present" if _ZEN else "declared pending, no DOI yet")
 rule("a quoted bound ratio carries both conventions",
      ("86" not in ALL.split("## References")[0]
       or ("5.9 under the conservative disjoint-support convention" in ALL
@@ -974,19 +985,19 @@ rule("the availability statement names the repository",
 # copy names the tag and the submitted copy names the hash the tag resolves to.
 _AVAIL = TXT[TXT.index(_AVAIL_HEAD):] if _AVAIL_HEAD in TXT else ""
 _cited = re.findall(r"`([0-9a-f]{40})`", _AVAIL)
-_defers = "`v16-submission`" in _AVAIL
+_defers = "`v17-submission`" in _AVAIL
 rule("the release state is cited as a full hash, or as the tag that resolves to it",
      len(_cited) == 1 or _defers, f"{_cited}")
 if _cited:
     import subprocess as _sp2
     try:
-        _resolved = _sp2.run(["git", "rev-parse", "v16-submission^{commit}"],
+        _resolved = _sp2.run(["git", "rev-parse", "v17-submission^{commit}"],
                              capture_output=True, text=True, timeout=30,
                              cwd=os.path.dirname(os.path.abspath(__file__))).stdout.strip()
     except Exception:
         _resolved = ""
     if re.fullmatch(r"[0-9a-f]{40}", _resolved or ""):
-        rule("the cited commit is the one the v16-submission tag points at",
+        rule("the cited commit is the one the v17-submission tag points at",
              _resolved == _cited[0], f"tag is {_resolved}, paper says {_cited[0]}")
 # every surname cited in the body must have an entry, and every entry must be cited
 _ORG = {"EEMUA", "IEC", "ISA", "Gemma"}

@@ -24,7 +24,7 @@ section, and the component's evaluation is held to a weaker standard than the
 sensor path's.
 
 *Training.* Thermal images are classified with YOLOv8n-cls (Jocher et al.
-2023), the smallest classification variant in the family. Images are resized to
+2023), the smallest classification variant in the family. The Ultralytics package version used at training time was not recorded, so that element of the environment cannot be reproduced exactly. The version pinned in `requirements.txt` describes the repository environment, not the training environment. Images are resized to
 224 by 224 and the network starts from pretrained weights. Training uses AdamW at
 10⁻³ with cosine annealing, weight decay 10⁻⁴, batch size 32 and 50 epochs, with
 random flip, rotation and brightness augmentation. The split is 80/20 stratified
@@ -152,7 +152,7 @@ Second, the temperature itself carries a methodological lesson about this study 
 
 ![](figures_v2/fig_calibration.png){width=6.50in}
 
-Fig. S3—Calibration. (a) ECE with bootstrap intervals. (b) The same on a logarithmic axis, split into all windows against hazardous windows only. (c) Sensitivity to the number of bins. MC dropout uses 20 passes and the deep ensemble five members.
+Fig. S3—Calibration. (a) ECE with bootstrap intervals. (b) The same on a logarithmic axis, split into all windows against hazardous windows only. (c) Sensitivity to the number of bins. (d) Reliability diagram: mean confidence against accuracy in each of the 15 equal-mass bins, averaged by bin index across the five runs. Both axes are plotted as −log10(1 − p), so the dashed diagonal is perfect calibration and each decade of residual error takes equal length; bins with no errors sit at the top of the axis. Colours as in (c). MC dropout uses 20 passes and the deep ensemble five members.
 
 
 ---
@@ -654,7 +654,7 @@ About a factor of twenty separates the binomial reference from the disjoint-supp
 | Fig. 6, Table S21 | `retrain/run_all_v2.py` | `v2_perturb.csv` | five seeds | `comparison` |
 | Correlation term of Eq. S2 | `retrain/run_split_counts.py` | `v3_split_counts.json` | both protocols | `splitcounts` |
 | Table S2, Fig. S2 | `retrain/run_all_v2.py`, `retrain/run_final.py` | `v2_costsweep.csv`, `v3_cost_validation.csv` | five seeds | `comparison`, `final` |
-| Table S3, Fig. S3 | `retrain/run_calib_actions_v2.py` | `v2_calibration.csv`, `v2_calibration_perseed.csv`, `v2_calibration_binsweep.csv` | five seeds | `calibration` |
+| Table S3, Fig. S3 | `retrain/run_calib_actions_v2.py` | `v2_calibration.csv`, `v2_calibration_perseed.csv`, `v2_calibration_binsweep.csv`, `v2_calibration_reliability.csv` | five seeds | `calibration` |
 | Table S4 | `retrain/run_rho_sensitivity.py` | `v3_rho_sensitivity.json` | 30 runs | `rho` |
 | Table S5 | `retrain/run_rope_sensitivity.py` | `v3_rope_sensitivity.json` | 30 runs | `rope` |
 | Table S6, Fig. S4 | `retrain/run_all_v2.py` | `v2_ablation.csv` | five seeds | `comparison` |

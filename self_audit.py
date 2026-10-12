@@ -195,6 +195,10 @@ eqs = sorted({int(re.match(r"\d+", m).group())
               for m in re.findall(r"\.{4,}\s*\((\d+[a-z]?)\)", TXT)})
 rule("D", "figure numbering is a clean run", figs == list(range(1, len(figs) + 1)), str(figs))
 rule("D", "table numbering is a clean run", tabs == list(range(1, len(tabs) + 1)), str(tabs))
+# SPE guidance on abstract length, as the pre-submission review quoted it. The
+# Summary is checked on every run rather than by eye.
+_sum_words = len(SUMMARY.split())
+rule("D", "the Summary is under 400 words", _sum_words < 400, f"{_sum_words} words")
 rule("D", "equation numbering is a clean run", eqs == list(range(1, len(eqs) + 1)), str(eqs))
 
 for n in set(int(x) for x in re.findall(r"Figs?\.\s*\*{0,2}(\d+)", TXT)):

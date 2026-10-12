@@ -31,6 +31,12 @@ from retrain.run_split_counts import load as load_counts
 ROPE = 0.01
 REF = "A_cost_weighted"
 
+# The correlation term the 30-run accuracies were first analysed with, before the
+# block-count correction (plan item A5). run_final.py now writes the corrected rho
+# directly, so when the file already holds the corrected value the superseded value
+# must come from this record rather than from the file, or the artifact loses it.
+RHO_SUPERSEDED = 0.20243433696348495
+
 
 def bayes_correlated_t(diff, rho, rope=ROPE):
     d = np.asarray(diff, float)
@@ -52,6 +58,8 @@ def main():
     path = os.path.join(OUT, "v3_powered_bayes.json")
     blob = json.load(open(path))
     rho_old = blob.get("rho")
+    if rho_old is None or abs(rho_old - rho_new) < 1e-12:
+        rho_old = RHO_SUPERSEDED
     acc = blob["per_run_acc"]
     ref = np.asarray(acc[REF], float)
 

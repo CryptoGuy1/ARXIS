@@ -61,7 +61,7 @@ except ImportError as e:
 # ══════════════════════════════════════════════════════════════
 # CONSTANTS
 # ══════════════════════════════════════════════════════════════
-ACTIONS = {0: "Monitor", 1: "Increase Sampling", 2: "Request Verification", 3: "Raise Alarm", 4: "Emergency Shutdown"}
+ACTIONS = {0: "Monitor", 1: "Increase Sampling", 2: "Request Verification", 3: "Raise Alarm", 4: "Recommend ESD assessment"}
 GAS_MAP = {"NoGas": 0, "Smoke": 1, "Mixture": 2, "Perfume": 3}
 GAS_NAMES = {v: k for k, v in GAS_MAP.items()}
 CORRECT_ACTIONS = {0: [0], 1: [3], 2: [4], 3: [1, 2]}
@@ -812,7 +812,7 @@ st.markdown(f"""
     </div>
     <div style="text-align:right;">
       <div style="font-family:JetBrains Mono,monospace; font-size:11px; color:#4b5e78; line-height:2.2;">
-        22-FEATURE RL STATE · 5-ACTION POLICY<br>
+        22-FEATURE STATE · 5-ACTION DECISION<br>
         MC DROPOUT UNCERTAINTY · REAL-TIME SAFETY<br>
         SENSOR FUSION + VISUAL VERIFICATION
       </div>
@@ -851,7 +851,7 @@ with st.sidebar:
     <span style="color:#4b5e78;">GAS MAP</span><br>
     <span style="color:#00ff9d;">■</span> NoGas → Monitor<br>
     <span style="color:#f97316;">■</span> Smoke → Raise Alarm<br>
-    <span style="color:#ff2d55;">■</span> Mixture → Emergency Shutdown<br>
+    <span style="color:#ff2d55;">■</span> Mixture → Recommend ESD assessment<br>
     <span style="color:#a78bfa;">■</span> Perfume → Increase Sampling
     </div>
     """, unsafe_allow_html=True)

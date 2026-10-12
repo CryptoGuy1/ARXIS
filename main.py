@@ -11,6 +11,12 @@ SCOPE WARNING (read before quoting any number this script prints):
     harness (5 seeds, block-wise leakage-safe holdout, exact binomial bounds).
     Treat `folder_live_test_log.csv` as an illustrative trace, never as evidence.
 
+    RUNTIME SCOPE: this pipeline adds a safety override, vision verification and an
+    explanation layer on top of the decision component. The manuscript evaluates the
+    bare decision component, not this runtime. The added guardrails are not evaluated
+    in the paper; see its "What Is Evaluated, and What Is Not" section.
+    Action 4 is "Recommend ESD assessment". It is advisory and actuates nothing.
+
 Paths: the dataset locations below default to a local Windows layout. Override
 without editing this file by setting ARXIS_RAW_CSV and ARXIS_IMAGE_DIR.
 """
@@ -75,7 +81,7 @@ ACTIONS = {
     1: "Increase Sampling",
     2: "Request Verification",
     3: "Raise Alarm",
-    4: "Emergency Shutdown",
+    4: "Recommend ESD assessment",
 }
 
 GAS_MAP = {

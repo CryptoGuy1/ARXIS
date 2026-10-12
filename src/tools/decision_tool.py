@@ -1,4 +1,5 @@
 import math
+import os
 from typing import Tuple
 
 import numpy as np
@@ -97,6 +98,14 @@ class DecisionTool:
         self.mc_dropout_samples = mc_dropout_samples
         self.window_size = window_size
 
+        if not os.path.isfile(model_path):
+            raise FileNotFoundError(
+                f"Decision Agent checkpoint not found: {model_path}. "
+                "This checkpoint is not part of the ARXIS release (see the README, "
+                "'Runtime checkpoints not included'). The reported experiments do not "
+                "use it. Pass a checkpoint you trained with the release code, or the "
+                "path to one, to run the live pipeline."
+            )
         # Trusted local checkpoints contain numpy arrays (feat_scaler_*, anom_*);
         # torch 2.6+ defaults weights_only=True which rejects them, so load explicitly.
         ckpt = torch.load(model_path, map_location=self.device, weights_only=False)
@@ -135,7 +144,7 @@ class DecisionTool:
             1: "increase_sampling",
             2: "request_verification",
             3: "raise_alert",
-            4: "emergency_shutdown",
+            4: "recommend_esd_assessment",
         }
 
     def normalize_anomaly(self, anomaly_score: float) -> float:

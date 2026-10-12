@@ -45,7 +45,7 @@ System readings:
   Gas class: {gas_label}
 
 RL policy output:
-  Action chosen: {action} ({['Monitor', 'Increase Sampling', 'Request Verification', 'Raise Alarm', 'Emergency Shutdown'][action] if 0 <= action <= 4 else 'Unknown'})
+  Action chosen: {action} ({['Monitor', 'Increase Sampling', 'Request Verification', 'Raise Alarm', 'Recommend ESD assessment'][action] if 0 <= action <= 4 else 'Unknown'})
   Q-values: {q_values}
 
 Action meanings:
@@ -53,7 +53,7 @@ Action meanings:
   1 = Increase sampling
   2 = Request verification
   3 = Raise alarm
-  4 = Emergency shutdown
+  4 = Recommend ESD assessment
 
 Your task:
   1. Determine if the action is SAFE given the anomaly and gas class.

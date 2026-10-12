@@ -13,7 +13,7 @@ CANONICAL MAPPING (gas_id):
 CORRECT ACTIONS:
     0 -> [0] Monitor
     1 -> [3] Raise Alarm
-    2 -> [4] Emergency Shutdown
+    2 -> [4] Recommend ESD assessment
     3 -> [1,2] Increase Sampling / Request Verification
 """
 import numpy as np

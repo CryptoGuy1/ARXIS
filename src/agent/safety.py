@@ -9,15 +9,15 @@ FIXED (post-audit, v3):
   CORRECT design — the override is a *fail-safe against UNDER-escalation* that works
   both with and without a known gas class:
     * With a known danger gas (Smoke=1, Mixture=2): escalate an under-responding policy
-      to the class-correct severe action (Smoke -> 3 Raise Alarm, Mixture -> 4 Emergency).
+      to the class-correct severe action (Smoke -> 3 Raise Alarm, Mixture -> 4 Recommend ESD assessment).
     * With a known non-danger gas (NoGas=0, Perfume=3): do NOT escalate — these gases
       don't warrant emergency action regardless of anomaly.
     * Without a known gas class (deployment): escalate an under-responding policy to
       Raise Alarm (3) if the raw anomaly is extreme. This is the most conservative
       choice that still alerts on a confirmed hazard.
     * It NEVER overrides an already-correct severe action (Smoke=3 or Mixture=4),
-      so Smoke is never wrongly forced to Emergency Shutdown.
-    * Mixture is the only class whose correct action is Emergency (4); Smoke's
+      so Smoke is never wrongly forced to Recommend ESD assessment.
+    * Mixture is the only class whose correct action is Recommend ESD assessment (4); Smoke's
       correct action is Raise Alarm (3) and is preserved.
 """
 
@@ -31,7 +31,7 @@ DANGER_GAS_IDS = {1, 2}          # Smoke, Mixture
 EMERGENCY_RAW_ANOMALY = 50.0
 
 # Class-correct severe action (used only to promote an UNDER-escalated policy).
-CORRECT_SEVERE_ACTION = {1: 3, 2: 4}   # Smoke -> Raise Alarm, Mixture -> Emergency
+CORRECT_SEVERE_ACTION = {1: 3, 2: 4}   # Smoke -> Raise Alarm, Mixture -> Recommend ESD assessment
 
 
 def safety_override(state, action, gas_id=None, raw_anomaly=None):
@@ -57,7 +57,7 @@ def safety_override(state, action, gas_id=None, raw_anomaly=None):
     # ── Known danger gas: escalate to the class-correct severe action ──
     if gas_id is not None and gas_id in DANGER_GAS_IDS:
         # If the policy already chose the class-correct severe action (or higher),
-        # leave it — never override Smoke=Raise Alarm (3) or Mixture=Emergency (4).
+        # leave it — never override Smoke=Raise Alarm (3) or Mixture=Recommend ESD assessment (4).
         correct_severe = CORRECT_SEVERE_ACTION[gas_id]
         if action >= correct_severe:
             return action
@@ -70,7 +70,7 @@ def safety_override(state, action, gas_id=None, raw_anomaly=None):
 
     # ── Unknown gas class (deployment): extreme anomaly with under-response ──
     # Conservative default: escalate to Raise Alarm (3) — alerts on a confirmed
-    # hazard without over-escalating to Emergency Shutdown on an unknown class.
+    # hazard without over-escalating to Recommend ESD assessment on an unknown class.
     if action < 3:
         return 3
 

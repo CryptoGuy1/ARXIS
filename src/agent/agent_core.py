@@ -61,7 +61,7 @@ class MultimodalAgent:
             1: "increase_sampling",
             2: "request_verification",
             3: "raise_alert",
-            4: "emergency_shutdown",
+            4: "recommend_esd_assessment",
         }
 
         self.gas_names = {
@@ -74,7 +74,7 @@ class MultimodalAgent:
         self.expected_actions = {
             0: [0],     # NoGas -> Monitor
             1: [3],     # Smoke -> Raise Alarm
-            2: [4],     # Mixture -> Emergency Shutdown
+            2: [4],     # Mixture -> Recommend ESD assessment
             3: [1, 2],  # Perfume -> Increase Sampling / Request Verification
         }
 
@@ -221,7 +221,7 @@ class MultimodalAgent:
         - If no vision result -> do nothing
         - If confidence < 0.80 -> log only, no escalation
         - If high-confidence Smoke -> escalate to at least Raise Alarm
-        - If high-confidence Mixture -> escalate to Emergency Shutdown
+        - If high-confidence Mixture -> escalate to Recommend ESD assessment
         - NoGas/Perfume do not downgrade actions in Stage 1
         """
         final_action = int(action_after_safety)
@@ -288,7 +288,7 @@ class MultimodalAgent:
                 final_action = 4
                 vision_reason = (
                     f"High-confidence visual evidence indicates Mixture "
-                    f"(conf={yolo_conf:.4f}); escalated final action to Emergency Shutdown."
+                    f"(conf={yolo_conf:.4f}); escalated final action to Recommend ESD assessment."
                 )
             else:
                 vision_reason = (

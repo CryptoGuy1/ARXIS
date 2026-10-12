@@ -59,7 +59,7 @@ DANGER = list(RW.DANGER_GAS_IDS)  # [1, 2]
 
 def escalation_rate(ygas, yact):
     """Fraction of danger rows where the chosen action is an ALERT or higher
-    (action >= 3: Raise Alert / Emergency Shutdown). This is the fair,
+    (action >= 3: Raise Alarm / Recommend ESD assessment). This is the fair,
     corruption-free 'did it escalate at all' signal — it does NOT require the
     agent to pick the exact correct severe tier, only that it alerted rather
     than staying silent (action 0/1/2)."""

@@ -132,6 +132,16 @@ Expect several hours on two cores. The autoencoder is retrained once per distinc
 
 ---
 
+## Runtime checkpoints not included
+
+The live pipeline (`main.py` and `app.py`) loads two files that are not part of this release, and this section says why.
+
+The Decision Agent checkpoint at `models/retrained/exp1_pareto/exp1_miss8_seed42.pth` is written only by `retrain/run_exp1_real.py`, a deprecated driver, and it does not reproduce from the release code. Its feature scaler does not match the release's, and its held-out numbers cannot be trusted as held out until the training split is confirmed. It is therefore not shipped. `DecisionTool` raises a clear `FileNotFoundError` when this file is missing, and the reported experiments do not load it.
+
+The thermal classifier at `models/yolov8_gas_classifier.pt` is not shipped either. Its recorded metrics match Table S1 of the supporting information, but its weights are kept outside the repository, and no reported number depends on them.
+
+The autoencoder at `models/lstm_autoencoder_weights.pth` is shipped and reproduces the notebook that trained it (`test_runtime_anomaly.py`). To run the live pipeline, a Decision Agent must be placed at the path in `main.py` and `app.py` or that path must be changed. The release has no supported driver that writes such a file, so this is a new model, not the one the paper reports.
+
 ## Layout
 
 Everything Supplementary Section S19 names is at the path it names.

@@ -9,7 +9,7 @@
 #   scored on a single unscaled reading. Under that broken feature the class
 #   ordering was inverted (Perfume appeared most anomalous, Mixture least), so
 #   the old reward said "Monitor" is correct for Mixture — backwards, since
-#   Mixture needs Emergency Shutdown.
+#   Mixture needs Recommend ESD assessment.
 #
 # CORRECTED FACT (do not propagate the old claim):
 #   With the pretrained AE loaded and the full 20-step window scored
@@ -30,7 +30,7 @@
 #   1 = Increase Sampling → correct for Perfume  (gas_id=3, low anomaly)
 #   2 = Req Verification  → correct for Perfume  (gas_id=3, high anomaly)
 #   3 = Raise Alarm       → correct for Smoke    (gas_id=1)
-#   4 = Emergency         → correct for Mixture  (gas_id=2)
+#   4 = Recommend ESD assessment  → correct for Mixture  (gas_id=2)
 #
 # gas_id mapping (from GAS_MAP in training notebook):
 #   NoGas=0, Smoke=1, Mixture=2, Perfume=3
@@ -106,7 +106,7 @@ def _reward_gas_id(gas_id: int, action: int, anomaly: float) -> float:
     # ── Precision bonuses ──────────────────────────────────────
     if gas_id == 1 and action == 3:    # Smoke → Raise Alarm ✓
         reward += 1.0
-    if gas_id == 2 and action == 4:    # Mixture → Emergency ✓
+    if gas_id == 2 and action == 4:    # Mixture → Recommend ESD assessment ✓
         reward += 1.0
 
     # ── Perfume severity calibration ───────────────────────────

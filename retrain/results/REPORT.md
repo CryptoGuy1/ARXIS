@@ -142,7 +142,7 @@
 - Train Gradient Boosting (300 trees) on **action targets** directly:
   - NoGas → action 0 (Monitor)
   - Smoke → action 3 (Raise Alarm)
-  - Mixture → action 4 (Emergency Shutdown)
+  - Mixture → action 4 (Recommend ESD assessment)
   - Perfume → action 1 (Increase Sampling)
 
 | Metric | Value |
@@ -206,9 +206,9 @@
 
 **Goal:** Test whether the policy preserves safety under distribution shift.
 
-**Method:** Sample 200 danger windows. Apply perturbations. Measure danger miss, escalation (a≥3), and emergency shutdown (a=4).
+**Method:** Sample 200 danger windows. Apply perturbations. Measure danger miss, escalation (a≥3), and Recommend ESD assessment (a=4).
 
-| Configuration | Danger Miss | Escalation (a≥3) | Emergency (a=4) |
+| Configuration | Danger Miss | Escalation (a≥3) | Recommend ESD assessment (a=4) |
 |---------------|-------------|------------------|-----------------|
 | Clean | 0.9550 | 0.0000 | 0.0000 |
 | Gaussian σ=0.20 | 0.9550 | 0.0000 | 0.0000 |

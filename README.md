@@ -117,7 +117,7 @@ Two labels in this repository read as stronger claims than the code supports, an
 are worth flagging before anyone reads them literally.
 
 `SupervisedDQN` in `retrain/comparators.py` is **not** a reinforcement-learning agent.
-It is the `DuelingDQN` network architecture trained with plain cross-entropy on actions,
+It is the `DuelingDQN` network architecture trained with cost-weighted cross-entropy on actions,
 with no reward, no bootstrap and no environment. The name is historical. The manuscript
 calls the same object a cost-weighted cross-entropy policy, which is what it is. The one
 genuinely offline-RL comparator in the study is `CQL`, and it is single-step.
@@ -157,9 +157,13 @@ continuity_v9.json               the figure list carried over from the pre-rewri
 
 data/                            the corpus CSV and the thermal frames the figures use
 figures_v2/                      every figure in the manuscript and the supporting information
-models/                          the autoencoder checkpoint, tracked so the checks run from a
-                                 bare clone. No comparator checkpoint is shipped: every model
-                                 in the study refits from the corpus under the listed seeds
+models/                          the LSTM autoencoder weights and config used by the runtime
+                                 anomaly tool, tracked so the checks run from a bare clone.
+                                 models/retrained/ holds the gradient-boosting model and feature
+                                 scaler written by earlier drivers; no non-deprecated driver reads
+                                 them. Every model in the study refits from the corpus under the
+                                 listed seeds. The runtime decision-agent checkpoint named in
+                                 main.py is not in this release
 retrain/
   raw_pipeline.py                windowing, partitioning, partition-local anomaly, scaling
   safety_metrics.py              the five-quantity evaluation set and the binomial bounds

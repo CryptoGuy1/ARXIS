@@ -1,16 +1,19 @@
-"""Anomaly tool — aligned with the retrain/ validation harness (audit A1/A2/fix #2).
+"""Runtime anomaly tool: the pretrained NoGas LSTM autoencoder shipped in models/.
 
-The live inference path (src/) previously fed a SINGLE unscaled 7-value reading
-into the AE and returned its point reconstruction error. That produced values in
-the 1e5–1e6 range with an INVERTED class ordering (Perfume most anomalous), which
-diverged from the retrain/ feature the DQN was actually trained on. This rewrite
-mirrors retrain/raw_pipeline.py exactly:
+The shipped weights were trained in the author's Colab notebook (Autoencoder_Model),
+and this module reproduces that notebook's definition exactly:
 
-  - load the pretrained NoGas LSTM-AE weights (audit A1),
-  - scale the 20-step window on the NoGas distribution (audit A4 logic),
-  - reconstruction error = mean over the full window,
-so the anomaly feature the agent sees matches the trained 22-feature state
-(low~NoGas, high~Smoke; ordering NoGas < Perfume < Mixture < Smoke).
+  - input scaler: MinMaxScaler fitted on the NoGas sensor rows of the corpus;
+  - network: an LSTM encoder whose final hidden state is repeated across the
+    20 time steps and fed to an LSTM decoder, then a linear output layer;
+  - score: mean squared reconstruction error over the full 20-step window.
+
+With these definitions and the shipped weights, the notebook's in-sample NoGas
+threshold and ROC-AUC are reproduced (see test_runtime_anomaly.py).
+
+This is the runtime path only. The reported experiments do not use these weights:
+retrain/raw_pipeline.py refits an autoencoder inside each training partition with
+its own scaler and forward pass (Section S21 of the supporting information).
 """
 
 import os
@@ -18,7 +21,7 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SENSOR_COLS = ["MQ2", "MQ3", "MQ5", "MQ6", "MQ7", "MQ8", "MQ135"]
@@ -33,10 +36,12 @@ class LSTMAutoencoder(nn.Module):
         self.output_layer = nn.Linear(hidden_size, input_size)
 
     def forward(self, x):
-        encoded, _ = self.encoder(x)
-        decoded, _ = self.decoder(encoded)
-        out = self.output_layer(decoded)
-        return out
+        # Notebook definition: the encoder's final hidden state is repeated over
+        # every time step and passed to the decoder (not the encoder's per-step outputs).
+        _, (h, _) = self.encoder(x)
+        rep = h.repeat(x.shape[1], 1, 1).permute(1, 0, 2)
+        decoded, _ = self.decoder(rep)
+        return self.output_layer(decoded)
 
 
 class AnomalyTool:
@@ -58,7 +63,7 @@ class AnomalyTool:
         import pandas as pd
         df = pd.read_csv(raw_csv)
         normal = df[df["Gas"] == "NoGas"][SENSOR_COLS].values
-        return StandardScaler().fit(normal)
+        return MinMaxScaler().fit(normal)
 
     def update(self, sensor_array):
         """Push a new 7-value reading into the rolling 20-step window."""

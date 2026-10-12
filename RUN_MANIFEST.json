@@ -1,10 +1,10 @@
 {
- "generated_utc": "2026-10-12T16:41:17+00:00",
+ "generated_utc": "2026-10-12T16:41:26+00:00",
  "git": {
-  "commit": "98c7d562053877d2b08f0de7f25cc2b6bcc25005",
+  "commit": "1ea0a0d61c0cc0fd043fcf8621b64a886c26d7fe",
   "branch": "HEAD",
-  "describe": "v17-submission-dirty",
-  "dirty": true,
+  "describe": "v17-submission-1-g1ea0a0d",
+  "dirty": false,
   "remote": "/mnt/user-data/outputs/ARXIS-v16-submission.bundle"
  },
  "host": {

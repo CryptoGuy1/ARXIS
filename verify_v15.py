@@ -992,19 +992,19 @@ rule("the availability statement names the repository",
 # copy names the tag and the submitted copy names the hash the tag resolves to.
 _AVAIL = TXT[TXT.index(_AVAIL_HEAD):] if _AVAIL_HEAD in TXT else ""
 _cited = re.findall(r"`([0-9a-f]{40})`", _AVAIL)
-_defers = "`v18-submission`" in _AVAIL
+_defers = "`v18.1-submission`" in _AVAIL
 rule("the release state is cited as a full hash, or as the tag that resolves to it",
      len(_cited) == 1 or _defers, f"{_cited}")
 if _cited:
     import subprocess as _sp2
     try:
-        _resolved = _sp2.run(["git", "rev-parse", "v18-submission^{commit}"],
+        _resolved = _sp2.run(["git", "rev-parse", "v18.1-submission^{commit}"],
                              capture_output=True, text=True, timeout=30,
                              cwd=os.path.dirname(os.path.abspath(__file__))).stdout.strip()
     except Exception:
         _resolved = ""
     if re.fullmatch(r"[0-9a-f]{40}", _resolved or ""):
-        rule("the cited commit is the one the v18-submission tag points at",
+        rule("the cited commit is the one the v18.1-submission tag points at",
              _resolved == _cited[0], f"tag is {_resolved}, paper says {_cited[0]}")
 # every surname cited in the body must have an entry, and every entry must be cited
 _ORG = {"EEMUA", "IEC", "ISA", "Gemma"}

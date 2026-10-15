@@ -152,7 +152,7 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "359f8dc4723462f0"
+   "sha256_16": "2a970284ab8d80a7"
   }
  ],
  "results": {
@@ -429,9 +429,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_perception.png": {
-   "bytes": 577939,
-   "sha256_16": "2cf9aae193588696",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 690300,
+   "sha256_16": "0010706090f064fe",
+   "modified_utc": "2026-10-15T21:23:17+00:00"
   },
   "fig_perturb.png": {
    "bytes": 669482,
@@ -439,9 +439,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_powered.png": {
-   "bytes": 599523,
-   "sha256_16": "fd3367f3c7a4d0bc",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 592981,
+   "sha256_16": "49019db5083522a2",
+   "modified_utc": "2026-10-15T21:23:17+00:00"
   },
   "fig_protocol.png": {
    "bytes": 200667,
@@ -454,9 +454,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_workflow.png": {
-   "bytes": 2092499,
-   "sha256_16": "e70dfb4d024686d2",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 2264883,
+   "sha256_16": "1838ab50c4c03a70",
+   "modified_utc": "2026-10-15T21:23:17+00:00"
   },
   "fig_zoo.png": {
    "bytes": 312677,

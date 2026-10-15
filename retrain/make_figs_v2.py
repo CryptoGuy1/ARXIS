@@ -637,7 +637,7 @@ def fig_perception():
     ax.legend(fontsize=9.2, ncol=3, loc="lower center", bbox_to_anchor=(0.5, 1.04),
               columnspacing=1.6, handlelength=1.4)
     note(fig, "Replotted from the reported perception results. The split is randomized over "
-              "consecutive frames from one session, so these are an optimistic upper bound.",
+              "consecutive frames from one acquisition campaign, so these are an optimistic upper bound.",
          y=0.035)
     fig.savefig(os.path.join(FIG, "fig_perception.png"), dpi=600); plt.close(fig)
     print("wrote fig_perception.png")
@@ -969,7 +969,7 @@ def fig_powered():
         # horizontal value labels overlapped; they are set upright instead.
         ax.text(bi.get_x() + bi.get_width() / 2, vv + ee + 0.006, f"{vv:.3f}",
                 ha="center", va="bottom", fontsize=8.4, color=INK2, rotation=90)
-    ax.set_xticks(x); ax.set_xticklabels([PRETTY.get(m, m) for m in order], rotation=40,
+    ax.set_xticks(x); ax.set_xticklabels([("Ordinal objective\n(supporting variant)" if m == "Ordinal" else PRETTY.get(m, m)) for m in order], rotation=40,
                        ha="right", fontsize=10.2, rotation_mode="anchor")
     ax.set_ylim(0.70, 1.10); ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_ylabel("Decision accuracy", labelpad=1.5)
@@ -978,6 +978,8 @@ def fig_powered():
 
     ax = axes[1]
     names = [m for m in order if m in sig]
+    # the ordinal objective is a supporting variant, not an independent comparator
+    lab = lambda m: "Ordinal (supporting variant)" if m == "Ordinal" else PRETTY.get(m, m)
     left = [sig[m]["p_other_better"] for m in names]
     mid = [sig[m]["p_practically_equivalent"] for m in names]
     right = [sig[m]["p_ref_better"] for m in names]
@@ -993,7 +995,7 @@ def fig_powered():
             # proud of the band they sit in.
             ax.text(left[yi] + m / 2, yi, f"{m:.2f}", ha="center", va="center",
                     fontsize=8.4, color=INK)
-    ax.set_yticks(y); ax.set_yticklabels([PRETTY.get(m, m) for m in names], fontsize=10.2)
+    ax.set_yticks(y); ax.set_yticklabels([lab(m) for m in names], fontsize=10.2)
     ax.set_xlim(0, 1); ax.xaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_xlabel("Posterior probability")
     ax.set_title("(b)", loc="left")
@@ -1054,7 +1056,8 @@ def fig_workflow():
         fh, fsn, fss = 11.8, 8.2, 7.0
         h1 = 3.4 + 2.6 + fh + S.caption_h(fsn, fss) + 1.5
         ph, chip_h = 8.0, 11.6
-        h2 = 3.4 + ph + 3.0 + chip_h + 1.8
+        AUX_H, AUX_GAP = 2.6, 0.9           # the auxiliary reference, drawn apart
+        h2 = 3.4 + ph + 3.0 + chip_h + AUX_GAP + AUX_H + 1.8
         GAP1, FAN, rh, mh = 7.4, 13.4, 7.2, 3.6
         FOOT = 2.6              # the line under the metric bar
         H = 1.2 + FOOT + h1 + GAP1 + h2 + FAN + rh + 2.8 + mh + 1.5
@@ -1082,8 +1085,17 @@ def fig_workflow():
         S.barrow(ax, bx + 2 * bw + 5.1, by + ph / 2, 2.8, 3.6, "right")
         S.cyl(ax, bx + 2 * (bw + 3.4), by, bw, ph,
               "4,900 train / 1,264 test\n316 windows per class", 7.4)
-        S.chips(ax, gx + 1.8, p2[1] + 1.8, gw - 3.6, chip_h, S.COMPARATORS, 6,
-                S.PCH_F, S.PCH_E)
+        # the ten primary comparators, then CUSUM apart as a dashed auxiliary reference
+        S.chips(ax, gx + 1.8, p2[1] + 1.8 + AUX_H + AUX_GAP, gw - 3.6, chip_h,
+                S.COMPARATORS[:-1], 5, S.PCH_F, S.PCH_E)
+        from matplotlib.patches import FancyBboxPatch
+        aux_x, aux_w, aux_y = gx + 1.8, gw - 3.6, p2[1] + 1.8
+        ax.add_patch(FancyBboxPatch((aux_x, aux_y), aux_w, AUX_H,
+                     boxstyle="round,pad=0.02,rounding_size=0.09", facecolor="#ffffff",
+                     edgecolor=S.PCH_E, linewidth=1.0, linestyle="--", zorder=2))
+        ax.text(aux_x + aux_w / 2, aux_y + AUX_H / 2,
+                "Auxiliary reference, outside the benchmark: CUSUM (two-action)",
+                ha="center", va="center", fontsize=7.4, color=S.INK, zorder=3)
 
         S.barrow(ax, 50.0, (p1[1] + p2[1] + h2) / 2.0,
                  p1[1] - (p2[1] + h2) - 0.7, 5.2, "down")

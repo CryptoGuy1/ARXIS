@@ -6,7 +6,7 @@ runs/ holds one JSON per run: top-1, per-class accuracy, the confusion matrix, t
 
 split_tables/ holds one row per frame with its Serial Number, image name, class and split (train, embargo or test). These are the auditable assignments behind each run.
 
-curves/ holds the per-epoch training logs for the runs that wrote them. The block-wise seed-1337 run did not produce a curve file.
+curves/ holds the per-epoch training logs for all eight runs. The block-wise seed-1337 log was recovered later from the Kaggle output and checked against its JSON: 50 epochs, and a final-epoch top-1 of 0.79219, which matches the JSON.
 
 checkpoints.json records, for each run, the SHA-256 hash and size of its final-epoch checkpoint, the top-1 the checkpoint stores from training, and the training arguments it recorded. The checkpoints themselves are not in the repository. Two checkpoint files that were uploaded twice were byte-identical.
 

@@ -117,7 +117,7 @@
       "errors": 266,
       "hazard_called_nonhazard": 5,
       "hazard_frames": 640,
-      "last_epoch_curve_top1": null,
+      "last_epoch_curve_top1": 0.79219,
       "per_class": {
         "Mixture": 1.0,
         "NoGas": 0.653125,

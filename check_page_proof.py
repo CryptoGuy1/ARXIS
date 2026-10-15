@@ -101,8 +101,11 @@ def check_sources() -> None:
              f"{sorted(set(stray))[:4]}")
         # The author asked for no bold anywhere in the writeup. Captions are set
         # apart by size and centring instead, in build_docx.py.
-        bold = re.findall(r"\*\*[^*]+\*\*", txt)
-        rule(f"{name}: nothing is set in bold", not bold, f"{bold[:3]}")
+        # The SPE template asks for bold in-text citations of figures and tables and
+        # for no bold on equation citations. Nothing else is bold.
+        bold = [b for b in re.findall(r"\*\*([^*]+)\*\*", txt)
+                if not re.fullmatch(r"(?:Fig\. \d+|Table \d+)", b)]
+        rule(f"{name}: only figure and table citations are set in bold", not bold, f"{bold[:3]}")
         # Two affiliations in one Markdown paragraph run together on the page.
         aff = re.search(r"^\^1\^ .*$", txt, re.M)
         if aff:
@@ -134,9 +137,11 @@ def check_docx(docx: str) -> str | None:
     # note and is not held to the manuscript's typographic rules.
     if "Change_Review" not in name:
         body = re.sub(r"<w:tbl>.*?</w:tbl>", "", xml, flags=re.S)
-        rule(f"{name}: no run is set in bold",
-             "<w:b />" not in body and "<w:b/>" not in body,
-             f"{body.count('<w:b />')} bold run(s)")
+        bold_runs = [t for rpr, t in re.findall(
+            r"<w:r>(?:<w:rPr>((?:(?!</w:rPr>).)*)</w:rPr>)?<w:t[^>]*>([^<]*)</w:t>", body, re.S)
+            if re.search(r"<w:b\s*/>", rpr or "") and not re.fullmatch(r"(?:Fig\. \d+|Table \d+)", t)]
+        rule(f"{name}: only figure and table citations are set in bold", not bold_runs,
+             f"{len(bold_runs)} other bold run(s)")
 
         caps = [p for p in re.findall(r"<w:p>(?:(?!</w:p>).)*?</w:p>", xml, re.S)
                 if re.match(r"^(?:Fig\.|Table)\s(?:\d+|[A-Z]-\d+|S\d+)—",

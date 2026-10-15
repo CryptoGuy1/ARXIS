@@ -704,8 +704,17 @@ check("disjoint-support bound, clean", 18.10, 100 * (1 - 0.05 ** (1.0 / _neff_c)
 # figures rather than on their formatting.
 rule("the widened bounds appear in the text",
      "from 0.47% to 9.21%" in ALL and "from 0.94% to 18.10%" in ALL)
-rule("bold survives only on caption leads and run-in headings",
-     not re.search(r"(?<!^)\*\*(?:Table|Fig\.|Eq\.) ?\d", TXT, re.M), "a bolded cross-reference remains")
+# The SPE template asks for figure and table citations in bold and equation
+# citations in plain text. Captions and table cells are outside that rule.
+_body_lines = [l for l in TXT[:TXT.index("## References")].split("\n")
+               if l.strip() and not l.startswith(("|", "![", "#", "&nbsp;"))
+               and not re.match(r"^(?:Fig\.|Table) \d+—", l)]
+_bare_fig_table = [l for l in _body_lines
+                   if re.search(r"(?<!\*\*)\b(?:Fig\. \d+|Table \d+)\b(?!\*\*)", re.sub(r"\*\*(?:Fig\. \d+|Table \d+)\*\*", "", l))]
+rule("figure and table citations are bold in the body, as the SPE template asks",
+     not _bare_fig_table, f"{len(_bare_fig_table)} plain citation line(s)")
+rule("equation citations are not bold, as the SPE template asks",
+     not re.search(r"\*\*Eq\.? ?\d", TXT), "a bolded equation citation remains")
 
 # --- episode-level hazard metrics
 _em = pd.read_csv(R + "v3_episode_metrics.csv")
@@ -750,7 +759,7 @@ rule("the miss-only comparison is not stated as a ranking",
 # The contributions were a bullet list and are running prose now, as the model
 # papers set them. The six research questions stay a list, numbered i to vi, each
 # item carrying the RQ label the rest of the paper cross-references.
-_RQ_BLOCK = TXT[TXT.index("Six questions follow."):
+_RQ_BLOCK = TXT[TXT.index("Six research questions (RQ) follow."):
                 TXT.index("## Related Work and Positioning")]
 _RQ_ITEMS = re.findall(r"^(i{1,3}|iv|v|vi)\.\s+RQ(\d)\.", _RQ_BLOCK, re.M)
 rule("the research questions are counted correctly",

@@ -13,6 +13,7 @@ claims reproducibility it does not deliver.
 
     python3 audit_release.py
 """
+import glob
 import os
 import re
 import sys
@@ -21,6 +22,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 MD = os.path.join(ROOT, "ARXIS_Manuscript_v15_SPE.md")
 SI = os.path.join(ROOT, "ARXIS_Supporting_Information.md")
 RESULTS = os.path.join(ROOT, "retrain", "results_v2")
+THERMAL = os.path.join(ROOT, "retrain", "results_thermal")
 
 # Files the manuscript names in backticks. Paths are relative to the repository
 # root; a few are expected only in the public release and are listed separately.
@@ -188,12 +190,14 @@ def main():
     for name in sorted(claimed):
         if name in RELEASE_ONLY:
             continue
+        # The thermal folder names its files relative to itself (`runs/*.json`,
+        # `curves/`, `results_thermal/summary.json`), so those are looked up there too.
+        candidates = [os.path.join(ROOT, name), os.path.join(RESULTS, os.path.basename(name)),
+                      os.path.join(THERMAL, name), os.path.join(ROOT, "retrain", name)]
         if name.endswith("/"):
-            ok = os.path.isdir(os.path.join(ROOT, name.rstrip("/")))
+            ok = any(os.path.isdir(c.rstrip("/")) for c in candidates)
         else:
-            ok = os.path.exists(os.path.join(ROOT, name))
-            if not ok:
-                ok = os.path.exists(os.path.join(RESULTS, os.path.basename(name)))
+            ok = any(glob.glob(c) if "*" in c else os.path.exists(c) for c in candidates)
         (present if ok else missing).append(name)
 
     produced = set()

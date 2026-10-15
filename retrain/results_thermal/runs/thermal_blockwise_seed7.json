@@ -1,0 +1,85 @@
+{
+  "run": "thermal_blockwise_seed7",
+  "split": "blockwise",
+  "seed": 7,
+  "ultralytics": "8.4.14",
+  "torch": "2.11.0+cu128",
+  "device": "Tesla T4",
+  "config": {
+    "epochs": 50,
+    "imgsz": 224,
+    "batch": 32,
+    "test_frac": 0.2,
+    "embargo_frames": 20,
+    "gas_order": [
+      "NoGas",
+      "Smoke",
+      "Mixture",
+      "Perfume"
+    ],
+    "hazard": [
+      "Smoke",
+      "Mixture"
+    ]
+  },
+  "held_out_block_start_per_class": {
+    "NoGas": 1192,
+    "Smoke": 795,
+    "Mixture": 869,
+    "Perfume": 1133
+  },
+  "counts": {
+    "train": 4960,
+    "embargo": 160,
+    "heldout": 1280
+  },
+  "optimizer": {
+    "class": "AdamW",
+    "lr_at_train_start": 0.00125,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "momentum": null,
+    "weight_decay_values": [
+      0.0,
+      0.0005
+    ]
+  },
+  "primary_top1_final_epoch": 0.84921875,
+  "top1_best_checkpoint_reference_only": 0.91328125,
+  "per_class_final_epoch": {
+    "NoGas": 0.915625,
+    "Smoke": 0.828125,
+    "Mixture": 0.99375,
+    "Perfume": 0.659375
+  },
+  "confusion_final_epoch": {
+    "Mixture": {
+      "Mixture": 318,
+      "NoGas": 0,
+      "Perfume": 0,
+      "Smoke": 2
+    },
+    "NoGas": {
+      "Mixture": 0,
+      "NoGas": 293,
+      "Perfume": 24,
+      "Smoke": 3
+    },
+    "Perfume": {
+      "Mixture": 0,
+      "NoGas": 107,
+      "Perfume": 211,
+      "Smoke": 2
+    },
+    "Smoke": {
+      "Mixture": 0,
+      "NoGas": 54,
+      "Perfume": 1,
+      "Smoke": 265
+    }
+  },
+  "hazard_frames": 640,
+  "hazard_called_nonhazard_final_epoch": 55
+}

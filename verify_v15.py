@@ -1431,6 +1431,41 @@ if _m_pf:
          int(_pf_rows.groupby('seed').n.first().sum()) == _pf_n,
          f"manuscript says {_pf_n}, file gives {int(_pf_rows.groupby('seed').n.first().sum())}")
 
+# ============ F. perception numbers against the thermal study ============
+# The perception figures in the text are taken from retrain/results_thermal/summary.json,
+# which retrain/summarize_thermal.py writes from the per-run results after checking each run
+# against its own confusion matrix, split table and checkpoint. Here each quoted number is
+# compared with the summary, and the summary itself is required to be present and passing.
+_TS_PATH = os.path.join("retrain", "results_thermal", "summary.json")
+rule("the thermal summary exists", os.path.exists(_TS_PATH), _TS_PATH)
+if os.path.exists(_TS_PATH):
+    _TS = json.load(open(_TS_PATH))
+    _bw = _TS["groups"]["blockwise"]
+    _rd = _TS["groups"]["randomized"]
+    rule("five block-wise runs and three randomized runs are summarized",
+         _bw["top1"]["n"] == 5 and _rd["top1"]["n"] == 3,
+         f"{_bw['top1']['n']} block-wise, {_rd['top1']['n']} randomized")
+    rule("every thermal run has a checkpoint hash",
+         all("checkpoint_sha256" in v for v in _TS["runs"].values()))
+    check("block-wise mean top-1 (%)", 100 * _bw["top1"]["mean"], 85.0, tol=0.05)
+    check("block-wise sd (points)", 100 * _bw["top1"]["sd"], 4.9, tol=0.05)
+    check("block-wise minimum top-1 (%)", 100 * _bw["top1"]["min"], 79.2, tol=0.05)
+    check("block-wise maximum top-1 (%)", 100 * _bw["top1"]["max"], 92.1, tol=0.05)
+    check("randomized mean top-1 (%)", 100 * _rd["top1"]["mean"], 98.2, tol=0.05)
+    check("randomized minimum top-1 (%)", 100 * _rd["top1"]["min"], 98.0, tol=0.05)
+    check("randomized maximum top-1 (%)", 100 * _rd["top1"]["max"], 98.3, tol=0.05)
+    check("block-wise minimum hazard misses", _bw["hazard_called_nonhazard"]["min"], 0, tol=0.5)
+    check("block-wise maximum hazard misses", _bw["hazard_called_nonhazard"]["max"], 65, tol=0.5)
+    check("block-wise maximum hazard-miss rate (%)", 100 * _bw["hazard_called_nonhazard"]["max"] / 640, 10.2, tol=0.05)
+    check("gap between randomized and block-wise means (points)",
+          _TS["gap_randomized_minus_blockwise_mean_points"], 13.2, tol=0.05)
+    _ph = ["79.2 to 92.1%", "85.0%", "98.0 to 98.3%", "between 0 and 65", "0.0 to 10.2%", "13.2 points"]
+    for _p in _ph:
+        rule(f"the perception text quotes '{_p}'", _p in ALL)
+    rule("no perception passage still calls the randomized figure like-for-like",
+         "like-for-like recognition comparison" not in ALL)
+
+
 print(f"{N[0]} checks run, {len(FAIL)} failure(s)")
 for f in FAIL:
     print("  FAIL", f)

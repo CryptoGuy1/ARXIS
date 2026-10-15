@@ -41,7 +41,7 @@ Two distinctions matter for reading the code.
 
 [MultimodalGasData](https://data.mendeley.com/datasets/zkwgkjkjn9/2) (Narkhede et al. 2022, CC BY 4.0): 6,400 samples in four classes, a seven-channel MQ-series MOX array paired with 206×156 thermal frames, logged at 2 s intervals.
 
-Place `Gas_Sensors_Measurements.csv` in `data/`. The thermal images are needed only for the perception component and are not used by any safety result.
+Place `Gas_Sensors_Measurements.csv` in `data/`. The thermal images are needed only for the perception component, and no safety result uses them. The thermal runs are in `retrain/results_thermal`, and the scripts there were run on Kaggle with the full thermal set; `retrain/summarize_thermal.py` checks their saved results without needing the images.
 
 ---
 
@@ -138,7 +138,7 @@ The live pipeline (`main.py` and `app.py`) loads two files that are not part of 
 
 The Decision Agent checkpoint at `models/retrained/exp1_pareto/exp1_miss8_seed42.pth` is written only by `retrain/run_exp1_real.py`, a deprecated driver, and it does not reproduce from the release code. Its feature scaler does not match the release's, and its held-out numbers cannot be trusted as held out until the training split is confirmed. It is therefore not shipped. `DecisionTool` raises a clear `FileNotFoundError` when this file is missing, and the reported experiments do not load it.
 
-The thermal classifier at `models/yolov8_gas_classifier.pt` is not shipped either. Its recorded metrics match Table S1 of the supporting information, but its weights are kept outside the repository, and no reported number depends on them.
+The thermal classifier at `models/yolov8_gas_classifier.pt` is not shipped either. Its recorded metrics match Table S1 of the supporting information. The retrained thermal runs under both protocols are in `retrain/results_thermal`, with their results, split tables, training curves and checkpoint hashes, but not their checkpoints. The perception numbers in the paper come from those saved results, which `make thermal` checks.
 
 The autoencoder at `models/lstm_autoencoder_weights.pth` is shipped and reproduces the notebook that trained it (`test_runtime_anomaly.py`). To run the live pipeline, a Decision Agent must be placed at the path in `main.py` and `app.py` or that path must be changed. The release has no supported driver that writes such a file, so this is a new model, not the one the paper reports.
 
@@ -165,7 +165,8 @@ make_manifest.py                 writes RUN_MANIFEST.json from the live interpre
 continuity_v9.json               the figure list carried over from the pre-rewrite
                                  revision, so nothing can be dropped unnoticed
 
-data/                            the corpus CSV and the thermal frames the figures use
+data/                            the corpus CSV and five example thermal frames; the full thermal set is not included
+retrain/results_thermal/         the thermal classifier under both protocols: per-run results, split tables, curves, drivers and checkpoint hashes
 figures_v2/                      every figure in the manuscript and the supporting information
 models/                          the LSTM autoencoder weights and config used by the runtime
                                  anomaly tool, tracked so the checks run from a bare clone.

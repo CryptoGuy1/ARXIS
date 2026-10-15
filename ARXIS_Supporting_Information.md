@@ -17,27 +17,13 @@ Objects are numbered S1, S2, S3 and are cited from the body by those labels.
 
 ## S1 Perception Component
 
-The thermal path is described here in full. It is worth being explicit about why
-it sits in supporting information: the decision state of Eq. 1 carries no visual
-term, so no safety result in the manuscript depends on any number in this
-section, and the component's evaluation is held to a weaker standard than the
-sensor path's.
+The thermal path is described here in full. The decision state of Eq. 1 carries no visual term, so no safety result in the manuscript depends on any number in this section. The component was nonetheless evaluated under both protocols the sensor path uses, and the block-wise results are reported in full, including where they are poor.
 
-*Training.* Thermal images are classified with YOLOv8n-cls (Jocher et al. 2023), the smallest classification variant in the family. The classifier was trained with Ultralytics 8.4.14 on Python 3.12.12, PyTorch 2.9.0 with CUDA 12.8, and one Tesla T4 GPU. The run used 50 epochs, batch size 32, image size 224, initialization from pretrained weights, seed 0 and deterministic operations. The optimizer was left at automatic selection. Ultralytics 8.4.14 chooses the optimizer from the number of training iterations, which here is 4,000 (80 iterations per epoch over 5,120 training images, times 50 epochs). Below 10,000 iterations it selects AdamW, with a learning rate of 0.00125, which is 0.002 × 5 / (4 + nc) for four classes, and momentum 0.9. Weight decay of 5×10⁻⁴ is applied to weight tensors only, not to biases or normalization parameters. Training used three warm-up epochs and linear learning-rate decay. The augmentations were a horizontal flip with probability 0.5, no rotation, hue, saturation and value jitter, RandAugment, and random erasing with probability 0.4. The training and validation sets were made by shuffling each class's 1,600 frames into an 80/20 split without a fixed seed, giving 1,280 training and 320 validation images per class, 5,120 and 1,280 in total. The reported figures use the validation partition. The final top-1 validation accuracy is 0.98828 (1,265 of 1,280), the value in Table S1. The checkpoint's stored arguments list a learning rate of 10⁻² and momentum 0.937; automatic selection overrides both, and they are not the values used. The weights are not in the repository, and no reported number depends on them, so the figures can be checked against the training record but not rerun from the repository. The split is randomized over consecutive frames rather than block-wise. The limitations of the manuscript state this, and no conclusion rests on the perception number.
+*Training.* Thermal images are classified with YOLOv8n-cls (Jocher et al. 2023), the smallest classification variant in the family. The classifier was trained with Ultralytics 8.4.14 on Python 3.12.12, PyTorch 2.9.0 with CUDA 12.8, and one Tesla T4 GPU. The run used 50 epochs, batch size 32, image size 224, initialization from pretrained weights, seed 0 and deterministic operations. The optimizer was left at automatic selection. Ultralytics 8.4.14 chooses the optimizer from the number of training iterations, counted at its nominal batch of 64: for the 5,120 randomized training frames that is 80 per epoch, or 4,000 in total, and for the 4,960 block-wise training frames it is 78 per epoch, or 3,900 in total. Below 10,000 iterations it selects AdamW, with a learning rate of 0.00125, which is 0.002 × 5 / (4 + nc) for four classes, and momentum 0.9. Weight decay of 5×10⁻⁴ is applied to weight tensors only, not to biases or normalization parameters. Training used three warm-up epochs and linear learning-rate decay. The augmentations were a horizontal flip with probability 0.5, no rotation, hue, saturation and value jitter, RandAugment, and random erasing with probability 0.4. The original training and validation sets were made by shuffling each class's 1,600 frames into an 80/20 split without a fixed seed, giving 1,280 training and 320 validation images per class, 5,120 and 1,280 in total. The original checkpoint's stored arguments list a learning rate of 10⁻² and momentum 0.937; automatic selection overrides both, and they are not the values used. The original weights are not in the repository, so the original figures can be checked against the training record but not rerun. The retrained runs use the same settings under each protocol. Their checkpoints are not in the repository either, but their SHA-256 hashes are recorded alongside their results, split tables and training curves (Section S19).
 
-*The split, and what it costs.* The sensor-side partitioning discipline was not
-carried across to the images. That split is randomized over frames captured
-consecutively within a single session, so it is exposed to the same leakage
-mechanism the block-wise holdout was built to avoid, and adjacent thermal frames
-are close to duplicates. The figure below is an optimistic upper bound rather
-than an independent estimate. This leaves the two halves of the pipeline held to
-different evidential standards, which is stated in the manuscript's limitations
-rather than left to this file. A block-wise re-split of the image set is
-outstanding work.
+*The split, and what it costs.* The sensor side uses a block-wise holdout with an embargo. The original perception split did not. It was randomized over frames captured consecutively within a single session, so adjacent thermal frames, which are close to duplicates, fall on both sides of it, and its figure is an optimistic upper bound. To measure what that costs, the classifier was retrained under two protocols with the settings above. The randomized protocol holds out a stratified 20% of each class, 320 frames per class and 1,280 in total, with no embargo, so 5,120 frames train the model. The block-wise protocol follows the rule of the sensor pipeline: one contiguous 320-frame block per class, at a position drawn from the seed, with 20 frames discarded on each side of it, so 4,960 frames train the model and 160 are discarded. Each run reports its final-epoch weights on its held-out frames. Each run also records a best-checkpoint figure for reference only, because Ultralytics selects that checkpoint on the same frames.
 
-*Results.*
-
-The thermal classifier reached 98.8% top-1 accuracy on 1,280 held-out validation images (Table S1). Twelve of the 15 misclassifications fell on the NoGas and Perfume boundary. The other three were NoGas frames called Smoke, which is a false alarm rather than a miss; no hazardous frame was called non-hazardous, which is what matters once the class label is mapped to an action (Fig. S1).
+*Results.* The original checkpoint reached 98.8% top-1 accuracy on 1,280 held-out validation images, with 15 misclassifications (Table S1). Twelve of the 15 fell on the NoGas and Perfume boundary, and the other three were NoGas frames called Smoke, a false alarm rather than a miss. No hazardous frame was called non-hazardous, which is what matters once the class label is mapped to an action (Fig. S1). These are the figures recorded for that checkpoint. They are not a rerun, and they are not a leakage-controlled result.
 
 | Gas class | Precision | Recall | F1 | Accuracy (%) |
 |---|---|---|---|---|
@@ -47,14 +33,34 @@ The thermal classifier reached 98.8% top-1 accuracy on 1,280 held-out validation
 | Smoke | 0.991 | 1.000 | 0.995 | 100.0 |
 | Overall | 0.988 | 0.988 | 0.988 | 98.8 |
 
-Table S1—Perception component, 1,280 held-out validation images. Obtained under a randomized image split rather than the block-wise protocol used on the sensor side, so read as an optimistic upper bound rather than an independent estimate. These figures are carried over unchanged from the previous version: the thermal classifier is trained outside the sensor pipeline and was not affected by either of the partitioning corrections, and the block-wise re-split of the image set remains outstanding.
+Table S1—Perception component, original checkpoint, 1,280 held-out validation images from the randomized split, as recorded at training. These figures are not a rerun. The retrained results are in Tables S1b and S1c.
+
+*Retraining under both protocols.* Table S1b gives the three randomized runs, with seeds 42, 1234 and 2024, and Table S1c the five block-wise runs, with seeds 42, 1337, 7, 2024 and 99. On the randomized split the three runs give 98.0 to 98.3% (mean 98.2%), with 22 to 25 errors each, and between 0 and 2 hazardous frames called non-hazardous. The original 98.8% therefore sits about 0.6 points above every retrained run. That gap is larger than the spread among the retrained runs, so the original result does not reproduce exactly under this code, and its cause is not identified here. On the block-wise split the five runs give 79.2 to 92.1% (mean 85.0%, standard deviation 4.9 points), which is 13.2 points below the randomized mean. That gap is consistent with the leakage mechanism described above, but this study does not isolate it, because the two protocols also differ in which frames they train on and which they test on. Recall for NoGas ranges from 49 to 92% and for Perfume from 53 to 99% across seeds, while Mixture stays between 99 and 100%. Between 0 and 65 of the 640 hazardous frames in each run (0.0 to 10.2%) are called non-hazardous, so under the protocol the sensor path uses, the hazard-miss rate is not zero.
+
+| Run | Seed | Top-1 (%) | Errors | NoGas (%) | Smoke (%) | Mixture (%) | Perfume (%) | Hazardous called non-hazardous (of 640) |
+|---|---|---|---|---|---|---|---|---|
+| Randomized | 42 | 98.13 | 24 | 95.0 | 99.4 | 100.0 | 98.1 | 2 |
+| Randomized | 1234 | 98.28 | 22 | 95.6 | 100.0 | 100.0 | 97.5 | 0 |
+| Randomized | 2024 | 98.05 | 25 | 95.9 | 99.4 | 99.7 | 97.2 | 2 |
+| Mean | | 98.15 | 23.7 | 95.5 | 99.6 | 99.9 | 97.6 | 1.3 |
+
+Table S1b—Perception component retrained under the randomized split, 1,280 held-out frames per run, final-epoch weights. The mean row is the arithmetic mean of the three runs.
+
+| Run | Seed | Top-1 (%) | Errors | NoGas (%) | Smoke (%) | Mixture (%) | Perfume (%) | Hazardous called non-hazardous (of 640) |
+|---|---|---|---|---|---|---|---|---|
+| Block-wise | 42 | 81.88 | 232 | 49.1 | 79.7 | 100.0 | 98.8 | 65 |
+| Block-wise | 1337 | 79.22 | 266 | 65.3 | 98.4 | 100.0 | 53.1 | 5 |
+| Block-wise | 7 | 84.92 | 193 | 91.6 | 82.8 | 99.4 | 65.9 | 55 |
+| Block-wise | 2024 | 86.88 | 168 | 79.4 | 84.4 | 100.0 | 83.8 | 50 |
+| Block-wise | 99 | 92.11 | 101 | 90.3 | 100.0 | 99.4 | 78.8 | 0 |
+| Mean | | 85.00 | 192.0 | 75.1 | 89.1 | 99.8 | 76.1 | 35.0 |
+
+Table S1c—Perception component retrained under the block-wise holdout used for the sensor path, 1,280 held-out frames per run (one contiguous block per class, 20-frame embargo), final-epoch weights. Hazardous classes are Smoke and Mixture. The mean row is the arithmetic mean of the five runs.
 
 ![](figures_v2/fig_perception.png){width=6.50in}
 
-Fig. S1—Thermal classifier behavior on 1,280 held-out validation images. (a) Counts, (b) row-normalized, (c) per-class scores.
+Fig. S1—Thermal classifier behavior, original checkpoint, 1,280 randomized-split held-out images. (a) Counts, (b) row-normalized, (c) per-class scores. The retrained confusion matrices are in the repository under retrain/results_thermal/runs.
 
-
----
 
 ## S2 Explanation Component
 
@@ -596,7 +602,7 @@ A rate computed over oversampled windows and a count of events that drew a respo
 
 These specifications and their diagrams were carried in the Methodology of an earlier revision.
 
-*Component Models.* *Perception.* Thermal images are classified with YOLOv8n-cls (Jocher et al. 2023) under a randomized 80/20 stratified split over the 6,400 frames (Supplementary Section S1). That split was not held to the sensor-side discipline, so it is exposed to the leakage mechanism the block-wise holdout exists to avoid and the perception figure is an optimistic upper bound. No claim here rests on it, but the multimodal system as a whole has not been validated to the standard applied to the sensor path (Fig. S7).
+*Component Models.* *Perception.* Thermal images are classified with YOLOv8n-cls (Jocher et al. 2023). The original checkpoint was trained on a randomized 80/20 stratified split over the 6,400 frames and reports 98.8%. Retrained under that protocol it gives 98.0 to 98.3%, and under the block-wise holdout the sensor path uses it gives 79.2 to 92.1% over five seeds, with a mean of 85.0% (Supplementary Section S1). The randomized figures are an optimistic upper bound, and the block-wise figures are the ones that apply to a leakage-controlled comparison. No claim here rests on the perception numbers, but the multimodal system as a whole has not been validated to the standard applied to the sensor path (Fig. S7).
 
 ![](figures_v2/fig_arch_yolo.png){width=6.50in}
 
@@ -665,7 +671,7 @@ About a factor of twenty separates the binomial reference from the disjoint-supp
 | Anomaly component, Fig. S10 | `retrain/run_anomaly_by_class.py`, `retrain/run_all_v2.py` | `v2_anomaly.json` | five seeds | `anomalyclass`, `comparison` |
 | Every independence-reference bound | `retrain/run_block_bootstrap.py`, `retrain/run_partition_bounds.py` | `v3_block_bootstrap.json`, `v3_partition_bounds.json`, `v3_loco_perseed.csv` | five seeds | `blockboot`, `bounds` |
 | Paired bootstrap over runs | `retrain/run_paired_bootstrap.py` | `v3_paired_bootstrap.json` | 30 runs | `bootstrap` |
-| Table S1, Fig. S1 | Ultralytics 8.4.14, trained outside this pipeline | not released as a result file | randomized image split | n/a |
+| Tables S1, S1b, S1c | `retrain/summarize_thermal.py`, over the Kaggle drivers in `retrain/results_thermal/scripts/` | `results_thermal/summary.json`, `runs/*.json`, `split_tables/`, `curves/`, `checkpoints.json` | block-wise five seeds; randomized three seeds | `thermal` |
 | Tables 1, 2, 3 and 7 | definitions, research questions and the evaluation screen, synthesized from the rows above | none | n/a | n/a |
 | Figs. 1 and 2 | `retrain/make_figs_v2.py` | the sensor-policy definitions and the metric boundaries | n/a | `figures` |
 | Figs. 3 to 6, and the remaining figures of the supporting information | `retrain/make_figs_v2.py` | the result files named above | as above | `figures` |
@@ -737,7 +743,7 @@ Table A-1—Provenance of every reported object. Result files sit in `retrain/re
 
 ## S21 Component Behavior in Detail
 
-*Component Behavior.* The thermal classifier reached 98.8% top-1 accuracy on 1,280 held-out validation images, all 15 misclassifications falling on the NoGas and Perfume boundary, so neither hazardous class was confused with a non-hazardous one. That figure comes from a randomized image split, which makes it comparable to the published accuracies on this corpus and comparably optimistic. Supplementary Section S1 gives the per-class scores.
+*Component Behavior.* The original checkpoint reached 98.8% top-1 accuracy on 1,280 randomized-split held-out images. Retrained under the same protocol it reaches 98.0 to 98.3%, which makes it comparable to the published randomized accuracies on this corpus and comparably optimistic. Under the block-wise holdout the sensor path uses, the same classifier reaches 79.2 to 92.1% over five seeds, with a mean of 85.0%, and between 0 and 65 hazardous frames per run are called non-hazardous. Supplementary Section S1 gives the per-class scores and the seed-by-seed tables.
 
 The anomaly component raises two questions (Fig. S10). On whether the score tracks hazard, mean reconstruction error on held-out windows is 0.023 for clean air and 0.107 for the vapor class against 164.7 for smoke and 80.6 for the mixture (Fig. 7a), three orders of magnitude apart. It is not monotone in target severity, since Mixture carries the higher target action yet scores below Smoke, so it is evidence of abnormality and not a severity estimate.
 
@@ -760,7 +766,7 @@ Fig. S10—Anomaly component. (a) Mean reconstruction error by class. (b) Operat
 | Liang et al. (2023) | pipeline flow | normal-only anomaly detection | field validated | n/a | stops at detection |
 | Korjani et al. (2024) | optical gas imaging | vision detection | field imagery | n/a | degraded sensing not a safety metric |
 | Elkan (2001) | n/a | cost-sensitive learning theory | n/a | n/a | untested on a saturated benchmark |
-| This study | MGD | action from MOX and anomaly state | block-wise holdout, 20-window embargo, seed-varying block | Tables 8, 10 | surrogate analytes; one session and device; perception path held to a weaker standard |
+| This study | MGD | action from MOX and anomaly state | block-wise holdout, 20-window embargo, seed-varying block | Tables 8, 10 | surrogate analytes; one session and device; perception path evaluated under both protocols (Table S1c) |
 
 Table S17—Representative prior work with dataset, task and validation protocol. MGD = MultimodalGasData.
 

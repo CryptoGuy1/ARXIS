@@ -125,6 +125,10 @@ figures: comparison classdisjoint leakage calibration anomaly final
 verify:
 	$(PY) verify_v15.py
 
+# the thermal classifier under both protocols: per-run checks and the summary the perception numbers come from
+thermal:
+	$(PY) retrain/summarize_thermal.py
+
 # the document against itself: superseded values, traceability, cross-references,
 # notation, vocabulary, prose risk
 selfaudit:
@@ -135,7 +139,7 @@ test:
 	$(PY) test_safety_metrics.py
 
 # everything a reviewer would want green before reading the paper
-check: verify selfaudit test figtext proof
+check: verify selfaudit test figtext proof thermal
 	$(PY) audit_release.py
 
 ## every pair of text elements in every figure, tested for overlap

@@ -1,0 +1,234 @@
+{
+  "thermal_blockwise_seed1337": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "bcde565aa998b0e18b73011422599b3e14a2c493d863af73e3dc9a6cea942de1",
+    "stored_top1": 0.79219,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_blockwise_seed2024": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "3dbee0054c71b01b50a5af7f5fc3adb3a477a50ecee4fcdfb6d5ed760466039e",
+    "stored_top1": 0.86875,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_blockwise_seed42": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "adf0366e991bc7f3f801119e598d668e7c8321c3fd43e946b2a0e87f03688ecb",
+    "stored_top1": 0.82031,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_blockwise_seed7": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "98a54a79d2ec45e9912dd5c69c4198cc98778a5dfcfb9472ac7ab0afe508a6b6",
+    "stored_top1": 0.84922,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_blockwise_seed99": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "3e3d2885a1265aa7c06ecd1333f4f7dba55fa20b16059bb61de59ab54033ee32",
+    "stored_top1": 0.92109,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_randomized_seed1234": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "539483071472f48377bedaff75db4440b0041080e85a68934ef45e29db3c8a2b",
+    "stored_top1": 0.98281,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_randomized_seed2024": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "f708bcc2b851930797d49a22168053573935f5bb5d5fd824a0caf5157ca961a5",
+    "stored_top1": 0.98047,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  },
+  "thermal_randomized_seed42": {
+    "bytes": 2971720,
+    "names": {
+      "0": "Mixture",
+      "1": "NoGas",
+      "2": "Perfume",
+      "3": "Smoke"
+    },
+    "sha256": "ccf94b89f6be999fc4323228497b3271143e17872adbafc106541cf36a5f290a",
+    "stored_top1": 0.98125,
+    "train_args": {
+      "auto_augment": "randaugment",
+      "batch": 32,
+      "degrees": 0.0,
+      "deterministic": true,
+      "epochs": 50,
+      "erasing": 0.4,
+      "fliplr": 0.5,
+      "hsv_h": 0.015,
+      "hsv_s": 0.7,
+      "hsv_v": 0.4,
+      "imgsz": 224,
+      "optimizer": "auto",
+      "seed": 0,
+      "warmup_bias_lr": 0.0,
+      "warmup_epochs": 3
+    },
+    "ultralytics": "8.4.14"
+  }
+}

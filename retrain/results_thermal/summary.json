@@ -1,0 +1,265 @@
+{
+  "gap_randomized_minus_blockwise_mean_points": 13.151041666666663,
+  "groups": {
+    "blockwise": {
+      "errors": {
+        "max": 266.0,
+        "mean": 192.0,
+        "min": 101.0,
+        "n": 5,
+        "sd": 63.11497445139307
+      },
+      "hazard_called_nonhazard": {
+        "max": 65.0,
+        "mean": 35.0,
+        "min": 0.0,
+        "n": 5,
+        "sd": 30.20761493398643
+      },
+      "per_class": {
+        "Mixture": {
+          "max": 1.0,
+          "mean": 0.9974999999999999,
+          "min": 0.99375,
+          "n": 5,
+          "sd": 0.0034232659844072757
+        },
+        "NoGas": {
+          "max": 0.915625,
+          "mean": 0.75125,
+          "min": 0.490625,
+          "n": 5,
+          "sd": 0.17989254605180283
+        },
+        "Perfume": {
+          "max": 0.9875,
+          "mean": 0.760625,
+          "min": 0.53125,
+          "n": 5,
+          "sd": 0.17390281050057815
+        },
+        "Smoke": {
+          "max": 1.0,
+          "mean": 0.890625,
+          "min": 0.796875,
+          "n": 5,
+          "sd": 0.0943987966687076
+        }
+      },
+      "top1": {
+        "max": 0.92109375,
+        "mean": 0.85,
+        "min": 0.7921875,
+        "n": 5,
+        "sd": 0.04930857379015085
+      }
+    },
+    "randomized": {
+      "errors": {
+        "max": 25.0,
+        "mean": 23.666666666666668,
+        "min": 22.0,
+        "n": 3,
+        "sd": 1.5275252316519468
+      },
+      "hazard_called_nonhazard": {
+        "max": 2.0,
+        "mean": 1.3333333333333333,
+        "min": 0.0,
+        "n": 3,
+        "sd": 1.1547005383792517
+      },
+      "per_class": {
+        "Mixture": {
+          "max": 1.0,
+          "mean": 0.9989583333333334,
+          "min": 0.996875,
+          "n": 3,
+          "sd": 0.0018042195912176063
+        },
+        "NoGas": {
+          "max": 0.959375,
+          "mean": 0.9552083333333332,
+          "min": 0.95,
+          "n": 3,
+          "sd": 0.004773516348912353
+        },
+        "Perfume": {
+          "max": 0.98125,
+          "mean": 0.9760416666666666,
+          "min": 0.971875,
+          "n": 3,
+          "sd": 0.0047735163489122925
+        },
+        "Smoke": {
+          "max": 1.0,
+          "mean": 0.9958333333333332,
+          "min": 0.99375,
+          "n": 3,
+          "sd": 0.0036084391824351483
+        }
+      },
+      "top1": {
+        "max": 0.9828125,
+        "mean": 0.9815104166666666,
+        "min": 0.98046875,
+        "n": 3,
+        "sd": 0.0011933790872280762
+      }
+    }
+  },
+  "runs": {
+    "thermal_blockwise_seed1337": {
+      "best_checkpoint_reference": 0.8796875,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "bcde565aa998b0e18b73011422599b3e14a2c493d863af73e3dc9a6cea942de1",
+      "checkpoint_stored_top1": 0.79219,
+      "errors": 266,
+      "hazard_called_nonhazard": 5,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": null,
+      "per_class": {
+        "Mixture": 1.0,
+        "NoGas": 0.653125,
+        "Perfume": 0.53125,
+        "Smoke": 0.984375
+      },
+      "seed": 1337,
+      "split": "blockwise",
+      "top1": 0.7921875
+    },
+    "thermal_blockwise_seed2024": {
+      "best_checkpoint_reference": 0.9375,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "3dbee0054c71b01b50a5af7f5fc3adb3a477a50ecee4fcdfb6d5ed760466039e",
+      "checkpoint_stored_top1": 0.86875,
+      "errors": 168,
+      "hazard_called_nonhazard": 50,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.86875,
+      "per_class": {
+        "Mixture": 1.0,
+        "NoGas": 0.79375,
+        "Perfume": 0.8375,
+        "Smoke": 0.84375
+      },
+      "seed": 2024,
+      "split": "blockwise",
+      "top1": 0.86875
+    },
+    "thermal_blockwise_seed42": {
+      "best_checkpoint_reference": 0.871875,
+      "checkpoint_minus_json_frames": 2,
+      "checkpoint_sha256": "adf0366e991bc7f3f801119e598d668e7c8321c3fd43e946b2a0e87f03688ecb",
+      "checkpoint_stored_top1": 0.82031,
+      "errors": 232,
+      "hazard_called_nonhazard": 65,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.82031,
+      "per_class": {
+        "Mixture": 1.0,
+        "NoGas": 0.490625,
+        "Perfume": 0.9875,
+        "Smoke": 0.796875
+      },
+      "seed": 42,
+      "split": "blockwise",
+      "top1": 0.81875
+    },
+    "thermal_blockwise_seed7": {
+      "best_checkpoint_reference": 0.91328125,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "98a54a79d2ec45e9912dd5c69c4198cc98778a5dfcfb9472ac7ab0afe508a6b6",
+      "checkpoint_stored_top1": 0.84922,
+      "errors": 193,
+      "hazard_called_nonhazard": 55,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.84922,
+      "per_class": {
+        "Mixture": 0.99375,
+        "NoGas": 0.915625,
+        "Perfume": 0.659375,
+        "Smoke": 0.828125
+      },
+      "seed": 7,
+      "split": "blockwise",
+      "top1": 0.84921875
+    },
+    "thermal_blockwise_seed99": {
+      "best_checkpoint_reference": 0.9359375,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "3e3d2885a1265aa7c06ecd1333f4f7dba55fa20b16059bb61de59ab54033ee32",
+      "checkpoint_stored_top1": 0.92109,
+      "errors": 101,
+      "hazard_called_nonhazard": 0,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.92109,
+      "per_class": {
+        "Mixture": 0.99375,
+        "NoGas": 0.903125,
+        "Perfume": 0.7875,
+        "Smoke": 1.0
+      },
+      "seed": 99,
+      "split": "blockwise",
+      "top1": 0.92109375
+    },
+    "thermal_randomized_seed1234": {
+      "best_checkpoint_reference": 0.9859375,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "539483071472f48377bedaff75db4440b0041080e85a68934ef45e29db3c8a2b",
+      "checkpoint_stored_top1": 0.98281,
+      "errors": 22,
+      "hazard_called_nonhazard": 0,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.98281,
+      "per_class": {
+        "Mixture": 1.0,
+        "NoGas": 0.95625,
+        "Perfume": 0.975,
+        "Smoke": 1.0
+      },
+      "seed": 1234,
+      "split": "randomized",
+      "top1": 0.9828125
+    },
+    "thermal_randomized_seed2024": {
+      "best_checkpoint_reference": 0.984375,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "f708bcc2b851930797d49a22168053573935f5bb5d5fd824a0caf5157ca961a5",
+      "checkpoint_stored_top1": 0.98047,
+      "errors": 25,
+      "hazard_called_nonhazard": 2,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.98047,
+      "per_class": {
+        "Mixture": 0.996875,
+        "NoGas": 0.959375,
+        "Perfume": 0.971875,
+        "Smoke": 0.99375
+      },
+      "seed": 2024,
+      "split": "randomized",
+      "top1": 0.98046875
+    },
+    "thermal_randomized_seed42": {
+      "best_checkpoint_reference": 0.9828125,
+      "checkpoint_minus_json_frames": 0,
+      "checkpoint_sha256": "ccf94b89f6be999fc4323228497b3271143e17872adbafc106541cf36a5f290a",
+      "checkpoint_stored_top1": 0.98125,
+      "errors": 24,
+      "hazard_called_nonhazard": 2,
+      "hazard_frames": 640,
+      "last_epoch_curve_top1": 0.98125,
+      "per_class": {
+        "Mixture": 1.0,
+        "NoGas": 0.95,
+        "Perfume": 0.98125,
+        "Smoke": 0.99375
+      },
+      "seed": 42,
+      "split": "randomized",
+      "top1": 0.98125
+    }
+  }
+}

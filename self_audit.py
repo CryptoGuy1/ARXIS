@@ -321,7 +321,7 @@ rule("F", "no paragraph opens with a bare pronoun and no noun", not vague,
 # The three places a reader looks for the headline findings must agree with each
 # other and with the results section.
 COHERENCE = [
-    ("the held-out-class miss counts", "507 of 7,905", [SUMMARY, RQTABLE, CONCL, BODY]),
+    ("the worst-partition miss counts", "234 of 1,581", [SUMMARY, RQTABLE, CONCL, BODY]),
     ("the escalation spread", "about 200", [SUMMARY, RQTABLE, CONCL, BODY]),
     ("the count of models under the 3.3% line", "seven of ten", [SUMMARY, CONCL, BODY]),
     ("the protocol effect", "3.23", [SUMMARY, CONCL, BODY]),

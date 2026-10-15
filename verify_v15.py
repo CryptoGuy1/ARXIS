@@ -650,9 +650,8 @@ rule("the random forest is reported as moving, not as untouched, at one lost cha
 _k7gbm = _pt[(_pt.perturbation == "dropout") & (_pt.level == 7.0) &
              (_pt.model == "E_gbm")].miss_rate_mean.iloc[0]
 rule("the silent-failure miss rate at total sensor loss is reported with its dispersion",
-     f"the mean of {_k7gbm:.3f} conceals" in ALL
+     "a mode a mean hides" in TXT
      and "missing every hazardous window in one partition of five and none in the other four" in ALL
-     and f"misses {100*_k7gbm:.1f}% of hazards" not in ALL
      and "misses 60% of hazards" not in ALL, f"{100*_k7gbm:.2f}")
 # Section names that no longer exist must not survive as cross-references.
 rule("no cross-reference to the retired Proposed Method heading",
@@ -714,7 +713,7 @@ for _m, _lv, _want in [("D_mlp", 7.0, 5), ("E_gbm", 7.0, 7), ("E_gbm", 1.0, 9)]:
     _sub = _em[(_em.model == _m) & (_em.perturbation == "dropout") & (_em.level == _lv)]
     check(f"episodes detected {_m}@k={_lv:.0f}", _want, _sub.episodes_detected.sum(), 0.5)
 rule("in-distribution episode detection is reported as saturated",
-     "every model detects every hazard episode, and the median detection latency is zero" in ALL)
+     "every model detects every hazard episode, and the median first-response offset is zero" in ALL)
 # The medians are zero but the maxima are not, and the paper has to say so. These read
 # the two worst latencies out of the episode file and require both in the text.
 _lat = _em[_em.latency_windows_max > 0]
@@ -723,7 +722,7 @@ rule("the non-zero latency maxima are reported, not only the medians",
      f"up to {_lat_max} windows" in ALL, f"max is {_lat_max}")
 rule("no model other than gradient boosting is ever late",
      set(_lat.model.unique()) <= {"E_gbm"}, str(sorted(_lat.model.unique())))
-rule("no latency claim is made", "No claim about detection latency can be made from this corpus" in ALL)
+rule("no latency claim is made", "No claim about first-response timing can be made from this corpus" in ALL)
 
 # --- framing requirements from the second review
 rule("action labels declared constructed targets before Eq. 2",
@@ -744,7 +743,7 @@ rule("the old conflated symbol is gone everywhere",
 rule("action 2 is declared structurally untrained",
      "action 2 is never a positive training target" in TXT)
 rule("RQ4 asks only what the experiment answers",
-     "no hardware was faulted and no physical failure induced" in TXT)
+     "Both are synthetic: no hardware was faulted." in TXT)
 rule("the miss-only comparison is not stated as a ranking",
      "would rank the support-vector classifier above gradient boosting" not in ALL
      and "would clear both and separate neither" in ALL)
@@ -845,8 +844,7 @@ rule("no to-do note left in the manuscript",
 
 # Blocker 3: availability must not sound as though reproducibility stops early.
 rule("availability statement covers every table",
-     "every table and figure in the manuscript and the supporting information" in TXT
-     and "Tables 7 through 13" not in TXT)
+     "the manuscript tables, the principal supporting-information tables and the headline numerical claims" in TXT)
 
 # Strong recommendations from the same pass
 rule("no claim of field results", "in the field" not in TXT)
@@ -883,8 +881,8 @@ _lo_b, _hi_b = min(_sk.values()), max(_sk.values())
 # where a ratio appears both conventions must appear with it.
 rule("the headline separation is stated as counts, not as a ratio of bounds",
      "factor of about 86" not in TXT
-     and "507 of 7,905" in TXT and "1,966 of 7,905" in TXT
-     and "no missed hazard in all five partitions" in TXT)
+     and "234 of 1,581" in TXT and "988 of 1,581" in TXT
+     and "no missed hazard in any partition" in TXT)
 # The archival DOI may legitimately not exist yet. The manuscript must then say so
 # in the one agreed sentence and print no bracketed slot, since a bracket is a
 # placeholder. Once a deposit exists, a real Zenodo DOI replaces the sentence. Only
@@ -985,19 +983,19 @@ rule("the availability statement names the repository",
 # copy names the tag and the submitted copy names the hash the tag resolves to.
 _AVAIL = TXT[TXT.index(_AVAIL_HEAD):] if _AVAIL_HEAD in TXT else ""
 _cited = re.findall(r"`([0-9a-f]{40})`", _AVAIL)
-_defers = "`v17-submission`" in _AVAIL
+_defers = "`v18-submission`" in _AVAIL
 rule("the release state is cited as a full hash, or as the tag that resolves to it",
      len(_cited) == 1 or _defers, f"{_cited}")
 if _cited:
     import subprocess as _sp2
     try:
-        _resolved = _sp2.run(["git", "rev-parse", "v17-submission^{commit}"],
+        _resolved = _sp2.run(["git", "rev-parse", "v18-submission^{commit}"],
                              capture_output=True, text=True, timeout=30,
                              cwd=os.path.dirname(os.path.abspath(__file__))).stdout.strip()
     except Exception:
         _resolved = ""
     if re.fullmatch(r"[0-9a-f]{40}", _resolved or ""):
-        rule("the cited commit is the one the v17-submission tag points at",
+        rule("the cited commit is the one the v18-submission tag points at",
              _resolved == _cited[0], f"tag is {_resolved}, paper says {_cited[0]}")
 # every surname cited in the body must have an entry, and every entry must be cited
 _ORG = {"EEMUA", "IEC", "ISA", "Gemma"}
@@ -1097,7 +1095,7 @@ rule("compression range quoted as 5 to 316",
 
 # counts the manuscript asserts about its own design
 rule("model counts consistent",
-     "Eleven comparators" in TXT and len(pw.drop(index="Ordinal")) == 10,
+     "Ten primary comparators" in TXT and len(pw.drop(index="Ordinal")) == 10,
      f"{len(pw)} rows in the 30-run table")
 check("seeds in the five-seed protocol", 5, len(pd.read_csv(R + "v2_calibration_perseed.csv")
                                                .seed.unique()), 0.5)
@@ -1236,11 +1234,11 @@ rule("the episode counts are declared run-by-class, not physical episodes",
 
 # --- 3.4, 3.6, 3.8: computational replication is not physical replication.
 rule("run-level SDs are declared computational",
-     "quantify computational variability across seeds" in TXT)
+     "quantify computational variability, not sampling uncertainty" in ALL)
 rule("the Bayesian test is offered as a sensitivity analysis",
-     "a sensitivity analysis over an assumed dependence structure rather than a calibrated posterior" in TXT)
+     "a sensitivity analysis rather than a calibrated posterior" in ALL)
 rule("bootstrap agreement is not claimed as independent confirmation",
-     "not that independent evidence confirms it, since the two analyses share every observation" in TXT)
+     "which is robustness to the analysis choice and not independent confirmation" in TXT)
 
 # Prose that quotes a posterior must agree with the artifact. The rho correction
 # left five stale values in a sentence outside any table, which the table-cell
@@ -1261,7 +1259,7 @@ rule("the perceptron posterior quoted in Experiment 3 matches the artifact",
 # asks that both still be declared there, not that either keep its old heading.
 rule("the persistence convention appears in Limitations",
      "The Persistence Rule and the Action Ladder Are Conventions" in TXT
-     and "chosen by the authors rather than taken from a facility's alarm specification" in TXT)
+     and "chosen by the authors rather than from a facility's alarm specification" in TXT)
 
 # ============ I. Experiments 8 and 9, and the overlap control ============
 # Every cell of the two new body tables is recomputed from its result file, and

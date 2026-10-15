@@ -1,4 +1,4 @@
-# Supporting Information
+# Supplementary Material
 
 A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation
 
@@ -11,7 +11,45 @@ script. It is here because the components and experiments below do not determine
 the paper's safety findings and their full treatment would crowd out the ones
 that do.
 
-Objects are numbered S1, S2, S3 and are cited from the body by those labels.
+This is the supplementary material file for the manuscript. Every object the body cites is S-numbered, and objects are numbered S1, S2, S3 and are cited from the body by those labels.
+
+## Contents
+
+| Section | Subject | Tables and figures |
+|---|---|---|
+| S1 | Perception Component | Tables S1, S1b, S1c; Fig. S1 |
+| S2 | Explanation Component | none |
+| S3 | Cost Asymmetry and the Ordinal Objective | Table S2; Fig. S2 |
+| S4 | Confidence Calibration | Table S3; Fig. S3 |
+| S5 | Comparator Specifications | none |
+| S6 | Sensitivity of the Equivalence Conclusions | Tables S4, S5 |
+| S7 | Decision-State Ablation and Upstream-Input Sensitivity | Table S6; Figs. S4, S5 |
+| S8 | What the Protocol Costs to Adopt | none |
+| S9 | Sensitivity of the Eventized Alarm Result to the Persistence Rule | Table S7 |
+| S10 | Isolating Overlap Contamination from Temporal Position | Table S8 |
+| S11 | The Reject Option in Full | Table S9 |
+| S12 | Raw-Space Faults, Per Model | Table S10 |
+| S13 | Eventized Alarm and Hazard Episodes, Per Model | Tables S11, S12 |
+| S14 | Reproducing These Results | none |
+| S15 | Anomaly Detector in Detail | Fig. S6 |
+| S16 | Reject Option and Raw-Space Faults | Tables S13, S14, S15, S16 |
+| S17 | Component Architectures | Figs. S7, S8, S9 |
+| S18 | Bounds on Observed Zeros | none |
+| S19 | Reproducibility | none |
+| S20 | Nomenclature | none |
+| S21 | Component Behavior in Detail | Fig. S10 |
+| S22 | Representative Prior Work | Table S17 |
+| S23 | Composition of the MOX Array | Table S18 |
+| S24 | Which Model Appears in Which Experiment | Table S19 |
+| S25 | Per-Class Action Shares in Distribution | Table S20; Fig. S11 |
+| S26 | Corpus Layout and the Split | Fig. S12 |
+| S27 | Class-Disjoint Evaluation in Detail | Figs. S13, S14 |
+| S28 | The Correlated t-Test and the Hyperparameter Grids | none |
+| S29 | Graded Sensor Degradation in Full | Table S21; Fig. S15 |
+| S30 | Which Metric Selects Which Model | Fig. S16 |
+| S31 | Material Removed from the Main Text | none (verbatim record) |
+
+Section S19 is the reproducibility appendix (Appendix A of earlier drafts), S20 is the nomenclature (a main-text section in earlier drafts), and S31 records the passages removed from the main text.
 
 ---
 
@@ -676,6 +714,14 @@ About a factor of twenty separates the binomial reference from the disjoint-supp
 | Figs. 1 and 2 | `retrain/make_figs_v2.py` | the sensor-policy definitions and the metric boundaries | n/a | `figures` |
 | Figs. 3 to 6, and the remaining figures of the supporting information | `retrain/make_figs_v2.py` | the result files named above | as above | `figures` |
 | Figs. S7 to S9 | `retrain/make_figs_arch.py` | component shapes from the modules below | n/a | `figures` |
+| Fig. S1 | `retrain/make_figs_v2.py` (`fig_perception`) | none: the confusion matrices and per-class scores are typed into the script from the reported perception results and are not regenerated from a result file | original checkpoint, randomized split | `figures` |
+| Fig. S12 | `retrain/make_figs_v2.py` (`fig_protocol`) | none: a schematic of the window counts (1,581 per class) and the block-wise layout | n/a | `figures` |
+| Figs. S13 and S14 | `retrain/make_figs_v2.py` (`fig_dissociation`, `fig_disposition`) | `v3_powered.csv`, `v3_loco_all.csv` | 30 runs; five seeds | `figures` |
+| Fig. S15 | `retrain/make_figs_v2.py` (`fig_alarmburden`) | `v2_perturb.csv` | five seeds | `figures` |
+| Fig. S16 | `retrain/make_figs_v2.py` (`fig_metricdisagreement`) | `v3_powered.csv`, `v3_loco_all.csv`, `v2_perturb.csv` | 30 runs; five seeds | `figures` |
+| Table S17 | none: a literature compilation, not a computed result | none | n/a | n/a |
+| Table S18 | none: a compilation of published sensor characterisation, not a computed result | none | n/a | n/a |
+| Table S19 | none: a synthesis of the drivers in the rows above | none | n/a | n/a |
 
 Table A-1—Provenance of every reported object. Result files sit in `retrain/results_v2/`. Protocol is the seed set given under Protocol above: five seeds means 42, 1337, 7, 2024 and 99, each with its own partition; 30 runs means seeds 1000 to 1029 with block position, initialization and a hyperparameter draw all varying. The commit and package versions that produced each file are recorded in `RUN_MANIFEST.json`, which `make_manifest.py` writes from the live interpreter rather than from this table, so a disagreement between the two is a real disagreement.
 
@@ -788,7 +834,7 @@ Table S18—Composition of the MOX array, with the gases each element is nominal
 
 ## S24 Which Model Appears in Which Experiment
 
-| Model | In distribution (Exp. 2) | Leave-one-class-out (Exp. 3) | Degradation (Exps. 6, 9) | Reject option (Exp. 8) | Action matrix and input probe (Exps. 2, 5) |
+| Model | In distribution (Exp. 2) | Leave-one-class-out (Exp. 3) | Degradation (Exps. 6, 8) | Reject option (Exp. 7) | Action matrix and input probe (Exps. 2, 5) |
 |---|---|---|---|---|---|
 | Cost-weighted policy | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Unweighted network | ✓ | ✓ | ✓ | ✓ | |
@@ -941,4 +987,20 @@ Table S21—Selected perturbation results, with the full sweep in Fig. 6 of the 
 ![](figures_v2/fig_metricdisagreement.png){width=6.50in}
 
 Fig. S16—Which model each metric selects, condition by condition.
+
+## S31 Material Removed from the Main Text
+
+The main text was shortened in the audit pass, so that it sits under the SPE limit. Nothing was lost from the paper: each passage removed in that pass is reproduced below verbatim, with the place it stood in the main text. Results detail moved to this file in the earlier length cut is in the sections listed in the contents above.
+
+*Removed from Engineering Implications.* *What the Results Add Up To.* The central result is a dissociation between accuracy and safety-relevant behavior. Every conventional comparator in **Table 5** looks defensible in distribution, but the orderings do not carry across class exclusion: the model that escalates fully on one held-out hazardous class under-escalates on the other, and the interpretable decision tree reaches 1.000 on one and sits among the worst on the other. The strongest escalators across both are the two tree ensembles, which carry none of the pipeline's safety machinery.
+
+*Removed from Engineering Implications, standing relative to prior work.* The thermal classifier's randomized figures are comparable only with figures of that kind, and under the block-wise holdout it averages 85.0%, which is the figure a leakage-controlled comparison should use.
+
+*Removed from Conclusions, second finding.* The worst-partition bounds are 0.19% and 16.35% under the independence reference and 3.72% and 21.99% under the disjoint-support convention, so the ratio of bounds is 86 or 5.9 depending only on how an observed zero is treated.
+
+*Removed from Limitations, perception split.* Drift is a per-channel gain and baseline shift applied at test time, and dropout sets standardized features to zero, which under a training-partition scaler is the training mean and not an electrical zero.
+
+*Removed from Experiment 2, CUSUM sentence.* but CUSUM, run over five seeds and outside **Table 5**, does. It is two-class by construction, so its five-run decision accuracy of 0.4535 ± 0.1010 is an artifact of scoring a two-state output against a four-class target map; its missed-hazard rate of 0.0000, escalation adequacy of 1.0000 and high-severity false-alarm rate of 0.1861 remain comparable.
+
+*Removed from Experiment 3, per-class pointer.* Table S20 gives the per-class shares.
 

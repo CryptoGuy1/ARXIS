@@ -902,7 +902,7 @@ _AVAIL = ALL.split("## Data and Code Availability", 1)[-1].split("\n## ", 1)[0]
 _ZEN = re.findall(r"10\.5281/zenodo\.\d+", _AVAIL)
 rule("the archival DOI is either a real deposit or the agreed pending sentence, never both or a bracket",
      "[to be inserted" not in ALL
-     and "Appendix A" not in ALL
+     and "Appendix A" not in TXT   # the manuscript has no dangling appendix pointers; the supplementary file names its own
      and ((len(_ZEN) == 1 and _PENDING not in _AVAIL)
           or (len(_ZEN) == 0 and _AVAIL.count(_PENDING) == 1)))
 print("note archival deposit:", "real DOI present" if _ZEN else "declared pending, no DOI yet")

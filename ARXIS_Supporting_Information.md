@@ -47,9 +47,8 @@ This is the supplementary material file for the manuscript. Every object the bod
 | S28 | The Correlated t-Test and the Hyperparameter Grids | none |
 | S29 | Graded Sensor Degradation in Full | Table S21; Fig. S15 |
 | S30 | Which Metric Selects Which Model | Fig. S16 |
-| S31 | Material Removed from the Main Text | none (verbatim record) |
 
-Section S19 is the reproducibility appendix (Appendix A of earlier drafts), S20 is the nomenclature (a main-text section in earlier drafts), and S31 records the passages removed from the main text.
+Section S19 is the reproducibility appendix (Appendix A of earlier drafts), S20 is the nomenclature (a main-text section in earlier drafts),.
 
 ---
 
@@ -157,7 +156,7 @@ under a matrix *M* that prices distance and direction along the action ladder. F
 
 It works on the quantity it targets. On the held-out Mixture class the ordinal objective escalates 0.386 ± 0.192 of hazardous windows against 0.259 ± 0.188 for the cost-weighted policy, a relative improvement of about 49% (Table 6 of the manuscript). It records no missed hazard, but that zero is structural rather than earned: the objective never emits the Monitor action, and a missed hazard is a hazardous window assigned that action. It is the only change to the objective anywhere in this study that moved escalation adequacy at all. It also costs more than it returns as specified: in-distribution accuracy falls to 0.7470 ± 0.0057, some 21 points below the cost-weighted policy, and expected cost under the matrix the objective itself minimizes rises from 0.0690 to 0.2590. The mechanism is visible in the action distribution, where the model stops emitting *Monitor* for clean air and sends it to *Increase sampling* instead. The matrix prices that error at 1 against 10 for a missed hazard, and the NoGas and Perfume classes overlap precisely where that trade is decided. The result is a system in a permanent state of mildly elevated sampling.
 
-What has been demonstrated is narrow. The mechanism is confirmed: pricing direction along the action ladder moves escalation, where scalar reweighting did not. What has not been demonstrated is a cost matrix worth deploying. A matrix that buys 15 points of escalation on a held-out hazardous class by paying 21 points of accuracy on clean air is not one we would put in front of an operator. A single untuned draw cannot locate the optimum over the space of such matrices. The experiment demonstrates that a directional cost structure can alter escalation behavior. It does not establish an optimal cost matrix. It is evidence about this particular matrix under this training procedure, not about ordinal objectives in general, and the row the objective occupies in the manuscript's Tables 8 and 12 is a mechanism result rather than a deployable policy.
+What has been demonstrated is narrow. The mechanism is confirmed: pricing direction along the action ladder moves escalation, where scalar reweighting did not. What has not been demonstrated is a cost matrix worth deploying. A matrix that buys 15 points of escalation on a held-out hazardous class by paying 21 points of accuracy on clean air is not one we would put in front of an operator. A single untuned draw cannot locate the optimum over the space of such matrices. The experiment demonstrates that a directional cost structure can alter escalation behavior. It does not establish an optimal cost matrix. It is evidence about this particular matrix under this training procedure, not about ordinal objectives in general, and and the ordinal objective, a supporting mechanism experiment, is a mechanism result rather than a deployable policy.
 
 ![](figures_v2/fig_costsweep.png){width=6.50in}
 
@@ -165,10 +164,6 @@ Fig. S2—Cost-asymmetry sweep. Shading is ± 1 SD across five seed-varying part
 
 
 ---
-
-*As the manuscript reported it.*
-
-*Cost asymmetry returns a clean negative* (Supplementary Section S3). Sweeping the loss-weight ratio *C* of Eq. 3 across nine values leaves missed-hazard rate at zero and escalation adequacy at 1.000 at every ratio including the symmetric 1:1, while accuracy peaks at 1:1 (0.9646) and falls to 0.9090 at 20:1. The asymmetry has nothing to reshape, because the target action is a deterministic function of a well-separated class label and the miss rate is on the floor before any weighting is applied. That is not evidence against cost-sensitive learning, which is well founded where the error surface is non-trivial (Elkan 2001), but evidence that this benchmark does not present such a surface. The reference *C* = 8:1 was originally chosen on test-partition dispersion, which is not defensible; re-selecting it on an embargoed validation band selects 6:1, and 8:1 is retained as a reference rather than a tuned setting. An ordinal objective pricing distance and direction along the ladder does move what it targets, and escalation on the held-out Mixture class rises from 0.259 ± 0.188 to 0.386 ± 0.192 at a cost of 21 accuracy points. It records no missed hazard, but that zero carries no information: the objective never emits the Monitor action, and a missed hazard is a hazardous window assigned that action, so it cannot record one. The escalation gain is the result; the zero is not.
 
 ## S4 Confidence Calibration
 
@@ -194,15 +189,11 @@ Fig. S3—Calibration. (a) ECE with bootstrap intervals. (b) The same on a logar
 
 ---
 
-*As the manuscript reported it.*
-
-*Calibration is not separable across estimators, and its own split had to be fixed* (Supplementary Section S4). Raw softmax, MC dropout, temperature scaling and a five-member deep ensemble are not separated under equal-mass bins, every block-bootstrap interval overlapping every other, and the pooled expected calibration error is driven almost entirely by the non-hazardous classes. The miscalibration lives on the NoGas and Perfume boundary, where the perception errors and the anomaly-score overlap also live, and a single pooled number hides that split. The calibration split was originally a uniformly random subset of the training partition, drawn over windows overlapping by 19 of 20 raw rows, and under it the fitted temperature came out below 1 and the previous version of this study concluded the network was under-confident. Carving the calibration band contiguously with the same embargo used everywhere else reverses that conclusion: the temperature is 1.423 ± 0.202 and never below 1.20, so the network is over-confident.
-
 ## S5 Comparator Specifications
 
 The full comparator list was carried in the Methodology of an earlier revision and is reproduced here.
 
-Eleven comparators run under one protocol:
+Ten primary comparators run under one protocol:
 
 - the cost-weighted policy of Eq. 3, and an unweighted network of identical topology;
 - a multilayer perceptron (256-256-128);
@@ -315,15 +306,11 @@ Fig. S5—Dependence of the selected action on the anomaly input, five seed-vary
 
 ---
 
-*As the manuscript reported it.*
-
-*One upstream input is load-bearing for one model* (Supplementary Section S7). Ablating the decision state by feature group shows the 22-dimensional state is not minimal: removing the anomaly score costs 0.43 accuracy points and removing the per-sensor standard deviations *improves* accuracy by 0.40, both inside the seed-to-seed spread, and no feature group changes the in-distribution safety metrics. Sweeping the anomaly input instead, with the other twenty-one features held at their observed values, is the consequential half: dependence runs from 0.00% of windows for the decision tree to 64.22 ± 7.65% for gradient boosting. Forcing that input to zero, which is what a failed or unconnected autoencoder would supply, leaves every other comparator's missed-hazard rate at zero while gradient boosting moves from 0.0092 to 0.4203 and its escalation adequacy falls from 0.992 to 0.497. Nothing in the accuracy column or the ablation table shows it.
-
 *That dependence is partly, not wholly, a weighting defect* (`v3_weighting_probe.csv`). The gradient-boosted comparator was labelled cost-sensitive in earlier versions of this work and is called clean-air-weighted gradient boosting here, because the released code weights by the target action: action 0 at 3.0, actions 3 and 4 at 1.2. A clean-air window's target is 0 and a hazardous window's is 3 or 4, so no hazardous row carries the up-weighted target and the model is weighted 2.5 to 1 toward clean air, the opposite of what its name asserted. Refitting with the weight keyed on the gas instead moves its in-distribution missed-hazard rate from 0.0092 to 0.0000 and escalation adequacy from 0.9905 to 1.0000, at 0.3 accuracy points, and the anomaly dependence falls without going away: forced to zero, the missed-hazard rate is 0.3307 rather than 0.4203. Under the high-end clamp the corrected model is worse, missing 9.9% of hazardous windows at one clamped channel and 16.5% at four where the shipped weighting missed none and under-escalated instead. The sign accounts for the in-distribution misses and part of the anomaly dependence, and trades one degradation failure for another. This paper reports the code as released; both are given so the reader can tell which is which. The probe mirrors the shipped magnitude of 2.5 to 1 rather than the 8:1 of Eq. 3, so it isolates the sign and not the ratio, and it does not cover the seven-channel clamp on which the silent-failure result rests. No comparator in this study is weighted at the 8:1 of Eq. 3, so the benchmark contains no cost-sensitive gradient-boosted model in that sense.
 
 ## S8 What the Protocol Costs to Adopt
 
-The metric set is inexpensive to adopt, and that cost is measured rather than asserted. Computing the five quantities of Table 2 over the real 1,264-window test partition takes 0.455 ms against 0.290 ms for accuracy alone, a ratio of 1.57×, which is arithmetic over predicted actions the evaluation already has; the episode-level quantities are the same kind of pass over the same predictions (`retrain/run_metric_cost.py`, `v3_metric_cost.json`). Both figures are means over 200 timed repetitions after warm-up and are machine-dependent, so the ratio rather than either absolute figure is the transferable quantity. The cost that is not negligible is retraining, and it falls unevenly. Reporting the metric set on an existing evaluation needs none, and neither do the perturbation suite or the upstream-input probe, since both re-evaluate an already-trained model under modified inputs. Leave-one-class-out needs one retrain per withheld hazardous class, so two here. The 30-run comparison with the equivalence test is the only element that costs a multiple of the original training budget, and it is needed only when the question is model selection rather than model characterization. A facility qualifying a single candidate model therefore pays almost nothing for the screen in Table 8 of the manuscript. A study ranking candidates pays for the run count, and Table 5 of the manuscript shows what that buys. These times are machine-dependent. The reported figures are the ones in the stored result file, `v3_metric_cost.json`, produced by `make metriccost` on the authors' machine with a fixed seed and 200 repeats. A second measurement on different hardware during this revision gave 0.990 ms for the metric set, 0.407 ms for accuracy alone and a ratio of 2.43. That run is not archived in the repository. The conclusion that the metric set costs a small multiple of accuracy alone, and well under a millisecond per 1,264 windows on either machine, holds in both.
+The metric set is inexpensive to adopt, and that cost is measured rather than asserted. Computing the five quantities of Table 2 over the real 1,264-window test partition takes 0.455 ms against 0.290 ms for accuracy alone, a ratio of 1.57×, which is arithmetic over predicted actions the evaluation already has; the episode-level quantities are the same kind of pass over the same predictions (`retrain/run_metric_cost.py`, `v3_metric_cost.json`). Both figures are means over 200 timed repetitions after warm-up and are machine-dependent, so the ratio rather than either absolute figure is the transferable quantity. The cost that is not negligible is retraining, and it falls unevenly. Reporting the metric set on an existing evaluation needs none, and neither do the perturbation suite or the upstream-input probe, since both re-evaluate an already-trained model under modified inputs. Leave-one-class-out needs one retrain per withheld hazardous class, so two here. The 30-run comparison with the equivalence test is the only element that costs a multiple of the original training budget, and it is needed only when the question is model selection rather than model characterization. A facility qualifying a single candidate model therefore pays almost nothing for the screen in Table 7 of the manuscript. A study ranking candidates pays for the run count, and Table 5 of the manuscript shows what that buys. These times are machine-dependent. The reported figures are the ones in the stored result file, `v3_metric_cost.json`, produced by `make metriccost` on the authors' machine with a fixed seed and 200 repeats. A second measurement on different hardware during this revision gave 0.990 ms for the metric set, 0.407 ms for accuracy alone and a ratio of 2.43. That run is not archived in the repository. The conclusion that the metric set costs a small multiple of accuracy alone, and well under a millisecond per 1,264 windows on either machine, holds in both.
 
 
 ---
@@ -521,9 +508,8 @@ Two features of these tables carry the argument made in the body. Compression is
 
 `make comparison` produces Table S2 and Fig. S2. `make calibration` produces
 Table S3 and Fig. S3 together with the perception figures. The verification
-script checks the tables in this file against the same result files it checks
-the manuscript against, so a number here cannot drift from a number there
-without the check failing.
+script checks the principal supplementary tables and headline numerical claims against
+the same stored result files used for the manuscript.
 
 
 ## S15 Anomaly Detector in Detail
@@ -791,9 +777,9 @@ Table A-1—Provenance of every reported object. Result files sit in `retrain/re
 
 *Component Behavior.* The original checkpoint reached 98.8% top-1 accuracy on 1,280 randomized-split held-out images. Retrained under the same protocol it reaches 98.0 to 98.3%, which makes it comparable to the published randomized accuracies on this corpus and comparably optimistic. Under the block-wise holdout the sensor path uses, the same classifier reaches 79.2 to 92.1% over five seeds, with a mean of 85.0%, and between 0 and 65 hazardous frames per run are called non-hazardous. Supplementary Section S1 gives the per-class scores and the seed-by-seed tables.
 
-The anomaly component raises two questions (Fig. S10). On whether the score tracks hazard, mean reconstruction error on held-out windows is 0.023 for clean air and 0.107 for the vapor class against 164.7 for smoke and 80.6 for the mixture (Fig. 7a), three orders of magnitude apart. It is not monotone in target severity, since Mixture carries the higher target action yet scores below Smoke, so it is evidence of abnormality and not a severity estimate.
+The anomaly component raises two questions (Fig. S10). On whether the score tracks hazard, mean reconstruction error on held-out windows is 0.023 for clean air and 0.107 for the vapor class against 164.7 for smoke and 80.6 for the mixture (Fig. S10(a)), three orders of magnitude apart. It is not monotone in target severity, since Mixture carries the higher target action yet scores below Smoke, so it is evidence of abnormality and not a severity estimate.
 
-On whether the partition used to fit it matters, it matters considerably. Fitting the autoencoder and its input scaler on the whole corpus, as an earlier implementation did, yields ROC-AUC 0.9622 at a false-positive rate of 5.0%. Fitting both inside the training partition, which every number in this paper now uses, yields ROC-AUC 0.9251 ± 0.0618, TPR 0.8015 ± 0.1205 and FPR 0.1101 ± 0.0992 across five seeds (Fig. 7b, and Fig. S6 of the supporting information), with a seed-to-seed spread from 0.8228 to 0.9898 that the pooled figure concealed. Just under four points of discrimination were an artifact of the anomaly model having seen the nominal windows it was later scored on, and the false-positive rate more than doubles once the fit is confined to the training partition. The correction matters beyond this component, because the anomaly score is one of the twenty-two inputs to every learned comparator: the leakage was upstream of the classifier, and no accuracy table would have shown it.
+On whether the partition used to fit it matters, it matters considerably. Fitting the autoencoder and its input scaler on the whole corpus, as an earlier implementation did, yields ROC-AUC 0.9622 at a false-positive rate of 5.0%. Fitting both inside the training partition, which every number in this paper now uses, yields ROC-AUC 0.9251 ± 0.0618, TPR 0.8015 ± 0.1205 and FPR 0.1101 ± 0.0992 across five seeds (Fig. S10(b), and Fig. S6), with a seed-to-seed spread from 0.8228 to 0.9898 that the pooled figure concealed. Just under four points of discrimination were an artifact of the anomaly model having seen the nominal windows it was later scored on, and the false-positive rate more than doubles once the fit is confined to the training partition. The correction matters beyond this component, because the anomaly score is one of the twenty-two inputs to every learned comparator: the leakage was upstream of the classifier, and no accuracy table would have shown it.
 
 ![](figures_v2/fig_anomaly.png){width=6.50in}
 
@@ -812,7 +798,7 @@ Fig. S10—Anomaly component. (a) Mean reconstruction error by class. (b) Operat
 | Liang et al. (2023) | pipeline flow | normal-only anomaly detection | field validated | n/a | stops at detection |
 | Korjani et al. (2024) | optical gas imaging | vision detection | field imagery | n/a | degraded sensing not a safety metric |
 | Elkan (2001) | n/a | cost-sensitive learning theory | n/a | n/a | untested on a saturated benchmark |
-| This study | MGD | action from MOX and anomaly state | block-wise holdout, 20-window embargo, seed-varying block | Tables 8, 10 | surrogate analytes; one device and campaign; perception path evaluated under both protocols (Table S1c) |
+| This study | MGD | action from MOX and anomaly state | block-wise holdout, 20-window embargo, seed-varying block | Tables 5–7 and Supplementary results | surrogate analytes; one device and campaign; perception path evaluated under both protocols (Table S1c) |
 
 Table S17—Representative prior work with dataset, task and validation protocol. MGD = MultimodalGasData.
 
@@ -933,7 +919,7 @@ Benavoli et al. (2017) derive this correlation term for *k*-fold cross-validatio
 
 ## S29 Graded Sensor Degradation in Full
 
-*Experiment 6: Graded Sensor Degradation.* Six models were put through synthetically imposed degradation designed to probe robustness: additive noise (σₙ = 0.1 to 0.5), calibration drift (gain and baseline shift of ±10% to ±50%) and channel dropout (*k* = 1 to 7 of 7 sensors) at graded severity. All three safety metrics are reported. Selected perturbation results appear in Table 7 and the full sweep in Fig. 6. Alarm burden there is the high-severity false-alarm rate per 1,000 clean windows per detector, which keeps it independent of any particular duty cycle, and the starred clean-condition entry is the independence-reference binomial upper bound a single partition supports on an observed zero rather than a point estimate. This addresses RQ4.
+*Experiment 6: Graded Sensor Degradation.* Six models were put through synthetically imposed degradation designed to probe robustness: additive noise (σₙ = 0.1 to 0.5), calibration drift (gain and baseline shift of ±10% to ±50%) and channel dropout (*k* = 1 to 7 of 7 sensors) at graded severity. All three safety metrics are reported. Selected results are summarized in Experiment 6 of the manuscript, with the full sweep in Fig. 6 and Table S21. Alarm burden there is the high-severity false-alarm rate per 1,000 clean windows per detector, which keeps it independent of any particular duty cycle, and the starred clean-condition entry is the independence-reference binomial upper bound a single partition supports on an observed zero rather than a point estimate. This addresses RQ4.
 
 All three families act on the *standardized* decision state of Eq. 1, downstream of the training-partition scaler, not on raw readings. So σₙ = 0.5 is half a training standard deviation on every channel, and channel dropout places the dropped channel at its *training-set mean* rather than at an electrical zero. That makes it the milder of the two channel-loss faults: Experiment 8 tests the electrical-zero case in raw sensor space and finds it behaves nothing like this one. The anomaly feature is not perturbed in any condition; Experiment 5 probes it separately.
 
@@ -987,49 +973,3 @@ Table S21—Selected perturbation results, with the full sweep in Fig. 6 of the 
 ![](figures_v2/fig_metricdisagreement.png){width=6.50in}
 
 Fig. S16—Which model each metric selects, condition by condition.
-
-## S31 Material Removed from the Main Text
-
-The main text was shortened in the audit pass, so that it sits under the SPE limit. Nothing was lost from the paper: each passage removed in that pass is reproduced below verbatim, with the place it stood in the main text. Results detail moved to this file in the earlier length cut is in the sections listed in the contents above.
-
-*Removed from Engineering Implications.* *What the Results Add Up To.* The central result is a dissociation between accuracy and safety-relevant behavior. Every conventional comparator in **Table 5** looks defensible in distribution, but the orderings do not carry across class exclusion: the model that escalates fully on one held-out hazardous class under-escalates on the other, and the interpretable decision tree reaches 1.000 on one and sits among the worst on the other. The strongest escalators across both are the two tree ensembles, which carry none of the pipeline's safety machinery.
-
-*Removed from Engineering Implications, standing relative to prior work.* The thermal classifier's randomized figures are comparable only with figures of that kind, and under the block-wise holdout it averages 85.0%, which is the figure a leakage-controlled comparison should use.
-
-*Removed from Conclusions, second finding.* The worst-partition bounds are 0.19% and 16.35% under the independence reference and 3.72% and 21.99% under the disjoint-support convention, so the ratio of bounds is 86 or 5.9 depending only on how an observed zero is treated.
-
-*Removed from Limitations, perception split.* Drift is a per-channel gain and baseline shift applied at test time, and dropout sets standardized features to zero, which under a training-partition scaler is the training mean and not an electrical zero.
-
-*Removed from Experiment 2, CUSUM sentence.* but CUSUM, run over five seeds and outside **Table 5**, does. It is two-class by construction, so its five-run decision accuracy of 0.4535 ± 0.1010 is an artifact of scoring a two-state output against a four-class target map; its missed-hazard rate of 0.0000, escalation adequacy of 1.0000 and high-severity false-alarm rate of 0.1861 remain comparable.
-
-*Removed from Experiment 3, per-class pointer.* Table S20 gives the per-class shares.
-
-
-
-*Removed in the second length cut (release v18.1), verbatim.* The passages below were removed from, or shortened in, the main text when the manuscript was brought below 9,700 words, and are kept here so that no removed statement is lost.
-
-*Removed from the Engineering Implications, selection paragraph.* "A selection defended on a single column is not defensible."
-
-*Removed from the Engineering Implications, proposed screen.* "Each row corresponds to a failure this study observed rather than one we imagined."
-
-*Shortened in the Engineering Implications, Future Work.* Before: "since everything here comes from one device in one acquisition campaign, and so is any basis for a detection-latency claim." After: "since everything here comes from one device in one acquisition campaign." Before: "since one comparator's missed-hazard rate moves from 0.0092 to 0.4203 when a single input is wrong and only one such input was tested." After: "since only one such input was tested."
-
-*Shortened in the Conclusions, second finding.* Before: "Across 30 randomized runs ten comparators lie within 4.43 accuracy points, eight of them record no observed missed hazard, escalation adequacy lies between 0.993 and 1.000, and no comparator produces an observed high-severity false alarm, so the safety metrics barely discriminate under the nominal distribution." After: "Across 30 randomized runs ten comparators lie within 4.43 accuracy points, so the safety metrics barely discriminate under the nominal distribution."
-
-*Shortened in the Conclusions, fifth finding.* Before: "sending every hazardous window to a sub-alarm action while the normalized anomaly feature falls to 0.011 against a clean 0.245." After: "sending every hazardous window to a sub-alarm action."
-
-*Shortened in the Limitations, dependence paragraph.* Before: "The partition is the right unit for this analysis but not for a physical inference about a detector in service, and no unit available in this corpus is." After: "The partition is the right unit for this analysis, not for a physical inference about a detector in service."
-
-*Removed from Experiment 2 (comparison of the ten comparators).* "With 30 runs the comparison states something positive rather than merely declining to rank."
-
-*Removed from Experiment 1 (protocol sensitivity).* "The embargo contributes almost nothing on its own, 0.9495 without it against 0.9496 with it, so the block structure does the work."
-
-*Removed from Methodology, comparators.* "The ablation holds the architecture fixed so only the feature set varies."
-
-*Removed from Experiment 3 (class-disjoint evaluation).* "Missed-hazard rate is also not enough on its own."
-
-*Summary, wording.* Before: "Three of five findings follow." After: "Three findings are emphasized."
-
-*Figure 4 caption.* Added: "The ordinal objective is a supporting variant, not a primary comparator." The relabeled figure row reads "Ordinal (supporting variant)" in panel (b) and "Ordinal objective (supporting variant)" on the axis of panel (a).
-
-*Figure 1.* CUSUM is drawn in a separate dashed box labeled as an auxiliary reference, outside the ten primary comparators.

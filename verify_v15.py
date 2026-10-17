@@ -651,8 +651,29 @@ _k7gbm = _pt[(_pt.perturbation == "dropout") & (_pt.level == 7.0) &
              (_pt.model == "E_gbm")].miss_rate_mean.iloc[0]
 rule("the silent-failure miss rate at total sensor loss is reported with its dispersion",
      "a mode a mean hides" in TXT
-     and "missing every hazardous window in one partition of five and none in the other four" in ALL
+     and "617 of 632 hazardous windows (97.6%) in one partition of five" in ALL
+     and "misses every hazardous window in one partition" not in ALL
      and "misses 60% of hazards" not in ALL, f"{100*_k7gbm:.2f}")
+# The per-partition counts behind the one-partition claims come from
+# retrain/run_perturb_perseed.py, which refits the named models under the same
+# seeds. Its pooled totals must reproduce the pooled file exactly; the gates below
+# read the partition split from the per-partition file itself.
+_ps = pd.read_csv(R + "v2_perturb_perseed.csv")
+_pooled_ok = True
+for (_mdl, _lvl), _g in _ps.groupby(["model", "level"]):
+    _row = _pt[(_pt.perturbation == "dropout") & (_pt.level == float(_lvl)) & (_pt.model == _mdl)].iloc[0]
+    _pooled_ok &= (int(_g.fa_k.sum()) == int(_row.fa_k_pooled) and int(_g.miss_k.sum()) == int(_row.miss_k_pooled)
+                   and int(_g.n_danger.sum()) == int(_row.n_danger_pooled) and int(_g.n_clean.sum()) == int(_row.n_clean_pooled))
+rule("per-partition counts reproduce the pooled perturbation file exactly", bool(_pooled_ok))
+_gb7 = _ps[(_ps.model == "E_gbm") & (_ps.level == 7)].sort_values("seed").miss_k.tolist()
+rule("gradient boosting at total loss: all 617 misses sit in one partition of five",
+     sorted(_gb7) == [0, 0, 0, 0, 617] and set(_ps[_ps.model == "E_gbm"].n_danger) == {632}, f"{_gb7}")
+_fa1 = _ps[_ps.level == 1]
+_one = all(sorted(_g.fa_k.tolist()) == [0, 0, 0, 0, int(_g.fa_k.max())] and _g.fa_k.max() > 0
+           for _, _g in _fa1.groupby("model"))
+rule("one lost channel: each model's alarm-grade false alarms sit in one partition of five",
+     _one and "all of the alarms in one partition of five" in ALL and "all of it in one partition of five" in ALL,
+     str({k: int(v) for k, v in _fa1.groupby("model").fa_k.max().items()}))
 # Section names that no longer exist must not survive as cross-references.
 rule("no cross-reference to the retired Proposed Method heading",
      "Proposed Method" not in TXT and "Proposed Method" not in SITXT)
@@ -1120,7 +1141,8 @@ rule("no external-validity claim in the Summary",
 rule("contribution described as an evaluation framework",
      ("pre-deployment evaluation framework" in TXT
       or "pre-deployment evaluation methodology" in TXT
-      or "benchmark study of learned gas-monitoring decision models" in TXT)
+      or "benchmark study of learned gas-monitoring decision models" in TXT
+      or "benchmarks learned gas-monitoring decision models" in TXT)
      and "a pre-deployment screen" not in TXT)
 # A13, A15
 rule("escalator claims scoped to the evaluated models",

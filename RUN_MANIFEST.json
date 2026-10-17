@@ -153,6 +153,11 @@
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
    "sha256_16": "2a970284ab8d80a7"
+  },
+  {
+   "path": "retrain/run_perturb_perseed.py",
+   "purpose": "per-partition counts for the one-partition perturbation claims (Table 7, Experiment 6)",
+   "sha256_16": "019ab197004cc17b"
   }
  ],
  "results": {
@@ -345,6 +350,11 @@
    "bytes": 4602,
    "sha256_16": "57decc5bd196100c",
    "modified_utc": "2026-10-12T10:54:22+00:00"
+  },
+  "v2_perturb_perseed.csv": {
+   "bytes": 1453,
+   "sha256_16": "5c6b4cc049d92e95",
+   "modified_utc": "2026-10-17T17:07:13.972860+00:00"
   }
  },
  "figures": {

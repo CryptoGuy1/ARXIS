@@ -15,7 +15,7 @@ PY := python3
 RESULTS := retrain/results_v2
 FIGS := figures_v2
 
-.PHONY: all verify selfaudit test check figtext proof docx manifest figures clean-cache release-check \
+.PHONY: all verify selfaudit test check figtext proof docx manifest figures clean-cache release-check perseed \
         comparison classdisjoint leakage calibration anomaly episodes final \
         hazardepisodes blockboot rho rope bounds bootstrap \
         anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting
@@ -25,6 +25,10 @@ FIGS := figures_v2
 # the five-seed comparator grid: the in-distribution set, Table S2, Table S6, Fig. 6
 comparison:
 	$(PY) -m retrain.run_all_v2
+
+# Table 7 and Experiment 6: per-partition counts behind the one-partition claims
+perseed:
+	$(PY) -m retrain.run_perturb_perseed
 
 # Table 6 and Fig. 5
 classdisjoint: comparison

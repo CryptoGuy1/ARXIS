@@ -199,9 +199,7 @@ An observed zero is not a demonstrated zero. All zero-count claims carry a one-s
 
 For *k* = 0 this reduces to *U* = 1 − (1 − *c*)^(1/*N*~opp~)^. Two conventions are reported throughout: an independence-reference Clopper-Pearson bound of Eq. 10 with the partition as the unit, and a conservative disjoint-support bound counting only non-overlapping windows. Bounds are computed from the counts, never from the averaged rate. About a factor of twenty separates them on a zero count, which is why no ratio of bounds is quoted as a finding in this paper. Supplementary Section S18 derives both, and reports the moving-block bootstrap beside them.
 
-### 3.15 *Table 2*
-
-states the metric set in the form proposed for adoption, including what each quantity does not catch. Entries given as mean ± standard deviation (SD) are taken over runs.
+**Table 2** states the metric set in the form proposed for adoption, including what each quantity does not catch. Entries given as mean ± standard deviation (SD) are taken over runs.
 
 | Quantity | Symbol | Reads | Catches | Does not catch | Report with |
 |---|---|---|---|---|---|

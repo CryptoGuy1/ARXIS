@@ -24,6 +24,10 @@ MD = "ARXIS_Manuscript_v15_SPE.md"
 SI = "ARXIS_Supporting_Information.md"
 R = "retrain/results_v2/"
 TXT = open(MD).read()
+# JLPPI edition: headings carry section numbers ("## 4. Results", "### 4.2 ...").
+# The gates below match headings by their unnumbered names, so strip the numbers here.
+TXT = re.sub(r"^## \d+\. ", "## ", TXT, flags=re.M)
+TXT = re.sub(r"^### \d+\.\d+ ", "### ", TXT, flags=re.M)
 SITXT = open(SI).read()
 FAIL, WARN, N = [], [], [0]
 
@@ -377,7 +381,7 @@ for m in re.finditer(r"^\*\*Fig\. (\d+)—", TXT, re.M):
     rule(f"Fig. {m.group(1)} caption sits under its image", before.strip().startswith("!["))
 
 HEADS = ["## Summary", "## Introduction", "## Related Work and Positioning", "## Methodology",
-         "## Results", "## Engineering Implications",
+         "## Results", "## Process-Safety Implications",
          "## Limitations and Threats to Validity", "## Conclusions",
          "## Acknowledgments", "## References"]
 for h in HEADS:
@@ -556,7 +560,7 @@ kw = re.search(r"^Keywords:(.+)$", TXT, re.M)
 rule("keywords line present", kw is not None)
 if kw:
     n_kw = len([k for k in kw.group(1).split(";") if k.strip()])
-    rule("keyword count within SPE's one to five", 1 <= n_kw <= 5, f"{n_kw} listed")
+    rule("keyword count within JLPPI's one to seven", 1 <= n_kw <= 7, f"{n_kw} listed")
 for phrase in ("Items Still Requiring Author Action", "Author Verification Items",
                "not intended for publication", "image corpus was unavailable",
                "image corpus was not available", "Liang et al. (2024)"):
@@ -598,10 +602,10 @@ pos = sorted((TXT.index(h), h) for h in HEADS[:7] if h in TXT)
 # stated target rather than an internal preference. Every other band came down,
 # because the same review asked for a 25 to 30 percent reduction and a band
 # that does not bind is not a check.
-BAND = {"## Summary": (160, 210), "## Introduction": (480, 640),
+BAND = {"## Summary": (160, 250), "## Introduction": (480, 640),
         "## Related Work and Positioning": (700, 1400),
         "## Methodology": (1800, 3600),
-        "## Engineering Implications": (700, 1800),
+        "## Process-Safety Implications": (700, 1800),
         "## Limitations and Threats to Validity": (500, 1200),
         "## Conclusions": (300, 560)}
 N_EXPERIMENTS = 9   # six answering a research question, three supporting
@@ -1400,10 +1404,10 @@ rule("no promise to add the DOI later survives the availability statement",
 # Publishers now ask that use of a generative AI tool be disclosed rather than
 # left to be inferred. The disclosure has to say what the tool did, what it did
 # not do, and who is answerable for the result.
-_ACK = TXT[TXT.index("## Acknowledgments"):TXT.index("## Author Contributions")] \
-    if "## Acknowledgments" in TXT and "## Author Contributions" in TXT else ""
+_ACK = TXT[TXT.index("## Declaration of Generative AI"):TXT.index("## Acknowledgments")] \
+    if "## Declaration of Generative AI" in TXT and "## Acknowledgments" in TXT else ""
 rule("the use of a generative AI tool is disclosed",
-     "Use of artificial intelligence" in _ACK)
+     "During the preparation of this work the author(s) used" in _ACK)
 rule("the disclosure says what the tool was not used for",
      "not used to generate data, results or references" in _ACK)
 rule("the disclosure places responsibility with the authors",

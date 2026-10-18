@@ -29,6 +29,9 @@ from collections import Counter
 MD = "ARXIS_Manuscript_v15_SPE.md"
 SI = "ARXIS_Supporting_Information.md"
 TXT = open(MD, encoding="utf-8").read()
+# JLPPI edition: strip section numbers so the heading lookups below keep their names.
+TXT = re.sub(r"^## \d+\. ", "## ", TXT, flags=re.M)
+TXT = re.sub(r"^### \d+\.\d+ ", "### ", TXT, flags=re.M)
 SITXT = open(SI, encoding="utf-8").read()
 
 FAIL, WARN = [], []
@@ -131,7 +134,7 @@ SUMMARY = section(TXT, "## Summary", ["## Introduction"])
 # The nomenclature moved to the supporting information, so the Conclusions now end
 # at the Acknowledgments. Without this the section ran on into the reference list
 # and read DOI digits as quoted values.
-CONCL = section(TXT, "## Conclusions", ["## Acknowledgments", "## Nomenclature"])
+CONCL = section(TXT, "## Conclusions", ["## Data and Code Availability", "## Acknowledgments", "## Nomenclature"])
 RQTABLE = TXT[:TXT.index("Table 3—Research questions")].rstrip().split("\n\n")[-1]
 BODY = TXT[TXT.index("## Results"):]
 

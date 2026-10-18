@@ -1,6 +1,6 @@
 # Supplementary Material
 
-A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation
+A Process-Safety Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation
 
 Benjamin C. Nweke, Gholamreza Ramezan, Soheil Saraji
 

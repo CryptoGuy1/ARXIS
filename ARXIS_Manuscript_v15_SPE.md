@@ -1,4 +1,4 @@
-# A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation
+# A Process-Safety Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation
 
 Benjamin C. Nweke^1,2,\*^, Gholamreza Ramezan^2^, Soheil Saraji^1^
 
@@ -7,24 +7,24 @@ Benjamin C. Nweke^1,2,\*^, Gholamreza Ramezan^2^, Soheil Saraji^1^
 
 ^\*^ Corresponding author; email: bnweke@uwyo.edu
 
-Keywords: benchmarking; MOX gas sensors; safety-oriented evaluation; temporal data leakage; class-disjoint evaluation
+Keywords: Process safety; Alarm management; Gas monitoring; Machine learning; Sensor degradation; Class-disjoint evaluation; Metal-oxide sensors
 
 ---
 
 ## Summary
 
-Fixed gas detectors add to operator alarm burden, yet learned gas-monitoring models are ranked almost entirely by classification accuracy, which says nothing about how often a hazard draws no response or clean air draws a high-severity one. This paper benchmarks learned gas-monitoring decision models. It scores ten comparators on a five-quantity evaluation set, decision accuracy beside four safety-relevant rates, under leakage-controlled partitioning, class exclusion and graded sensor degradation, with cumulative-sum (CUSUM) as an auxiliary reference. Three findings are emphasized. Random splitting over overlapping windows raises accuracy by 3.23 to 5.57 points for every temporal model. Ten comparators sit within 4.43 accuracy points in distribution, yet withholding one hazardous class separates them: in the worst partition the multilayer perceptron misses 234 of 1,581 Smoke windows, and the shallow decision tree 988 of 1,581 Mixture windows. Seven of ten comparators with miss bounds at or below 3.3% span an escalation spread of about 200, so miss rate alone cannot be the criterion. Raw-space faults expose a clamped array routing every hazardous window below alarm grade. Results concern surrogate analytes, a constructed action ladder and synthetic perturbation, not hydrocarbons, facility alarm philosophy or physical sensor failure. Report miss rate with an honest bound, escalation adequacy and alarm burden together.
+Gas-monitoring systems are an important process-safety barrier, but learned detection models are commonly ranked by classification accuracy even when their outputs may contribute directly to operator alarm burden. Accuracy says nothing about how often a hazard draws no response or clean air draws a high-severity one. This paper benchmarks learned gas-monitoring decision models. It scores ten comparators on a five-quantity evaluation set, decision accuracy beside four safety-relevant rates, under leakage-controlled partitioning, class exclusion and graded sensor degradation, with cumulative-sum (CUSUM) as an auxiliary reference. Three findings are emphasized. Random splitting over overlapping windows raises accuracy by 3.23 to 5.57 points for every temporal model. Ten comparators sit within 4.43 accuracy points in distribution, yet withholding one hazardous class separates them: in the worst partition the multilayer perceptron misses 234 of 1,581 Smoke windows, and the shallow decision tree 988 of 1,581 Mixture windows. Seven of ten comparators with miss bounds at or below 3.3% span an escalation spread of about 200, so miss rate alone cannot be the criterion. Raw-space faults expose a clamped array routing every hazardous window below alarm grade. Results concern surrogate analytes, a constructed action ladder and synthetic perturbation, not hydrocarbons, facility alarm philosophy or physical sensor failure. Report miss rate with an honest bound, escalation adequacy and alarm burden together.
 
 ---
 
 
-## Introduction
+## 1. Introduction
 
-Many process-safety incidents involve warning indications that do not lead to timely intervention. In the eleven minutes before the Milford Haven refinery explosion the control-room operator received 275 alarms (Goel et al. 2017). Sensing was not the failure; turning what was sensed into a decision was.
+Many process-safety incidents involve warning indications that do not lead to timely intervention. In the eleven minutes before the Milford Haven refinery explosion the control-room operator received 275 alarms (Goel et al., 2017). Sensing was not the failure; turning what was sensed into a decision was.
 
-The same question arises at upstream and midstream facilities, where fixed point-gas detectors feed alarm systems that already run at or above the rates industry guidance treats as manageable for one operator (Engineering Equipment and Materials Users’ Association [EEMUA] 2024; International Society of Automation [ISA] 2016). Machine learning has been applied far more heavily to detection than to disposition. Published gas-detection models are ranked by classification accuracy, yet their results are high, closely spaced and not directly comparable (Table S17). Accuracy also treats errors symmetrically. A hazard that draws no response forfeits the whole intervention window, a sub-alarm response notifies nobody, and a clean condition that draws a high-severity response degrades the alarm system that later hazards depend on (Laberge et al. 2014).
+The same question arises at upstream and midstream facilities, where fixed point-gas detectors feed alarm systems that already run at or above the rates industry guidance treats as manageable for one operator (Engineering Equipment and Materials Users’ Association [EEMUA], 2024; International Society of Automation [ISA], 2016). Machine learning has been applied far more heavily to detection than to disposition. Published gas-detection models are ranked by classification accuracy, yet their results are high, closely spaced and not directly comparable (Table S17). Accuracy also treats errors symmetrically. A hazard that draws no response forfeits the whole intervention window, a sub-alarm response notifies nobody, and a clean condition that draws a high-severity response degrades the alarm system that later hazards depend on (Laberge et al., 2014).
 
-Reconstruction-based anomaly detectors, embedded vision models, gas-detection networks optimized for the same constraint and cost-sensitive learning are all established (Malhotra et al. 2016; Korjani et al. 2024; Dehnaw et al. 2024; Elkan 2001). Less developed is the downstream disposition of a hazardous observation, and whether that disposition holds when the hazard is unfamiliar and the sensing is degraded. Six research questions (RQ) follow.
+Reconstruction-based anomaly detectors, embedded vision models, gas-detection networks optimized for the same constraint and cost-sensitive learning are all established (Malhotra et al., 2016; Korjani et al., 2024; Dehnaw et al., 2024; Elkan, 2001). Less developed is the downstream disposition of a hazardous observation, and whether that disposition holds when the hazard is unfamiliar and the sensing is degraded. Six research questions (RQ) follow.
 
 i. RQ0. Does the choice of partitioning protocol change what a comparison reports?
 ii. RQ1. Does accuracy-ranked model selection survive a missed-hazard criterion?
@@ -43,21 +43,31 @@ This study does not aim to advance classification accuracy on this benchmark. It
 
 ---
 
-## Related Work and Positioning
+## 2. Related Work and Positioning
 
-*Detection Stops Short of a Decision.* Gas-hazard detection rests on a well-developed base of hardware and software methods, from distributed acoustic and fiber-optic sensing to mass balance and model-based diagnostics (Murvay and Silea 2012; Adegboye et al. 2019; Zhang et al. 2013; Rousselet et al. 2011), including deep-learning electronic-nose classification (Faleh and Kachouri 2023), whose performance is uneven under real operating conditions (Han and Kim 2014). All of them stop at an indication, a location or a concentration, and the literature evaluating them does not ask whether the downstream response would have been adequate. Reconstruction-based sequence models trained on normal operation are the standard unsupervised route to sensor anomaly detection (Malhotra et al. 2016; Liang et al. 2023; Lima et al. 2026). An anomaly score is still intermediate, since nothing in training calibrates it to hazard severity, so a safety path using one must show that it ranks hazard monotonically. We test that below.
+### 2.1 Detection Stops Short of a Decision
 
-*A Saturated Benchmark.* MultimodalGasData pairs thermal frames with a seven-channel MOX array, and the original work showed fusion beats either modality alone: 96% fused against 82% for MOX and 93% for thermal (Narkhede et al. 2021, 2022). Later results are high but not comparable across tasks and test sets: Sharma et al. (2024) report 99.7% validation accuracy for a federated multimodal model; El Barkani et al. (2024) report 91.7% on thermal images alone on embedded hardware; and Zhang and Zhang (2025) report 98.9% for a binary leak task on a simulated test set of their own collection, and 95.4% on field data from a methane emissions test facility. These figures appear to be computed on randomized splits over temporally adjacent observations from the same acquisition campaign, the confound Dennler et al. (2022) demonstrated in a widely used MOX benchmark, and they report classification rather than action-level quantities. The same thermal classifier, retrained under the block-wise holdout the sensor path uses, averages 85.0% over five seeds (Supplementary Section S1), so its randomized figures are not evidence about deployment performance.
+Gas-hazard detection rests on a well-developed base of hardware and software methods. These range from distributed acoustic and fiber-optic sensing to mass balance and model-based diagnostics (Murvay and Silea, 2012; Adegboye et al., 2019; Zhang et al., 2013; Rousselet et al., 2011), including deep-learning electronic-nose classification (Faleh and Kachouri, 2023), whose performance is uneven under real operating conditions (Han and Kim, 2014). All of them stop at an indication, a location or a concentration, and the literature evaluating them does not ask whether the downstream response would have been adequate. Reconstruction-based sequence models trained on normal operation are the standard unsupervised route to sensor anomaly detection (Malhotra et al., 2016; Liang et al., 2023; Lima et al., 2026). An anomaly score is still intermediate, since nothing in training calibrates it to hazard severity, so a safety path using one must show that it ranks hazard monotonically. We test that below.
 
-*Unknown Gases Are Not a New Problem.* Open-set recognition is established. Qu et al. (2022) showed closed-set classifiers assign unknown analytes to known classes with high confidence; Ma et al. (2024) pursued it with a multi-scale temporal convolutional network; Yao et al. (2024) and Vergara et al. (2012) treat the unknown class jointly with drift, and Lin and Zhan (2026) compensate drift by knowledge distillation. Gas-leakage detection work is often scored on recognition (Kumar et al. 2024). Among the studies reviewed here we did not find one mapping an unfamiliar hazardous class onto a graded response ladder and separating passive silence, sub-alarm routing and alarm-grade notification. The experiment occupies that gap, and it is not an open-set method: it withholds a class, lets ordinary closed-set models do what they do, and records the action.
+### 2.2 A Saturated Benchmark
 
-*Alarm Analytics, Cost Sensitivity and Coordination.* Industrial alarm systems have their own analytics literature: Wang, J. et al. (2016) survey alarm overloading, and EEMUA (2024) and ISA (2016) codify the performance envelopes it targets. That work improves an existing alarm system; the question here is the prior one, what to measure before a learned model becomes a source of alarms. That error costs are unequal has had a clean treatment since Elkan (2001), but whether an asymmetry moved the error it was introduced to suppress is reported far less often, and we run that test. Coordinated multi-model systems have been applied in the energy sector (Sabbagh et al. 2024; Santiago et al. 2025; Jessen and Roshchin 2025). Explanation matters because trust and post-incident accountability depend on it, and a fluent explanation that does not match its decision is worse in a control room than none.
+MultimodalGasData pairs thermal frames with a seven-channel MOX array, and the original work showed fusion beats either modality alone: 96% fused against 82% for MOX and 93% for thermal (Narkhede et al., 2021, 2022). Later results are high but not comparable across tasks and test sets: Sharma et al. (2024) report 99.7% validation accuracy for a federated multimodal model; El Barkani et al. (2024) report 91.7% on thermal images alone on embedded hardware; and Zhang and Zhang (2025) report 98.9% for a binary leak task on a simulated test set of their own collection, and 95.4% on field data from a methane emissions test facility. These figures appear to be computed on randomized splits over temporally adjacent observations from the same acquisition campaign, the confound Dennler et al. (2022) demonstrated in a widely used MOX benchmark, and they report classification rather than action-level quantities. The same thermal classifier, retrained under the block-wise holdout the sensor path uses, averages 85.0% over five seeds (Supplementary Section S1), so its randomized figures are not evidence about deployment performance.
 
-*Where This Study Sits.* Table S17 lists representative prior work with the evaluation gap each leaves open, and states our own limitation in the same column. The contribution is a pre-deployment evaluation protocol for learned gas-monitoring components that separates recognition correctness, passive hazard miss, operator-notification adequacy and alarm burden, and measures all four under controlled class exclusion and perturbation. No new architecture is proposed; the protocol is a benchmarked template a facility could adapt once it has substituted its own hazard definitions, alarm philosophy, response thresholds and fault models.
+### 2.3 Unknown Gases Are Not a New Problem
+
+Open-set recognition is established. Qu et al. (2022) showed closed-set classifiers assign unknown analytes to known classes with high confidence; Ma et al. (2024) pursued it with a multi-scale temporal convolutional network; Yao et al. (2024) and Vergara et al. (2012) treat the unknown class jointly with drift, and Lin and Zhan (2026) compensate drift by knowledge distillation. Gas-leakage detection work is often scored on recognition (Kumar et al., 2024). Among the studies reviewed here we did not find one mapping an unfamiliar hazardous class onto a graded response ladder and separating passive silence, sub-alarm routing and alarm-grade notification. The experiment occupies that gap, and it is not an open-set method: it withholds a class, lets ordinary closed-set models do what they do, and records the action.
+
+### 2.4 Alarm Analytics, Cost Sensitivity and Coordination
+
+Industrial alarm systems have their own analytics literature: Wang, J. et al. (2016) survey alarm overloading, and EEMUA (2024) and ISA (2016) codify the performance envelopes it targets. Kaced et al. (2021) treat nuisance alarms in chemical processes as a multivariate problem, because process variables are increasingly correlated and alarm management has to account for that correlation. That work improves an existing alarm system; the question here is the prior one, what to measure before a learned model becomes a source of alarms. That error costs are unequal has had a clean treatment since Elkan (2001), but whether an asymmetry moved the error it was introduced to suppress is reported far less often, and we run that test. Coordinated multi-model systems have been applied in the energy sector (Sabbagh et al., 2024; Santiago et al., 2025; Jessen and Roshchin, 2025). Explanation matters because trust and post-incident accountability depend on it, and a fluent explanation that does not match its decision is worse in a control room than none.
+
+### 2.5 Where This Study Sits
+
+Table S17 lists representative prior work with the evaluation gap each leaves open, and states our own limitation in the same column. The contribution is a pre-deployment evaluation protocol for learned gas-monitoring components that separates recognition correctness, passive hazard miss, operator-notification adequacy and alarm burden, and measures all four under controlled class exclusion and perturbation. No new architecture is proposed; the protocol is a benchmarked template a facility could adapt once it has substituted its own hazard definitions, alarm philosophy, response thresholds and fault models. Its process-safety contribution is therefore not improved gas recognition, but a pre-deployment method for identifying learned-model behaviors that could otherwise appear as missed alarms, under-escalation, or nuisance-alarm loading when incorporated into a protection or operator-support workflow.
 
 ---
 
-## Methodology
+## 3. Methodology
 
 The pipeline combines established components; the contribution is the evaluation protocol and metric set. **Fig. 1** gives the workflow, from corpus and action map through a single protocol to the five conditions every trained model is put through, all read with the same five-quantity set.
 
@@ -65,25 +75,37 @@ The pipeline combines established components; the contribution is the evaluation
 
 Fig. 1—Workflow of the study: one corpus, one protocol, five conditions and the evaluation set they are read with.
 
-*Corpus and Preprocessing.* The public MultimodalGasData corpus (Narkhede et al. 2022; Mendeley Data, CC BY 4.0) pairs a seven-channel MQ-series metal-oxide (MOX) array with thermal frames from a Seek Compact camera, at 2 s intervals. There are 6,400 labeled samples in four classes of 1,600: clean air (NoGas), incense smoke (Smoke), alcohol-based deodorant vapor (Perfume), and a mixture of the two (Mixture), one frame of each in **Fig. 1**. Smoke and Mixture are hazardous surrogate conditions throughout, not facility hazards. Table S18 lists the array and the gases each element is marketed to sense.
+### 3.1 Corpus and Preprocessing
+
+The public MultimodalGasData corpus (Narkhede et al., 2022; Mendeley Data, CC BY 4.0) pairs a seven-channel MQ-series metal-oxide (MOX) array with thermal frames from a Seek Compact camera, at 2 s intervals. There are 6,400 labeled samples in four classes of 1,600: clean air (NoGas), incense smoke (Smoke), alcohol-based deodorant vapor (Perfume), and a mixture of the two (Mixture), one frame of each in **Fig. 1**. Smoke and Mixture are hazardous surrogate conditions throughout, not facility hazards. Table S18 lists the array and the gases each element is marketed to sense.
 
 Two properties shaped what follows. The analytes are surrogates: they exercise the MOX transduction mechanism, the array's cross-sensitivity and its baseline drift, but establish nothing about methane or anything heavier. And the four classes were recorded as four contiguous blocks. The serial-number column restarts three times across the 6,400 readings, so the corpus is four acquisition runs of 1,600 readings spanning about 213 minutes. Baseline drift within a run is therefore confounded with class identity, which motivates the leakage-controlled evaluation set out next.
 
-*Leakage-Controlled Partitioning.* Seven-channel readings form sliding windows of length 20, each labeled by its final reading, with windows spanning a class boundary discarded so that no window mixes two classes. That leaves 6,324 windows, 1,581 per class. Consecutive windows share 19 of 20 raw rows, so a random split drops near-duplicates into both partitions, and a sequential split is no better because the corpus is block-ordered by class. The protocol is a block-wise holdout: inside each class block a contiguous 20% forms the test partition, separated from training by an embargo of *G* = 20 windows on each side, so no training window shares a raw row with a test window. The held-out block's position moves with the run seed, so the reported dispersion includes partition variance (Bouthillier et al. 2021). The result is 4,900 training and 1,264 test windows, 316 per class, with feature scaling and anomaly normalization fitted on the training partition. The layout is drawn in Fig. S12.
+### 3.2 Leakage-Controlled Partitioning
 
-*What Is Evaluated, and What Is Not.* Each cycle the system takes a thermal image *I*ₜ and a sensor window Xₜ ∈ ℝ^(20×7)^ and returns a safety action *a*ₜ ∈ {0, …, 4} with an explanation *E*ₜ. Every number in this paper is produced by the sensor-policy core, which takes the 22-dimensional sensor state of Eq. 1 and emits an action; the thermal branch contributes no term to that state. The running implementation also wraps the policy in deterministic guardrails, an anomaly-threshold override and a promotion rule driven by the thermal classifier. These are not benchmarked, because a guardrail that raises actions would lift every comparator toward saturation, which is what this evaluation exists to break out of. No result below describes end-to-end behavior of the deployed system.
+Seven-channel readings form sliding windows of length 20, each labeled by its final reading, with windows spanning a class boundary discarded so that no window mixes two classes. That leaves 6,324 windows, 1,581 per class. Consecutive windows share 19 of 20 raw rows, so a random split drops near-duplicates into both partitions, and a sequential split is no better because the corpus is block-ordered by class. The protocol is a block-wise holdout: inside each class block a contiguous 20% forms the test partition, separated from training by an embargo of *G* = 20 windows on each side, so no training window shares a raw row with a test window. The held-out block's position moves with the run seed, so the reported dispersion includes partition variance (Bouthillier et al., 2021). The result is 4,900 training and 1,264 test windows, 316 per class, with feature scaling and anomaly normalization fitted on the training partition. The layout is drawn in Fig. S12.
 
-The pipeline is advisory and actuates nothing: *Recommend ESD assessment* (ESD, emergency shutdown) refers a condition under the facility procedure and does not command a trip. The International Electrotechnical Commission standard IEC 61511 (IEC 2016) sets lifecycle and independence expectations for safety instrumented systems, and this component sits in the operator-support layer outside any safety instrumented function. The separation is kept because one learned component selecting across both the alarm and the shutdown layer would make those layers share a dependency.
+### 3.3 What Is Evaluated, and What Is Not
 
-*Component Models.* The evaluated core is assembled from a thermal classifier (YOLOv8n-cls; Jocher et al. 2023), a long short-term memory (LSTM) autoencoder supplying a scalar anomaly score, a coordination step that forms the state, and a feedforward decision network with a dueling value and advantage head (Wang, Z. et al. 2016) trained by cost-weighted cross-entropy on the target action rather than by reinforcement learning. Architectures, layer sizes and training settings are in Supplementary Section S17, with the three component diagrams as Figs. S7 to S9.
+Each cycle the system takes a thermal image *I*ₜ and a sensor window Xₜ ∈ ℝ^(20×7)^ and returns a safety action *a*ₜ ∈ {0, …, 4} with an explanation *E*ₜ. Every safety-benchmark result reported below is produced by the sensor-policy core, which takes the 22-dimensional sensor state of Eq. 1 and emits an action; the thermal branch contributes no term to that state. The running implementation also wraps the policy in deterministic guardrails, an anomaly-threshold override and a promotion rule driven by the thermal classifier. These are not benchmarked, because a guardrail that raises actions would lift every comparator toward saturation, which is what this evaluation exists to break out of. No result below describes end-to-end behavior of the deployed system.
 
-*Coordination.* The 22-dimensional decision state is
+The pipeline is advisory and actuates nothing: *Recommend ESD assessment* (ESD, emergency shutdown) refers a condition under the facility procedure and does not command a trip. The International Electrotechnical Commission standard IEC 61511 (IEC, 2016) sets lifecycle and independence expectations for safety instrumented systems, and this component sits in the operator-support layer outside any safety instrumented function. The separation is kept because one learned component selecting across both the alarm and the shutdown layer would make those layers share a dependency.
+
+### 3.4 Component Models
+
+The evaluated core is assembled from a thermal classifier (YOLOv8n-cls; Jocher et al., 2023), a long short-term memory (LSTM) autoencoder supplying a scalar anomaly score, a coordination step that forms the state, and a feedforward decision network with a dueling value and advantage head (Wang, Z. et al., 2016) trained by cost-weighted cross-entropy on the target action rather than by reinforcement learning. Architectures, layer sizes and training settings are in Supplementary Section S17, with the three component diagrams as Figs. S7 to S9.
+
+### 3.5 Coordination
+
+The 22-dimensional decision state is
 
 &nbsp;&nbsp;&nbsp;&nbsp;φₜ = [ ρ̃ₜ , Xₜ[−1,:] , δₜ , σₜ ] ∈ ℝ²²  ............ (1)
 
 with ρ̃ₜ the normalized anomaly score, Xₜ[−1,:] the current seven-channel reading, δₜ the per-sensor change across the window, and σₜ the per-sensor standard deviation. There is no visual term in the state.
 
-*Decision.* Training targets come from the single-valued map *y*(·) of Eq. 2a; evaluation scores against the acceptable set *A*(·) of Eq. 2b (Fig. S9).
+### 3.6 Decision
+
+Training targets come from the single-valued map *y*(·) of Eq. 2a; evaluation scores against the acceptable set *A*(·) of Eq. 2b (Fig. S9).
 
 > The action labels in Eq. 2a and Eq. 2b are constructed evaluation targets. They are not facility alarm requirements, not a safety instrumented function specification, and not derived from any concentration, release rate, lower-explosive-limit fraction, toxic-exposure limit or consequence model. No such quantity exists in this corpus. Every metric defined on this ladder measures agreement with the constructed target, not consequence avoided.
 
@@ -103,9 +125,13 @@ where *p*~θ~ is the softmax over the five action scores and *p*~θ~(*y* | φ) i
 
 Two consequences bound what can be claimed. Because *y*(·) is a deterministic function of the class label, decision accuracy is four-class classification accuracy composed with a fixed map, so the two framings differ in error metric, not in task. And a rule applying *y*(·) to the true label hits 100% by construction, consuming the label it is meant to infer, so it appears below as a label-function reference and never as a baseline.
 
-*Comparators.* Ten primary comparators run under one protocol: the cost-weighted policy of Eq. 3 and an unweighted network of identical topology, a multilayer perceptron, clean-air-weighted gradient boosting, a random forest, a radial-basis-function (RBF) support-vector classifier, k-nearest neighbors, a recurrent network, conservative Q-learning and a shallow decision tree on the seven raw channels. CUSUM (Page 1954) is an auxiliary two-action process-monitoring reference, evaluated separately for the in-distribution safety metrics and outside the cross-model benchmark. Specifications are given in Supplementary Section S5. Twelve models appear in total, since the ordinal cost objective of Experiment 4 is a variant of the decision component rather than an independent method. Because it never emits the Monitor action its safety zeros are structural, so it is reported under Experiment 4 and excluded from every count of comparators. Table S19 states which model appears in which experiment.
+### 3.7 Comparators
 
-*The Evaluation Metric Set.* Five quantities rather than one, and this set is the proposal: decision accuracy beside four safety-relevant rates. Alarm burden is the false-alarm rate in operational units (Eq. 9), not a sixth quantity. **Table 1** gives the action space and **Fig. 2** shows where each quantity reads it.
+Ten primary comparators run under one protocol: the cost-weighted policy of Eq. 3 and an unweighted network of identical topology, a multilayer perceptron, clean-air-weighted gradient boosting, a random forest, a radial-basis-function (RBF) support-vector classifier, k-nearest neighbors, a recurrent network, conservative Q-learning and a shallow decision tree on the seven raw channels. CUSUM (Page, 1954) is an auxiliary two-action process-monitoring reference, evaluated separately for the in-distribution safety metrics and outside the cross-model benchmark. Specifications are given in Supplementary Section S5. Twelve models appear in total, since the ordinal cost objective of Experiment 4 is a variant of the decision component rather than an independent method. Because it never emits the Monitor action its safety zeros are structural, so it is reported under Experiment 4 and excluded from every count of comparators. Table S19 states which model appears in which experiment.
+
+### 3.8 The Evaluation Metric Set
+
+Five quantities rather than one, and this set is the proposal: decision accuracy beside four safety-relevant rates. Alarm burden is the false-alarm rate in operational units (Eq. 9), not a sixth quantity. **Table 1** gives the action space and **Fig. 2** shows where each quantity reads it.
 
 | Action | Label | Operational response |
 |---|---|---|
@@ -125,19 +151,25 @@ Fig. 2—One window, one action, and the boundary each metric reads.
 
 Let the test partition be windows *t* = 1 … *N*~test~ with true classes *g*ₜ and selected actions *a*ₜ, let *H* = {*t* : *g*ₜ ∈ {Smoke, Mixture}} be the hazardous-surrogate windows and *Z* = {*t* : *g*ₜ = NoGas} the clean ones, and let 1[·] be the indicator function.
 
-*Decision accuracy* is the share of test windows assigned an action in the acceptable set,
+### 3.9 Decision accuracy
+
+is the share of test windows assigned an action in the acceptable set,
 
 &nbsp;&nbsp;&nbsp;&nbsp;Acc = (1/*N*~test~) Σₜ 1[ *a*ₜ ∈ *A*(*g*ₜ) ].  ............ (4)
 
 Decision accuracy is reported for continuity with prior work. It is not a safety metric, nor treated as one here.
 
-*Missed-hazard rate* is the share of hazardous windows assigned the passive *Monitor* action,
+### 3.10 Missed-hazard rate
+
+is the share of hazardous windows assigned the passive *Monitor* action,
 
 &nbsp;&nbsp;&nbsp;&nbsp;*R*~miss~ = (1/|*H*|) Σ~t∈H~ 1[ *a*ₜ = 0 ].  ............ (5)
 
 Only *a* = 0 counts, so assigning a hazardous window to *Raise alarm* when *Recommend ESD assessment* was the target is not a miss: an operator is still notified. Its limitation is that *Increase sampling* and *Request verification* are also not misses, though neither places anything in front of an operator, which is why the next two quantities exist.
 
-*Escalation adequacy* is the share of hazardous windows assigned an alarm-grade action, and *under-escalation* the share receiving a sub-alarm one,
+### 3.11 Escalation adequacy
+
+is the share of hazardous windows assigned an alarm-grade action, and *under-escalation* the share receiving a sub-alarm one,
 
 &nbsp;&nbsp;&nbsp;&nbsp;*R*~esc~ = (1/|*H*|) Σ~t∈H~ 1[ *a*ₜ ≥ 3 ],  ............ (6)
 
@@ -145,7 +177,9 @@ Only *a* = 0 counts, so assigning a hazardous window to *Raise alarm* when *Reco
 
 By construction *R*~miss~ + *R*~under~ + *R*~esc~ = 1, so the three partition the hazardous windows and no response is counted twice or left out. It is precisely this partition that a miss metric alone collapses.
 
-*High-severity false-alarm rate* is the share of clean windows assigned an alarm-grade action, and the corresponding alarm burden is that rate expressed per 1,000 clean windows,
+### 3.12 High-severity false-alarm rate
+
+is the share of clean windows assigned an alarm-grade action, and the corresponding alarm burden is that rate expressed per 1,000 clean windows,
 
 &nbsp;&nbsp;&nbsp;&nbsp;*R*~fa~ = (1/|*Z*|) Σ~t∈Z~ 1[ *a*ₜ ≥ 3 ],  ............ (8)
 
@@ -153,15 +187,21 @@ By construction *R*~miss~ + *R*~under~ + *R*~esc~ = 1, so the three partition th
 
 Eq. 9 makes the quantity comparable with an alarm budget; dividing instead by the number of alerts raised gives a number that cannot be. The set *Z* is the clean-air (NoGas) windows, a deliberately narrow denominator. Perfume windows are also nonhazardous under Eq. 2b, so an alarm-grade action on one is an unnecessary alarm by the same map; every value of Eq. 8 therefore carries a companion rate over all nonhazardous windows, and Experiment 3 shows the two can disagree. 
 
-*Three levels, announced in advance.* Alarm-grade indication density is *B* itself. Eventized alarm rate collapses contiguous alarm-grade windows into annunciated episodes under a stated persistence rule. Operator burden would compare that episode rate against a facility's own alarm philosophy, which this study does not attempt. The first two differ by between 5 and 316 times here and order the models differently, so any statement about operator load rests on the second.
+### 3.13 Three levels, announced in advance
 
-*Bounds on every zero.* An observed zero is not a demonstrated zero. All zero-count claims carry a one-sided 95% upper bound from the Clopper-Pearson construction (Clopper and Pearson 1934), called here an independence-reference binomial upper bound. Clopper-Pearson is exact only under the binomial model, which requires *N*~opp~ independent Bernoulli trials, and this corpus is one continuous recording decomposed into windows overlapping by 19 of 20 raw rows. The bound fixes a reference point any reader can recompute and compare across models; it is not a confidence statement about an operational failure rate, and every number it produces is optimistic. For *k* observed failures in *N*~opp~ opportunities at confidence *c*,
+Alarm-grade indication density is *B* itself. Eventized alarm rate collapses contiguous alarm-grade windows into annunciated episodes under a stated persistence rule. Operator burden would compare that episode rate against a facility's own alarm philosophy, which this study does not attempt. The first two differ by between 5 and 316 times here and order the models differently, so any statement about operator load rests on the second.
+
+### 3.14 Bounds on every zero
+
+An observed zero is not a demonstrated zero. All zero-count claims carry a one-sided 95% upper bound from the Clopper-Pearson construction (Clopper and Pearson, 1934), called here an independence-reference binomial upper bound. Clopper-Pearson is exact only under the binomial model, which requires *N*~opp~ independent Bernoulli trials; within each class-specific acquisition run, consecutive windows overlap by 19 of 20 raw rows. The bound fixes a reference point any reader can recompute and compare across models; it is not a confidence statement about an operational failure rate, and every number it produces is optimistic. For *k* observed failures in *N*~opp~ opportunities at confidence *c*,
 
 &nbsp;&nbsp;&nbsp;&nbsp;*U*(*k*, *N*~opp~) = BetaInv( *c*; *k* + 1, *N*~opp~ − *k* ),  ............ (10)
 
 For *k* = 0 this reduces to *U* = 1 − (1 − *c*)^(1/*N*~opp~)^. Two conventions are reported throughout: an independence-reference Clopper-Pearson bound of Eq. 10 with the partition as the unit, and a conservative disjoint-support bound counting only non-overlapping windows. Bounds are computed from the counts, never from the averaged rate. About a factor of twenty separates them on a zero count, which is why no ratio of bounds is quoted as a finding in this paper. Supplementary Section S18 derives both, and reports the moving-block bootstrap beside them.
 
-**Table 2** states the metric set in the form proposed for adoption, including what each quantity does not catch. Entries given as mean ± standard deviation (SD) are taken over runs.
+### 3.15 *Table 2*
+
+states the metric set in the form proposed for adoption, including what each quantity does not catch. Entries given as mean ± standard deviation (SD) are taken over runs.
 
 | Quantity | Symbol | Reads | Catches | Does not catch | Report with |
 |---|---|---|---|---|---|
@@ -173,13 +213,15 @@ For *k* = 0 this reduces to *U* = 1 − (1 − *c*)^(1/*N*~opp~)^. Two conventio
 
 Table 2—The proposed evaluation set, with the blind spot of each quantity.
 
-*Protocol and Statistics.* Two protocols are used. The five-seed protocol (42, 1337, 7, 2024, 99), each seed carrying its own block position, covers experiments that vary something other than the model. It is a descriptive robustness check, not a basis for ranking models. Five paired observations cannot support a ranking: the two-sided Wilcoxon signed-rank test has a minimum attainable *p*-value of 2^(1−*N*~run~)^ = 0.0625 at *N*~run~ = 5, so no five-seed comparison reaches α = 0.05 at any effect size.
+### 3.16 Protocol and Statistics
 
-The model comparison itself is run 30 times, with seed, held-out block position and a hyperparameter draw all varying per run (Bouthillier et al. 2021), none of it tuned against the test partition. With 30 runs we use the Bayesian correlated *t*-test of Benavoli et al. (2017) at a correlation ρ = *n*~test~/(*n*~train~ + *n*~test~) = 1,264/(4,900 + 1,264) = 0.2051, computed from the partition the pipeline builds. Integrating the posterior over a region of practical equivalence of ± 1 accuracy point returns the probability that one model is practically better, that the other is, or that the two are equivalent; that third probability is a positive statement a null hypothesis test cannot give. Benavoli et al. derive the correlation term for *k*-fold cross-validation, so ρ is carried across from a design that is not quite this one, and the comparison is reported over ranges of ρ and of equivalence width (Supplementary Section S6). The full derivation is in Supplementary Section S28. Runs are seeded and execution is limited to two threads; no global determinism flag is set in the drivers that produced these results.
+Two protocols are used. The five-seed protocol (42, 1337, 7, 2024, 99), each seed carrying its own block position, covers experiments that vary something other than the model. It is a descriptive robustness check, not a basis for ranking models. Five paired observations cannot support a ranking: the two-sided Wilcoxon signed-rank test has a minimum attainable *p*-value of 2^(1−*N*~run~)^ = 0.0625 at *N*~run~ = 5, so no five-seed comparison reaches α = 0.05 at any effect size.
+
+The model comparison itself is run 30 times, with seed, held-out block position and a hyperparameter draw all varying per run (Bouthillier et al., 2021), none of it tuned against the test partition. With 30 runs we use the Bayesian correlated *t*-test of Benavoli et al. (2017) at a correlation ρ = *n*~test~/(*n*~train~ + *n*~test~) = 1,264/(4,900 + 1,264) = 0.2051, computed from the partition the pipeline builds. Integrating the posterior over a region of practical equivalence of ± 1 accuracy point returns the probability that one model is practically better, that the other is, or that the two are equivalent; that third probability is a positive statement a null hypothesis test cannot give. Benavoli et al. derive the correlation term for *k*-fold cross-validation, so ρ is carried across from a design that is not quite this one, and the comparison is reported over ranges of ρ and of equivalence width (Supplementary Section S6). The full derivation is in Supplementary Section S28. Runs are seeded and execution is limited to two threads; no global determinism flag is set in the drivers that produced these results.
 
 ---
 
-## Results
+## 4. Results
 
 This section reports eight experiments. Component behavior comes first, then the evaluation protocol itself as the subject of Experiment 1, because every number after it depends on that protocol being defensible, then the six experiments that answer a research question; the two carrying none are grouped as supporting evidence. **Table 3** maps the questions onto the experiments that answer them.
 
@@ -195,9 +237,13 @@ This section reports eight experiments. Component behavior comes first, then the
 
 Table 3—Research questions and the experiments that address them.
 
-*Component Behavior.* The thermal classifier's 98.8% top-1 accuracy on 1,280 held-out images comes from the original checkpoint, trained under a randomized split. Retraining that protocol with the same settings gives 98.0 to 98.3% over three seeds, comparable to published randomized figures and comparably optimistic. Under the block-wise holdout the sensor path uses, the same classifier reaches 79.2 to 92.1% over five seeds, a mean of 85.0%, and calls between 0 and 65 of the 640 hazardous frames non-hazardous in each run (Supplementary Section S1, Table S1c). The anomaly score separates clean air from hazard in the mean but overlaps on the NoGas and Perfume boundary, and refitting it inside each training partition lowers its held-out area under the receiver operating characteristic curve (ROC-AUC) substantially (Supplementary Section S21, Fig. S10).
+### 4.1 Component Behavior
 
-*Experiment 1: Sensitivity of Reported Accuracy to the Partitioning Protocol.* Random splitting over overlapping sliding windows is standard in this literature and places near-duplicates in both partitions (Dennler et al. 2022), but that was shown on a different MOX benchmark, so it is measured here. Six models were trained under four protocols (**Table 4**, **Fig. 3**): a uniformly random 80/20 split; a contiguous per-class block with no separation band; that block with the 20-window embargo used everywhere else here; and training on the first 60% of each class block, testing on the last 20%, discarding the middle 20%.
+The thermal classifier's 98.8% top-1 accuracy on 1,280 held-out images comes from the original checkpoint, trained under a randomized split. Retraining that protocol with the same settings gives 98.0 to 98.3% over three seeds, comparable to published randomized figures and comparably optimistic. Under the block-wise holdout the sensor path uses, the same classifier reaches 79.2 to 92.1% over five seeds, a mean of 85.0%, and calls between 0 and 65 of the 640 hazardous frames non-hazardous in each run (Supplementary Section S1, Table S1c). The anomaly score separates clean air from hazard in the mean but overlaps on the NoGas and Perfume boundary, and refitting it inside each training partition lowers its held-out area under the receiver operating characteristic curve (ROC-AUC) substantially (Supplementary Section S21, Fig. S10).
+
+### 4.2 Experiment 1: Sensitivity of Reported Accuracy to the Partitioning Protocol
+
+Random splitting over overlapping sliding windows is standard in this literature and places near-duplicates in both partitions (Dennler et al., 2022), but that was shown on a different MOX benchmark, so it is measured here. Six models were trained under four protocols (**Table 4**, **Fig. 3**): a uniformly random 80/20 split; a contiguous per-class block with no separation band; that block with the 20-window embargo used everywhere else here; and training on the first 60% of each class block, testing on the last 20%, discarding the middle 20%.
 
 | Model | Random split | Blocked, no embargo | Blocked + embargo | Train early, test late |
 |---|---|---|---|---|
@@ -219,7 +265,9 @@ Two factors are confounded in that contrast: near-duplicate windows can land on 
 
 Fig. 3—Protocol sensitivity. (a) Decision accuracy under four partitioning protocols. (b) Accuracy points added by a random split.
 
-*Experiment 2: In-Distribution Model Comparison.* Every comparator was trained 30 times under the protocol above and evaluated on the corresponding held-out partition (**Table 5**, **Fig. 4**). This addresses RQ1. FA denotes the high-severity false-alarm rate. Study-defined expected cost is the mean of the hand-designed, untuned ordinal matrix of Supplementary Section S3, a study-internal quantity and not a deployment-derived cost. The final column is the posterior probability of practical equivalence to the cost-weighted policy under Eq. S2 at a region of practical equivalence of ± 1 accuracy point.
+### 4.3 Experiment 2: In-Distribution Model Comparison
+
+Every comparator was trained 30 times under the protocol above and evaluated on the corresponding held-out partition (**Table 5**, **Fig. 4**). This addresses RQ1. FA denotes the high-severity false-alarm rate. Study-defined expected cost is the mean of the hand-designed, untuned ordinal matrix of Supplementary Section S3, a study-internal quantity and not a deployment-derived cost. The final column is the posterior probability of practical equivalence to the cost-weighted policy under Eq. S2 at a region of practical equivalence of ± 1 accuracy point.
 
 | Model | Decision accuracy | SD | Missed-hazard | Escalation | High-severity FA | Study-defined expected cost | P(equivalent) |
 |---|---|---|---|---|---|---|---|
@@ -250,7 +298,9 @@ Where the actions land makes the saturation concrete (Fig. S11): every comparato
 
 Resolving decision accuracy by class locates the whole between-model spread on NoGas and Perfume, which span 10.3 and 9.1 points across the seven models, while every model assigns the correct action to every Mixture window and to at least 98.0% of Smoke windows. The ordering on clean air reverses the aggregate: gradient boosting, sixth by decision accuracy in **Table 5**, is last here, assigning Monitor to 84.0% of clean windows against 94.2% for the support-vector classifier, the in-distribution face of the weighting defect reported under Experiment 8.
 
-*Experiment 3: Class-Disjoint Hazard Evaluation.* Each hazardous surrogate class was withheld in turn, models were retrained on the remaining three, and every window of the withheld class was evaluated, with scaling and anomaly normalization fitted on the three training classes only (**Fig. 5**). This is class exclusion within one acquisition campaign on one device, not demonstrated domain shift: the withheld analyte shares the device and ambient conditions, so what is withheld is the label and the feature region it occupies. Held-out decision accuracy is zero by construction, since the withheld class's target action is absent from training, so what the model does instead is the question (RQ2 and RQ3; **Table 6**, **Fig. 5**).
+### 4.4 Experiment 3: Class-Disjoint Hazard Evaluation
+
+Each hazardous surrogate class was withheld in turn, models were retrained on the remaining three, and every window of the withheld class was evaluated, with scaling and anomaly normalization fitted on the three training classes only (**Fig. 5**). This is class exclusion within one acquisition campaign on one device, not demonstrated domain shift: the withheld analyte shares the device and ambient conditions, so what is withheld is the label and the feature region it occupies. Held-out decision accuracy is zero by construction, since the withheld class's target action is absent from training, so what the model does instead is the question (RQ2 and RQ3; **Table 6**, **Fig. 5**).
 
 One structural property governs how every number here should be read. No comparator has a reject option: each is an ordinary closed-set classifier over the three retained labels and must emit one of the actions its training vocabulary contains. The experiment therefore measures how a closed-set policy *routes* an unfamiliar hazardous condition, not whether a detector can *recognize* it as unfamiliar, and it is neither an open-set method nor a scoring of one. A comparator scoring well here might do so by mapping the unknown analyte onto a conveniently alarming neighbor rather than through competence worth buying. Experiment 7 adds the reject option this design lacks.
 
@@ -278,35 +328,53 @@ Table 6—Class-disjoint hazard evaluation, ordered by the worst-partition bound
 
 Fig. 5—Behavior on a hazardous class withheld from training. (a) Missed-hazard rate, logarithmic axis. (b) Escalation adequacy.
 
-*What the held-out class separates.* In-distribution accuracy does not order held-out-class missed-hazard rate. On the held-out Smoke class the multilayer perceptron, third of ten by point accuracy in **Table 5**, misses 6.41% of hazardous windows, its five partitions producing 4, 23, 30, 216 and 234 misses, while six models record no miss on any partition. The alarm denominator hides a nuisance: two comparators that alarm on no clean window do send alarm-grade actions to Perfume, so the narrow denominator of Eq. 8 and a companion rate over all nonhazardous windows can disagree. On the held-out Mixture class seven of ten comparators have worst-partition bounds at or below 3.3% on missed hazards while their escalation adequacy runs from 0.0049 to 1.000, a factor of about 200. Moving the alarm boundary down one rung collapses that spread to 0.751 to 1.000, which locates the separation in the sub-alarm band.
+### 4.5 What the held-out class separates
 
-*Supporting Experiments 4 and 5.* Two experiments support the main sequence without carrying a research question. Each is reported in full in the supporting information and returns one result the rest of the paper uses.
+In-distribution accuracy does not order held-out-class missed-hazard rate. On the held-out Smoke class the multilayer perceptron, third of ten by point accuracy in **Table 5**, misses 6.41% of hazardous windows, its five partitions producing 4, 23, 30, 216 and 234 misses, while six models record no miss on any partition. The alarm denominator hides a nuisance: two comparators that alarm on no clean window do send alarm-grade actions to Perfume, so the narrow denominator of Eq. 8 and a companion rate over all nonhazardous windows can disagree. On the held-out Mixture class seven of ten comparators have worst-partition bounds at or below 3.3% on missed hazards while their escalation adequacy runs from 0.0049 to 1.000, a factor of about 200. Moving the alarm boundary down one rung collapses that spread to 0.751 to 1.000, which locates the separation in the sub-alarm band.
 
-*Cost asymmetry returns a clean negative* (Supplementary Section S3). Sweeping the loss-weight ratio *C* across nine values leaves missed-hazard rate at zero and escalation adequacy at 1.000 at every ratio, while accuracy falls from 0.9646 at 1:1 to 0.9090 at 20:1. The target action is a deterministic function of a well-separated class label, so the miss rate is on the floor before any weighting. That is evidence about this benchmark, not against cost-sensitive learning (Elkan 2001). The reference *C* = 8:1 was chosen on test-partition dispersion, which is not defensible; re-selecting it on an embargoed validation band gives 6:1. An ordinal objective that prices distance along the ladder does move escalation on the held-out Mixture class, from 0.259 ± 0.188 to 0.386 ± 0.192 at a cost of 21 accuracy points, but its zero missed hazards carry no information, because it never emits Monitor.
+### 4.6 Supporting Experiments 4 and 5
 
-*One upstream input is load-bearing for one model* (Supplementary Section S7). Ablating the decision state by feature group shows the 22-dimensional state is not minimal, but no group changes the in-distribution safety metrics. Sweeping the anomaly input with the other twenty-one features held at their observed values is the consequential test: dependence runs from 0.00% of windows for the decision tree to 64.22 ± 7.65% for gradient boosting. Forcing that input to zero, as a failed autoencoder would, leaves every other comparator's missed-hazard rate at zero while gradient boosting moves from 0.0092 to 0.4203 and its escalation adequacy falls from 0.992 to 0.497.
+Two experiments support the main sequence without carrying a research question. Each is reported in full in the supporting information and returns one result the rest of the paper uses.
 
-*That dependence is partly, not wholly, a weighting defect* (`v3_weighting_probe.csv`). The gradient-boosted comparator was labelled cost-sensitive in earlier versions, but the released code weights by the target action (action 0 at 3.0, actions 3 and 4 at 1.2). A clean-air window carries the up-weighted target and a hazardous window does not, so the model is weighted 2.5 to 1 toward clean air, and we call it clean-air-weighted gradient boosting. Keying the weight on the gas instead moves its in-distribution missed-hazard rate from 0.0092 to 0.0000 at 0.3 accuracy points, and its forced-zero missed-hazard rate from 0.4203 to 0.3307, so the anomaly dependence falls without going away. Under the high-end clamp the corrected model is worse, missing 9.9% of hazardous windows at one clamped channel and 16.5% at four, where the shipped weighting missed none and under-escalated instead. The probe isolates the sign of the weighting, not the 8:1 ratio of Eq. 3.
+### 4.7 Cost asymmetry returns a clean negative
 
-*Experiment 6: Graded Sensor Degradation.* Six models were put through additive noise, calibration drift and channel dropout at graded severities, with the anomaly feature recomputed at each level (**Fig. 6**, selected values in Table S21). Degradation is graceful then brittle: accuracy falls slowly under noise and drift and collapses under dropout, and no clean-condition metric predicts which model collapses first. A single lost channel of seven is the consequential fault. It moves alarm-grade indication density from zero to between 128 and 200 per 1,000 clean windows for three of the six models, pooled over five partitions with all of the alarms in one partition of five, and to 7 per 1,000 for a fourth, while every model is identical on clean data. The three safety metrics also select different models under loss. At *k* = 7 the cost-weighted policy, the unweighted network and the decision tree reach zero missed hazard by alarming on every window, while gradient boosting records no false alarm at any severity and misses 617 of 632 hazardous windows (97.6%) in one partition of five, and none in the other four. The full sweep is in Supplementary Sections S13 and S29.
+(Supplementary Section S3). Sweeping the loss-weight ratio *C* across nine values leaves missed-hazard rate at zero and escalation adequacy at 1.000 at every ratio, while accuracy falls from 0.9646 at 1:1 to 0.9090 at 20:1. The target action is a deterministic function of a well-separated class label, so the miss rate is on the floor before any weighting. That is evidence about this benchmark, not against cost-sensitive learning (Elkan, 2001). The reference *C* = 8:1 was chosen on test-partition dispersion, which is not defensible; re-selecting it on an embargoed validation band gives 6:1. An ordinal objective that prices distance along the ladder does move escalation on the held-out Mixture class, from 0.259 ± 0.188 to 0.386 ± 0.192 at a cost of 21 accuracy points, but its zero missed hazards carry no information, because it never emits Monitor.
+
+### 4.8 One upstream input is load-bearing for one model
+
+(Supplementary Section S7). Ablating the decision state by feature group shows the 22-dimensional state is not minimal, but no group changes the in-distribution safety metrics. Sweeping the anomaly input with the other twenty-one features held at their observed values is the consequential test: dependence runs from 0.00% of windows for the decision tree to 64.22 ± 7.65% for gradient boosting. Forcing that input to zero, as a failed autoencoder would, leaves every other comparator's missed-hazard rate at zero while gradient boosting moves from 0.0092 to 0.4203 and its escalation adequacy falls from 0.992 to 0.497.
+
+### 4.9 That dependence is partly, not wholly, a weighting defect
+
+(`v3_weighting_probe.csv`). The gradient-boosted comparator was labelled cost-sensitive in earlier versions, but the released code weights by the target action (action 0 at 3.0, actions 3 and 4 at 1.2). A clean-air window carries the up-weighted target and a hazardous window does not, so the model is weighted 2.5 to 1 toward clean air, and we call it clean-air-weighted gradient boosting. Keying the weight on the gas instead moves its in-distribution missed-hazard rate from 0.0092 to 0.0000 at 0.3 accuracy points, and its forced-zero missed-hazard rate from 0.4203 to 0.3307, so the anomaly dependence falls without going away. Under the high-end clamp the corrected model is worse, missing 9.9% of hazardous windows at one clamped channel and 16.5% at four, where the shipped weighting missed none and under-escalated instead. The probe isolates the sign of the weighting, not the 8:1 ratio of Eq. 3.
+
+### 4.10 Experiment 6: Graded Sensor Degradation
+
+Six models were put through additive noise, calibration drift and channel dropout at graded severities, with the anomaly feature recomputed at each level (**Fig. 6**, selected values in Table S21). Degradation is graceful then brittle: accuracy falls slowly under noise and drift and collapses under dropout, and no clean-condition metric predicts which model collapses first. A single lost channel of seven is the consequential fault. It moves alarm-grade indication density from zero to between 128 and 200 per 1,000 clean windows for three of the six models, pooled over five partitions with all of the alarms in one partition of five, and to 7 per 1,000 for a fourth, while every model is identical on clean data. The three safety metrics also select different models under loss. At *k* = 7 the cost-weighted policy, the unweighted network and the decision tree reach zero missed hazard by alarming on every window, while gradient boosting records no false alarm at any severity and misses 617 of 632 hazardous windows (97.6%) in one partition of five, and none in the other four. The full sweep is in Supplementary Sections S13 and S29.
 
 ![](figures_v2/fig_perturb.png){width=6.50in}
 
 Fig. 6—Graded perturbation suite, with *k* the number of the seven sensor channels removed.
 
-*Experiments 7 and 8.* A confidence-threshold reject option and faults injected in raw sensor space are both reported in Supplementary Section S16. Under an alarm-mapped convention, at the strictest threshold tested, the reject option raises escalation adequacy on the held-out Mixture class from 0.0030 to 0.7111 for the support-vector classifier and from 0.3750 to 0.9256 for the cost-weighted policy. Each gain is paid for on clean air: the support-vector classifier declines 41.2% of clean windows and the cost-weighted policy 52.9%. The confidence the threshold reads is calibrated in Supplementary Section S4. Raw-space faults expose the silent mode quoted in the Summary: a clamped array routes every hazardous window below alarm grade while its anomaly feature falls below the clean value.
+### 4.11 Experiments 7 and 8
+
+A confidence-threshold reject option and faults injected in raw sensor space are both reported in Supplementary Section S16. Under an alarm-mapped convention, at the strictest threshold tested, the reject option raises escalation adequacy on the held-out Mixture class from 0.0030 to 0.7111 for the support-vector classifier and from 0.3750 to 0.9256 for the cost-weighted policy. Each gain is paid for on clean air: the support-vector classifier declines 41.2% of clean windows and the cost-weighted policy 52.9%. The confidence the threshold reads is calibrated in Supplementary Section S4. Raw-space faults expose the silent mode quoted in the Summary: a clamped array routes every hazardous window below alarm grade while its anomaly feature falls below the clean value.
 
 ---
 
-## Engineering Implications
+## 5. Process-Safety Implications
 
-The results above are measurements. This section states what follows from them for model selection and for how a facility would adapt the framework. No deployment was carried out and nothing here has been through an acceptance process, so what follows is a proposal rather than a recommendation.
+The results above suggest a pre-deployment process-safety assurance role for the proposed benchmark. No deployment or acceptance test was performed, so the following implications concern how learned gas-monitoring components could be screened before they are permitted to contribute to an operator alarm system. This section states what follows for model selection and for how a facility would adapt the framework, and what follows is a proposal rather than a recommendation.
 
-*Selecting a Model When the Metrics Disagree.* Fig. S16 collapses every experiment into one view: for each condition, which model each metric crowns, and whether it can choose at all.
+### 5.1 Selecting a Model When the Metrics Disagree
+
+Fig. S16 collapses every experiment into one view: for each condition, which model each metric crowns, and whether it can choose at all.
 
 Two patterns matter for procurement. In distribution, accuracy names a winner in every row while the three safety metrics tie between seven and ten of the ten, so a selection made on in-distribution evidence is a selection made on accuracy. Under the conditions that do separate models the columns stop agreeing: escalation adequacy on the held-out Mixture class crowns gradient boosting, which accuracy ranks sixth, while at total sensor loss the false-alarm column crowns that same model for the opposite reason.
 
-*A Proposed Evaluation Screen for Sensor Loss.* Single-channel loss is a plausible fault mode for a fixed array, and Experiment 6 shows it separates models identical on every clean-condition metric; an acceptance test built only on clean data would pass all of them. **Table 7** sets out the screen we would propose, each criterion stated beside the measurement that motivates it. It is illustrative, derived from the failure modes observed here, and is not a substitute for site-specific functional-safety or alarm-management requirements.
+### 5.2 A Proposed Evaluation Screen for Sensor Loss
+
+Single-channel loss is a plausible fault mode for a fixed array, and Experiment 6 shows it separates models identical on every clean-condition metric; an acceptance test built only on clean data would pass all of them. **Table 7** sets out the screen we would propose, each criterion stated beside the measurement that motivates it. It is illustrative, derived from the failure modes observed here, and is not a substitute for site-specific functional-safety or alarm-management requirements.
 
 | Screen | Criterion | Motivating measurement |
 |---|---|---|
@@ -320,7 +388,9 @@ Table 7—A proposed evaluation screen for a learned gas-monitoring component.
 
 The screen is deliberately inexpensive. Every row but the fourth re-evaluates an already-trained model on already-collected data, and the held-out-class row costs one retrain per withheld class.
 
-*Expressing False Alarms in Reviewable Units.* A fraction cannot be placed against the envelopes an operator works inside. Two steps are needed: a rate per clean window becomes a count per 1,000 clean windows, a property of the model, and then a count per hour under an assumed duty cycle, a property of the deployment. The comparison with EEMUA (2024) and ISA (2016) is contextual, not a compliance test, since those standards describe what a whole operator position can absorb whereas *B* is a property of one detector. A single lost channel producing roughly 231 indications per hour is an order-of-magnitude screen, not a prediction of operator load, and it belongs in the alarm-management review.
+### 5.3 Expressing False Alarms in Reviewable Units
+
+A fraction cannot be placed against the envelopes an operator works inside. Two steps are needed: a rate per clean window becomes a count per 1,000 clean windows, a property of the model, and then a count per hour under an assumed duty cycle, a property of the deployment. The comparison with EEMUA (2024) and ISA (2016) is contextual, not a compliance test, since those standards describe what a whole operator position can absorb whereas *B* is a property of one detector. A single lost channel producing roughly 231 indications per hour is an order-of-magnitude screen, not a prediction of operator load, and it belongs in the alarm-management review.
 
 The most transferable point is not specific to gas monitoring. Wherever a graded response hierarchy is learned, a metric defined on the most extreme failure can be satisfied by systematic under-response one rung above it, which Eqs. 6 and 7 make visible and a miss metric alone collapses. The fix is to define the metric at the operationally meaningful threshold, here whether an operator is notified. Under complete sensor loss the same metrics reward opposite behaviors: escalating everything, or going silent, each reaching 0.0000 on one metric while failing another.
 
@@ -330,29 +400,47 @@ The learned policy contributes something narrow. In nominal conditions it matche
 
 On standing relative to prior work, published classification accuracies on this corpus run from 91.7% to 99.7%, and the decision accuracies here sit below most of them. Those comparisons appear to use randomized splits over overlapping windows; this evaluation uses a block-wise holdout with an explicit embargo, and Experiment 1 quantifies what that difference is worth. No accuracy advantage is claimed, and nothing in the sensor-policy contribution rests on either number.
 
-*Future Work.* Cross-session and cross-device validation comes first, since everything here comes from one device in one acquisition campaign. A controlled hydrocarbon release would replace the surrogate analytes and is the most direct route to hydrocarbon-specific validity. A tuned ordinal cost matrix follows from Experiment 4. Class-conditional conformal prediction (Angelopoulos and Bates 2023) could give distribution-free coverage on the hazardous class, under exchangeability assumptions the dependence structure documented above puts in question. Upstream-component failure also needs systematic treatment, since only one such input was tested.
+### 5.4 Future Work
 
-## Limitations and Threats to Validity
+Cross-session and cross-device validation comes first, since everything here comes from one device in one acquisition campaign. A controlled hydrocarbon release would replace the surrogate analytes and is the most direct route to hydrocarbon-specific validity. A tuned ordinal cost matrix follows from Experiment 4. Class-conditional conformal prediction (Angelopoulos and Bates, 2023) could give distribution-free coverage on the hazardous class, under exchangeability assumptions the dependence structure documented above puts in question. Upstream-component failure also needs systematic treatment, since only one such input was tested.
 
-*Analyte and Acquisition Validity.* Incense smoke, alcohol-based vapor and a mixture of the two are surrogates, so nothing here establishes detection performance for methane or heavier hydrocarbons; external validity to petroleum facility monitoring is argued from the shared MOX transduction mechanism rather than shown. All 6,400 samples come from one device, in four class-specific acquisition runs within one campaign, so sensor ageing, device-to-device variability, seasonal ambient swings and long-term drift are absent.
+## 6. Limitations and Threats to Validity
 
-*Dependence Between Repeated Partitions.* Consecutive windows overlap by 19 of 20 raw rows, and because the held-out block position moves with the seed, the same window can be evaluated in more than one partition. Windows are therefore not pooled across partitions, the worst partition is reported, and every binomial figure is an independence-reference bound.
+### 6.1 Analyte and Acquisition Validity
 
-*Statistical Power and the Correlation Assumption.* Every experiment other than the 30-run comparison runs on five seeds, where a Wilcoxon signed-rank test cannot reach α = 0.05 at any effect size, so no ranking should be read into the five-seed tables. The correlated *t*-test is therefore a sensitivity analysis rather than a calibrated posterior. The run-level standard deviations quantify computational variability, not sampling uncertainty, because there is one device and one campaign.
+Incense smoke, alcohol-based vapor and a mixture of the two are surrogates, so nothing here establishes detection performance for methane or heavier hydrocarbons; external validity to petroleum facility monitoring is argued from the shared MOX transduction mechanism rather than shown. All 6,400 samples come from one device, in four class-specific acquisition runs within one campaign, so sensor ageing, device-to-device variability, seasonal ambient swings and long-term drift are absent.
 
-*No Latency Evidence.* Each class was recorded as one continuous steady-state run, so a hazardous episode has no onset transient. Nothing here establishes how quickly any of these models would respond to a developing release, and a corpus with instrumented onsets is needed before any time-to-alarm claim can be made.
+### 6.2 Dependence Between Repeated Partitions
 
-*Metric Scope and the Alarm Boundary.* Missed-hazard rate counts only the fully passive action, which is why escalation adequacy is reported beside it. Escalation adequacy depends on the alarm boundary at *a* ≥ 3. Experiment 3 shows the spread on the held-out Mixture class collapses from a factor of about 200 to 1.3 at *a* ≥ 1, a boundary defensible only where actions 1 and 2 place nothing in front of an operator.
+Consecutive windows overlap by 19 of 20 raw rows, and because the held-out block position moves with the seed, the same window can be evaluated in more than one partition. Windows are therefore not pooled across partitions, the worst partition is reported, and every binomial figure is an independence-reference bound.
 
-*The Persistence Rule and the Action Ladder Are Conventions.* Eventized alarm burden uses an on-delay of three windows and an off-delay of fifteen, chosen by the authors rather than from a facility's alarm specification; re-eventizing across twenty-five settings preserves the channel-loss ordering but not the compliance reading (Supplementary Section S9). The class-to-action map of Eqs. 2a and 2b was likewise imposed, since no concentration, release rate, lower-explosive-limit fraction, toxic-exposure limit or consequence model is available in this corpus. Every quantity built on that ladder measures agreement with a constructed target, not consequence avoided, and a facility adopting the screen would build its own ladder.
+### 6.3 Statistical Power and the Correlation Assumption
 
-*The Ordinal Objective Never Selects Monitor, and Its Zero-Miss Result Is Structural.* The expected-cost formulation of Eq. S1 uses hand-chosen matrix entries that were never optimized, and it is reported under Experiment 4 rather than among the comparators. Accuracy is 0.7500 in 23 of the 30 runs. Over five partitions it assigns action 0 to no window, 0 of 6,320 (`v3_ordinal_actions.csv`), so a missed hazard, which requires action 0 under Eq. 5, cannot occur. It sends every clean-air window to action 1 or 2 and 19 of 1,580 Perfume windows to action 4, and on the held-out Mixture class its escalation rises from 0.259 ± 0.188 to 0.386 ± 0.192 relative to the cost-weighted policy. Its zeros are properties of its output vocabulary, not evidence about hazard sensitivity.
+Every experiment other than the 30-run comparison runs on five seeds, where a Wilcoxon signed-rank test cannot reach α = 0.05 at any effect size, so no ranking should be read into the five-seed tables. The correlated *t*-test is therefore a sensitivity analysis rather than a calibrated posterior. The run-level standard deviations quantify computational variability, not sampling uncertainty, because there is one device and one campaign.
 
-*Perception Split, Perturbation Realism, and an Unevaluated Component.* The perception path was evaluated under two protocols: 98.0 to 98.3% top-1 on retraining under the randomized split, against 98.8% for the original checkpoint, and 79.2 to 92.1% over five seeds under the block-wise holdout. Between 0 and 10.2% of hazardous frames are called non-hazardous, depending on the run. No safety result here depends on the perception output, since the decision state carries no visual term. The running system's promotion rule is driven by the thermal classifier, however, and it is not benchmarked; any end-to-end claim would need it evaluated under the block-wise protocol. Experiment 8 uses four synthetic stand-ins for hardware faults in raw sensor space: stuck-at-last-value, a forced raw zero, a high-end clamp at the training maximum, and raw additive noise. None is a measured device failure, and fixed bias, missing values and long-term drift remain uncovered. The explanation component, a local Gemma 3 1B model (Gemma Team 2025), is described but never evaluated and supports no result.
+### 6.4 No Latency Evidence
+
+Each class was recorded as one continuous steady-state run, so a hazardous episode has no onset transient. Nothing here establishes how quickly any of these models would respond to a developing release, and a corpus with instrumented onsets is needed before any time-to-alarm claim can be made.
+
+### 6.5 Metric Scope and the Alarm Boundary
+
+Missed-hazard rate counts only the fully passive action, which is why escalation adequacy is reported beside it. Escalation adequacy depends on the alarm boundary at *a* ≥ 3. Experiment 3 shows the spread on the held-out Mixture class collapses from a factor of about 200 to 1.3 at *a* ≥ 1, a boundary defensible only where actions 1 and 2 place nothing in front of an operator.
+
+### 6.6 The Persistence Rule and the Action Ladder Are Conventions
+
+Eventized alarm burden uses an on-delay of three windows and an off-delay of fifteen, chosen by the authors rather than from a facility's alarm specification; re-eventizing across twenty-five settings preserves the channel-loss ordering but not the compliance reading (Supplementary Section S9). The class-to-action map of Eqs. 2a and 2b was likewise imposed, since no concentration, release rate, lower-explosive-limit fraction, toxic-exposure limit or consequence model is available in this corpus. Every quantity built on that ladder measures agreement with a constructed target, not consequence avoided, and a facility adopting the screen would build its own ladder.
+
+### 6.7 The Ordinal Objective Never Selects Monitor, and Its Zero-Miss Result Is Structural
+
+The expected-cost formulation of Eq. S1 uses hand-chosen matrix entries that were never optimized, and it is reported under Experiment 4 rather than among the comparators. Accuracy is 0.7500 in 23 of the 30 runs. Over five partitions it assigns action 0 to no window, 0 of 6,320 (`v3_ordinal_actions.csv`), so a missed hazard, which requires action 0 under Eq. 5, cannot occur. It sends every clean-air window to action 1 or 2 and 19 of 1,580 Perfume windows to action 4, and on the held-out Mixture class its escalation rises from 0.259 ± 0.188 to 0.386 ± 0.192 relative to the cost-weighted policy. Its zeros are properties of its output vocabulary, not evidence about hazard sensitivity.
+
+### 6.8 Perception Split, Perturbation Realism, and an Unevaluated Component
+
+The perception path was evaluated under two protocols: 98.0 to 98.3% top-1 on retraining under the randomized split, against 98.8% for the original checkpoint, and 79.2 to 92.1% over five seeds under the block-wise holdout. Between 0 and 10.2% of hazardous frames are called non-hazardous, depending on the run. No safety result here depends on the perception output, since the decision state carries no visual term. The running system's promotion rule is driven by the thermal classifier, however, and it is not benchmarked; any end-to-end claim would need it evaluated under the block-wise protocol. Experiment 8 uses four synthetic stand-ins for hardware faults in raw sensor space: stuck-at-last-value, a forced raw zero, a high-end clamp at the training maximum, and raw additive noise. None is a measured device failure, and fixed bias, missing values and long-term drift remain uncovered. The explanation component, a local Gemma 3 1B model (Gemma Team, 2025), is described but never evaluated and supports no result.
 
 ---
 
-## Conclusions
+## 7. Conclusions
 
 This study evaluated a gas-monitoring pipeline against a broader metric set than accuracy, on a public MOX benchmark of surrogate analytes, under a leakage-controlled block-wise holdout. Five findings follow.
 
@@ -372,111 +460,114 @@ One scope statement belongs at the end, where over-reading is likeliest. This is
 
 ---
 
-## Acknowledgments
+## Data and Code Availability
 
-This work was supported by the Subsurface Energy and Digital Innovation Center at the University of Wyoming. The MultimodalGasData corpus is used under CC BY 4.0, and we thank Narkhede et al. for placing it in the public domain.
+The MultimodalGasData corpus is publicly available (Narkhede et al., 2022) under CC BY 4.0. The code, configurations, stored result files and verification scripts required to reproduce the sensor-side benchmark results are released with the submission artifact: the experiment drivers, the pipeline and safety-metric modules, the additional baselines, and the result files behind the tables and figures of the manuscript and supporting information. The release also carries a `Makefile`, a run manifest, and `verify_v15.py`, which checks the manuscript tables, the principal supporting-information tables and the headline numerical claims against the stored result files. Every sensor-side benchmark model is refitted inside each run under the seeds listed in Supplementary Section S19. The repository archives the LSTM autoencoder weights used by the runtime anomaly tool and the gradient-boosting model and feature scaler written by earlier, deprecated drivers, but no reported number depends on either. The thermal classifier's per-run results, split tables, training curves, drivers and checkpoint hashes for both protocols are in `retrain/results_thermal`, and `retrain/summarize_thermal.py` checks them against one another and writes the summary from which the perception numbers are taken. The thermal checkpoints themselves are not in the repository, nor is the original checkpoint behind the 98.8% figure; their secure hash (SHA-256) values are recorded in `checkpoints.json`. The runtime decision-agent checkpoint named in the application code is not included, because the only code that writes it is an earlier, deprecated driver and the file does not reproduce from the release code (README, Runtime checkpoints not included). The repository is at https://github.com/CryptoGuy1/ARXIS. The state that produced the numbers reported here is the tag `v18.1-final`, and that tag, rather than the tip of the default branch, reproduces the paper. An archival deposit of that tag is pending, and its DOI will be supplied to the journal before publication. Until the deposit is made, the tagged commit is the citable snapshot. Supplementary Section S19 gives the file-by-file listing.
 
-*Use of artificial intelligence.* A generative artificial intelligence (AI) assistant (Anthropic Claude) was used in preparing this work: to draft and edit manuscript text, to write the figure-drawing and verification scripts released with it, and to review the manuscript against its own result files. It was not used to generate data, results or references. Every number reported here is produced by the released code from the released result files, and `verify_v15.py` checks the manuscript tables and headline claims against those files. Bibliographic details were checked against publisher and digital object identifier (DOI) records where those could be accessed. The authors directed the work, verified the output and take full responsibility for the content.
+## Author Contributions (CRediT)
 
-## Author Contributions
+B. C. Nweke: Conceptualization; Methodology; Software; Investigation; Formal analysis; Data curation; Visualization; Writing – original draft. G. Ramezan: Conceptualization; Methodology; Writing – review and editing. S. Saraji: Conceptualization; Supervision; Project administration; Resources; Writing – review and editing.
 
-B. C. Nweke: conceptualization, methodology, software, investigation, formal analysis, data curation, visualization, writing of the original draft. G. Ramezan: conceptualization, methodology, writing, review and editing. S. Saraji: conceptualization, supervision, project administration, resources, writing, review and editing.
-
-## Declaration of Competing Interest
+## Declaration of Competing Interests
 
 The authors declare no known competing financial interests or personal relationships that could have appeared to influence the work reported here.
 
-## Data and Code Availability
+## Funding
 
-The MultimodalGasData corpus is publicly available (Narkhede et al. 2022) under CC BY 4.0. The code, configurations, stored result files and verification scripts required to reproduce the sensor-side benchmark results are released with the submission artifact: the experiment drivers, the pipeline and safety-metric modules, the additional baselines, and the result files behind the tables and figures of the manuscript and supporting information. The release also carries a `Makefile`, a run manifest, and `verify_v15.py`, which checks the manuscript tables, the principal supporting-information tables and the headline numerical claims against the stored result files. Every model reported in the paper is refitted inside each run under the seeds listed in Supplementary Section S19. The repository archives the LSTM autoencoder weights used by the runtime anomaly tool and the gradient-boosting model and feature scaler written by earlier, deprecated drivers, but no reported number depends on either. The thermal classifier's per-run results, split tables, training curves, drivers and checkpoint hashes for both protocols are in `retrain/results_thermal`, and `retrain/summarize_thermal.py` checks them against one another and writes the summary from which the perception numbers are taken. The thermal checkpoints themselves are not in the repository, nor is the original checkpoint behind the 98.8% figure; their secure hash (SHA-256) values are recorded in `checkpoints.json`. The runtime decision-agent checkpoint named in the application code is not included, because the only code that writes it is an earlier, deprecated driver and the file does not reproduce from the release code (README, Runtime checkpoints not included). The repository is at https://github.com/CryptoGuy1/ARXIS. The state that produced the numbers reported here is the tag `v18.1-final`, and that tag, rather than the tip of the default branch, reproduces the paper. An archival deposit of that tag is pending, and its DOI will be supplied to the journal before publication. Until the deposit is made, the tagged commit is the citable snapshot. Supplementary Section S19 gives the file-by-file listing.
+This work was supported by the Subsurface Energy and Digital Innovation Center at the University of Wyoming.
+
+## Declaration of Generative AI and AI-Assisted Technologies in the Manuscript Preparation Process
+
+During the preparation of this work the author(s) used Claude (Anthropic) to draft and edit manuscript text, to write the figure-drawing and verification scripts released with the work, and to review the manuscript against its own result files. It was not used to generate data, results or references. After using this tool, the author(s) reviewed and edited the content as needed and take full responsibility for the content of the published article. Every number reported here is produced by the released code from the released result files, and `verify_v15.py` checks the manuscript tables and headline claims against those files. Bibliographic details were checked against publisher and digital object identifier (DOI) records where those could be accessed.
+
+## Acknowledgments
+
+The MultimodalGasData corpus is used under CC BY 4.0, and we thank Narkhede et al. for making it publicly available.
 
 ---
 
 ## References
 
-Adegboye, M. A., Fung, W. K., and Karnik, A. 2019. Recent Advances in Pipeline Monitoring and Oil Leakage Detection Technologies: Principles and Approaches. *Sensors* 19 (11): 2548. https://doi.org/10.3390/s19112548.
+Adegboye, M.A., Fung, W.K., Karnik, A., 2019. Recent Advances in Pipeline Monitoring and Oil Leakage Detection Technologies: Principles and Approaches. *Sensors* 19, 2548. https://doi.org/10.3390/s19112548.
 
+Angelopoulos, A.N., Bates, S., 2023. Conformal Prediction: A Gentle Introduction. *Found. Trends Mach. Learn.* 16, 494–591. https://doi.org/10.1561/2200000101.
 
-Angelopoulos, A. N. and Bates, S. 2023. Conformal Prediction: A Gentle Introduction. *Foundations and Trends in Machine Learning* 16 (4): 494–591. https://doi.org/10.1561/2200000101.
+Benavoli, A., Corani, G., Demšar, J., et al., 2017. Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis. *J. Mach. Learn. Res.* 18, 1–36.
 
-Benavoli, A., Corani, G., Demšar, J. et al. 2017. Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis. *Journal of Machine Learning Research* 18 (77): 1–36.
+Bouthillier, X., Delaunay, P., Bronzi, M., et al., 2021. Accounting for Variance in Machine Learning Benchmarks. *Proceedings of Machine Learning and Systems* 3, 747–769.
 
-Bouthillier, X., Delaunay, P., Bronzi, M. et al. 2021. Accounting for Variance in Machine Learning Benchmarks. *Proc., Machine Learning and Systems (MLSys)* 3: 747–769.
+Clopper, C.J., Pearson, E.S., 1934. The Use of Confidence or Fiducial Limits Illustrated in the Case of the Binomial. *Biometrika* 26, 404–413. https://doi.org/10.1093/biomet/26.4.404.
 
-Clopper, C. J. and Pearson, E. S. 1934. The Use of Confidence or Fiducial Limits Illustrated in the Case of the Binomial. *Biometrika* 26 (4): 404–413. https://doi.org/10.1093/biomet/26.4.404.
+Dehnaw, A.M., Lu, Y.-J., Shih, J.-H., et al., 2024. Deep Neural Network Optimization for Efficient Gas Detection Systems in Edge Intelligence Environments. *Processes* 12, 2638. https://doi.org/10.3390/pr12122638.
 
-Dehnaw, A. M., Lu, Y.-J., Shih, J.-H. et al. 2024. Deep Neural Network Optimization for Efficient Gas Detection Systems in Edge Intelligence Environments. *Processes* 12 (12): 2638. https://doi.org/10.3390/pr12122638.
+Dennler, N., Rastogi, S., Fonollosa, J., et al., 2022. Drift in a Popular Metal Oxide Sensor Dataset Reveals Limitations for Gas Classification Benchmarks. *Sens. Actuators B Chem.* 361, 131668. https://doi.org/10.1016/j.snb.2022.131668.
 
-Dennler, N., Rastogi, S., Fonollosa, J. et al. 2022. Drift in a Popular Metal Oxide Sensor Dataset Reveals Limitations for Gas Classification Benchmarks. *Sensors and Actuators B: Chemical* 361: 131668. https://doi.org/10.1016/j.snb.2022.131668.
+EEMUA, 2024. *Alarm Systems: A Guide to Design, Management and Procurement*, revised fourth edition. EEMUA Publication 191. London: Engineering Equipment and Materials Users Association.
 
-EEMUA. 2024. *Alarm Systems: A Guide to Design, Management and Procurement*, revised fourth edition. EEMUA Publication 191. London: Engineering Equipment and Materials Users Association.
+El Barkani, M., Benamar, N., Talei, H., et al., 2024. Gas Leakage Detection Using Tiny Machine Learning. *Electronics* 13, 4768. https://doi.org/10.3390/electronics13234768.
 
-El Barkani, M., Benamar, N., Talei, H. et al. 2024. Gas Leakage Detection Using Tiny Machine Learning. *Electronics* 13 (23): 4768. https://doi.org/10.3390/electronics13234768.
+Elkan, C., 2001. The Foundations of Cost-Sensitive Learning. In: *Proceedings of the 17th International Joint Conference on Artificial Intelligence (IJCAI)*, Seattle, Washington, 4–10 August, pp. 973–978.
 
-Elkan, C. 2001. The Foundations of Cost-Sensitive Learning. *Proc., 17th International Joint Conference on Artificial Intelligence (IJCAI)*, Seattle, Washington, 4–10 August, 973–978.
+Faleh, R., Kachouri, A., 2023. A Hybrid Deep Convolutional Neural Network-Based Electronic Nose for Pollution Detection Purposes. *Chemom. Intell. Lab. Syst.* 237, 104825. https://doi.org/10.1016/j.chemolab.2023.104825.
 
-Faleh, R. and Kachouri, A. 2023. A Hybrid Deep Convolutional Neural Network-Based Electronic Nose for Pollution Detection Purposes. *Chemometrics and Intelligent Laboratory Systems* 237: 104825. https://doi.org/10.1016/j.chemolab.2023.104825.
+Gemma Team, Google DeepMind, 2025. Gemma 3 Technical Report. arXiv:2503.19786 (preprint, submitted 25 March 2025).
 
-Gemma Team, Google DeepMind. 2025. Gemma 3 Technical Report. arXiv:2503.19786 (preprint, submitted 25 March 2025).
+Goel, P., Datta, A., Mannan, M.S., 2017. Industrial Alarm Systems: Challenges and Opportunities. *J. Loss Prev. Process Ind.* 50, 23–36. https://doi.org/10.1016/j.jlp.2017.09.001.
 
-Goel, P., Datta, A., and Mannan, M. S. 2017. Industrial Alarm Systems: Challenges and Opportunities. *Journal of Loss Prevention in the Process Industries* 50: 23–36. https://doi.org/10.1016/j.jlp.2017.09.001.
+Han, P., Kim, M., 2014. Optimizing Leak Detection Performance by Combining Statistical and Pressure Wave Leak Detection Technologies. Paper presented at the PSIG Annual Meeting, Baltimore, Maryland.
 
-Han, P. and Kim, M. 2014. Optimizing Leak Detection Performance by Combining Statistical and Pressure Wave Leak Detection Technologies. Paper presented at the PSIG Annual Meeting, Baltimore, Maryland.
+IEC, 2016. *Functional Safety: Safety Instrumented Systems for the Process Industry Sector, Part 1: Framework, Definitions, System, Hardware and Application Programming Requirements*, IEC 61511-1:2016 with Amendment 1:2017. Geneva: International Electrotechnical Commission.
 
-IEC. 2016. *Functional Safety: Safety Instrumented Systems for the Process Industry Sector, Part 1: Framework, Definitions, System, Hardware and Application Programming Requirements*, IEC 61511-1:2016 with Amendment 1:2017. Geneva: International Electrotechnical Commission.
+ISA, 2016. *Management of Alarm Systems for the Process Industries*, ANSI/ISA-18.2-2016. Research Triangle Park, North Carolina: International Society of Automation.
 
-ISA. 2016. *Management of Alarm Systems for the Process Industries*, ANSI/ISA-18.2-2016. Research Triangle Park, North Carolina: International Society of Automation.
+Jessen, H., Roshchin, M., 2025. Agentic AI Revolution Across O&G Value Streams: New Strategy Through ENERGYai Examples. Paper SPE-229240-MS presented at the Abu Dhabi International Petroleum Exhibition and Conference, Abu Dhabi, UAE, 3–6 November.
 
-Jessen, H. and Roshchin, M. 2025. Agentic AI Revolution Across O&G Value Streams: New Strategy Through ENERGYai Examples. Paper SPE-229240-MS presented at the Abu Dhabi International Petroleum Exhibition and Conference, Abu Dhabi, UAE, 3–6 November.
+Jocher, G., Qiu, J., Chaurasia, A., 2023. Ultralytics YOLO. https://github.com/ultralytics/ultralytics.
 
-Jocher, G., Qiu, J., and Chaurasia, A. 2023. Ultralytics YOLO. https://github.com/ultralytics/ultralytics.
+Kaced, R., Kouadri, A., Baiche, K., Bensmail, A., 2021. Multivariate nuisance alarm management in chemical processes. *J. Loss Prev. Process Ind.* 72, 104548. https://doi.org/10.1016/j.jlp.2021.104548.
 
-Korjani, M., Conley, D., and Smith, M. 2024. Temporal Deep Learning Image Processing Model for Natural Gas Leak Detection Using OGI Camera. Paper OTC-34756-MS presented at the Offshore Technology Conference Asia, Kuala Lumpur, Malaysia, 27 February–1 March. https://doi.org/10.4043/34756-MS.
+Korjani, M., Conley, D., Smith, M., 2024. Temporal Deep Learning Image Processing Model for Natural Gas Leak Detection Using OGI Camera. Paper OTC-34756-MS presented at the Offshore Technology Conference Asia, Kuala Lumpur, Malaysia, 27 February–1 March. https://doi.org/10.4043/34756-MS.
 
-Kumar, G., Singh, V. P., and Pandey, S. K. 2024. Assessing Gas Leakage Detection Performance Using Machine Learning with Different Modalities. *Transactions on Electrical and Electronic Materials* 25 (5): 653–664. https://doi.org/10.1007/s42341-024-00545-0.
+Kumar, G., Singh, V.P., Pandey, S.K., 2024. Assessing Gas Leakage Detection Performance Using Machine Learning with Different Modalities. *Trans. Electr. Electron. Mater.* 25, 653–664. https://doi.org/10.1007/s42341-024-00545-0.
 
-Laberge, J. C., Bullemer, P., Tolsma, M., and Reising, D. V. C. 2014. Addressing Alarm Flood Situations in the Process Industries Through Alarm Summary Display Design and Alarm Response Strategy. *International Journal of Industrial Ergonomics* 44 (3): 395–406. https://doi.org/10.1016/j.ergon.2013.11.008.
+Laberge, J.C., Bullemer, P., Tolsma, M., Reising, D.V.C., 2014. Addressing Alarm Flood Situations in the Process Industries Through Alarm Summary Display Design and Alarm Response Strategy. *Int. J. Ind. Ergon.* 44, 395–406. https://doi.org/10.1016/j.ergon.2013.11.008.
 
-Liang, J., Liang, S., Zhang, H. et al. 2023. Leak Detection in Natural Gas Pipelines Based on Unsupervised Reconstruction of Healthy Flow Data. *SPE Prod & Oper* 38 (3): 513–526. SPE-214686-PA. https://doi.org/10.2118/214686-PA.
+Liang, J., Liang, S., Zhang, H., et al., 2023. Leak Detection in Natural Gas Pipelines Based on Unsupervised Reconstruction of Healthy Flow Data. *SPE Prod. Oper.* 38, 513–526. SPE-214686-PA. https://doi.org/10.2118/214686-PA.
 
-Lima, F. de A., Copetti, A., Bertini, L. et al. 2026. Autoencoders for Early Kick Detection: Improving Safety in Offshore Oilwell Drilling. *SPE J.* 31 (06): 3545–3563. SPE-231854-PA. https://doi.org/10.2118/231854-PA.
+Lima, F. de A., Copetti, A., Bertini, L., et al., 2026. Autoencoders for Early Kick Detection: Improving Safety in Offshore Oilwell Drilling. *SPE J.* 31 (6), 3545–3563. SPE-231854-PA. https://doi.org/10.2118/231854-PA.
 
-Lin, J. and Zhan, X. 2026. Sensor-Drift Compensation in Electronic-Nose-Based Gas Recognition Using Knowledge Distillation. *Informatics* 13 (1): 15. https://doi.org/10.3390/informatics13010015.
+Lin, J., Zhan, X., 2026. Sensor-Drift Compensation in Electronic-Nose-Based Gas Recognition Using Knowledge Distillation. *Informatics* 13, 15. https://doi.org/10.3390/informatics13010015.
 
-Ma, X., Wu, F., Yue, J. et al. 2024. MSE-TCN: Multi-Scale Temporal Convolutional Network with Channel Attention for Open-Set Gas Classification. *Microchemical Journal* 207: 111814. https://doi.org/10.1016/j.microc.2024.111814.
+Ma, X., Wu, F., Yue, J., et al., 2024. MSE-TCN: Multi-Scale Temporal Convolutional Network with Channel Attention for Open-Set Gas Classification. *Microchem. J.* 207, 111814. https://doi.org/10.1016/j.microc.2024.111814.
 
-Malhotra, P., Ramakrishnan, A., Anand, G. et al. 2016. LSTM-Based Encoder-Decoder for Multi-Sensor Anomaly Detection. arXiv:1607.00148 (preprint, submitted 1 July 2016).
+Malhotra, P., Ramakrishnan, A., Anand, G., et al., 2016. LSTM-Based Encoder-Decoder for Multi-Sensor Anomaly Detection. arXiv:1607.00148 (preprint, submitted 1 July 2016).
 
-Murvay, P.-S. and Silea, I. 2012. A Survey on Gas Leak Detection and Localization Techniques. *Journal of Loss Prevention in the Process Industries* 25 (6): 966–973. https://doi.org/10.1016/j.jlp.2012.05.010.
+Murvay, P.-S., Silea, I., 2012. A Survey on Gas Leak Detection and Localization Techniques. *J. Loss Prev. Process Ind.* 25, 966–973. https://doi.org/10.1016/j.jlp.2012.05.010.
 
-Narkhede, P., Walambe, R., Mandaokar, S. et al. 2021. Gas Detection and Identification Using Multimodal Artificial Intelligence Based Sensor Fusion. *Applied System Innovation* 4 (1): 3. https://doi.org/10.3390/asi4010003.
+Narkhede, P., Walambe, R., Mandaokar, S., et al., 2021. Gas Detection and Identification Using Multimodal Artificial Intelligence Based Sensor Fusion. *Appl. Syst. Innov.* 4, 3. https://doi.org/10.3390/asi4010003.
 
-Narkhede, P., Walambe, R., Chandel, P. et al. 2022. MultimodalGasData: Multimodal Dataset for Gas Detection and Classification. *Data* 7 (8): 112. https://doi.org/10.3390/data7080112.
+Narkhede, P., Walambe, R., Chandel, P., et al., 2022. MultimodalGasData: Multimodal Dataset for Gas Detection and Classification. *Data* 7, 112. https://doi.org/10.3390/data7080112.
 
+Page, E.S., 1954. Continuous Inspection Schemes. *Biometrika* 41, 100–115. https://doi.org/10.1093/biomet/41.1-2.100.
 
-Page, E. S. 1954. Continuous Inspection Schemes. *Biometrika* 41 (1/2): 100–115. https://doi.org/10.1093/biomet/41.1-2.100.
+Qu, C., Liu, C., Gu, Y., et al., 2022. Open-Set Gas Recognition: A Case-Study Based on an Electronic Nose Dataset. *Sens. Actuators B Chem.* 360, 131652. https://doi.org/10.1016/j.snb.2022.131652.
 
-Qu, C., Liu, C., Gu, Y. et al. 2022. Open-Set Gas Recognition: A Case-Study Based on an Electronic Nose Dataset. *Sensors and Actuators B: Chemical* 360: 131652. https://doi.org/10.1016/j.snb.2022.131652.
+Rousselet, M., Berland, S., Bustnes, T.E., 2011. Leak Detection Performance of a Commercial Real Time Transient Model for Troll Oil Pipeline. Paper presented at the PSIG Annual Meeting, Napa Valley, California, 24–27 May. PSIG-1114.
 
-Rousselet, M., Berland, S., and Bustnes, T. E. 2011. Leak Detection Performance of a Commercial Real Time Transient Model for Troll Oil Pipeline. Paper presented at the PSIG Annual Meeting, Napa Valley, California, 24–27 May. PSIG-1114.
+Sabbagh, V.B., Lima, C.B.C., Xexéo, G., 2024. Comparative Analysis of Single and Multiagent Large Language Model Architectures for Domain-Specific Tasks in Well Construction. *SPE J.* 29 (12), 6869–6882. SPE-223612-PA. https://doi.org/10.2118/223612-PA.
 
-Sabbagh, V. B., Lima, C. B. C., and Xexéo, G. 2024. Comparative Analysis of Single and Multiagent Large Language Model Architectures for Domain-Specific Tasks in Well Construction. *SPE J.* 29 (12): 6869–6882. SPE-223612-PA. https://doi.org/10.2118/223612-PA.
+Santiago, C.J.S., Shumaker, N., Weir, A., 2025. Integrating Data-Driven Insights with Domain Expertise Using Agentic Conversational Analytics for Well Completions Optimization. Paper SPE-228143-MS presented at the SPE Annual Technical Conference and Exhibition, Houston, Texas, 20–22 October. https://doi.org/10.2118/228143-MS.
 
-Santiago, C. J. S., Shumaker, N., and Weir, A. 2025. Integrating Data-Driven Insights with Domain Expertise Using Agentic Conversational Analytics for Well Completions Optimization. Paper SPE-228143-MS presented at the SPE Annual Technical Conference and Exhibition, Houston, Texas, 20–22 October. https://doi.org/10.2118/228143-MS.
+Sharma, A., Khullar, V., Kansal, I., et al., 2024. Gas Detection and Classification Using Multimodal Data Based on Federated Learning. *Sensors* 24, 5904. https://doi.org/10.3390/s24185904.
 
-Sharma, A., Khullar, V., Kansal, I. et al. 2024. Gas Detection and Classification Using Multimodal Data Based on Federated Learning. *Sensors* 24 (18): 5904. https://doi.org/10.3390/s24185904.
+Vergara, A., Vembu, S., Ayhan, T., et al., 2012. Chemical Gas Sensor Drift Compensation Using Classifier Ensembles. *Sens. Actuators B Chem.* 166–167, 320–329. https://doi.org/10.1016/j.snb.2012.01.074.
 
-Vergara, A., Vembu, S., Ayhan, T. et al. 2012. Chemical Gas Sensor Drift Compensation Using Classifier Ensembles. *Sensors and Actuators B: Chemical* 166–167: 320–329. https://doi.org/10.1016/j.snb.2012.01.074.
+Wang, J., Yang, F., Chen, T., et al., 2016. An Overview of Industrial Alarm Systems: Main Causes for Alarm Overloading, Research Status, and Open Problems. *IEEE Trans. Autom. Sci. Eng.* 13, 1045–1061.
 
-Wang, J., Yang, F., Chen, T. et al. 2016. An Overview of Industrial Alarm Systems: Main Causes for Alarm Overloading, Research Status, and Open Problems. *IEEE Transactions on Automation Science and Engineering* 13 (2): 1045–1061. https://doi.org/10.1109/TASE.2015.2464234.
+Wang, Z., Schaul, T., Hessel, M., et al., 2016. Dueling Network Architectures for Deep Reinforcement Learning. In: *Proceedings of the 33rd International Conference on Machine Learning (ICML)*, New York City, New York, 19–24 June, pp. 1995–2003.
 
-Wang, Z., Schaul, T., Hessel, M. et al. 2016. Dueling Network Architectures for Deep Reinforcement Learning. *Proc., 33rd International Conference on Machine Learning (ICML)*, New York City, New York, 19–24 June 2016, 1995–2003.
+Yao, Y., Chen, B., Liu, C., et al., 2024. Open-Set Adversarial Domain Match for Electronic Nose Drift Compensation and Unknown Gas Recognition. *Expert Syst. Appl.* 250, 123757. https://doi.org/10.1016/j.eswa.2024.123757.
 
-Yao, Y., Chen, B., Liu, C. et al. 2024. Open-Set Adversarial Domain Match for Electronic Nose Drift Compensation and Unknown Gas Recognition. *Expert Systems with Applications* 250: article 123757. https://doi.org/10.1016/j.eswa.2024.123757.
+Zhang, E., Zhang, E., 2025. Gas Pipeline Leakage Detection Based on Multiple Multimodal Deep Feature Selections and Optimized Deep Forest Classifier. *Front. Environ. Sci.* 13, 1569621. https://doi.org/10.3389/fenvs.2025.1569621.
 
-Zhang, Eddie and Zhang, Evan. 2025. Gas Pipeline Leakage Detection Based on Multiple Multimodal Deep Feature Selections and Optimized Deep Forest Classifier. *Frontiers in Environmental Science* 13: 1569621. https://doi.org/10.3389/fenvs.2025.1569621.
-
-Zhang, J., Hoffman, A., Murphy, K. et al. 2013. Review of Pipeline Leak Detection Technologies. Paper presented at the PSIG Annual Meeting, Prague, Czech Republic, 16–19 April. PSIG-1303.
-
----
-
+Zhang, J., Hoffman, A., Murphy, K., et al., 2013. Review of Pipeline Leak Detection Technologies. Paper presented at the PSIG Annual Meeting, Prague, Czech Republic, 16–19 April. PSIG-1303.

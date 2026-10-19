@@ -2,9 +2,9 @@
 
 > ### Reviewers: reproduce from the tag
 >
-> The manuscript *A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under
-> Class Exclusion and Sensor Degradation* is prepared for *SPE Journal*, Data Science and
-> Engineering Analytics. The exact state that produced its numbers is the tag
+> The manuscript *A Process-Safety Benchmark for Learned Gas-Monitoring Models Under
+> Class Exclusion and Sensor Degradation* is prepared for the *Journal of Loss Prevention
+> in the Process Industries*. The exact state that produced its numbers is the tag
 > `v18.1-final`.
 >
 > ```bash
@@ -19,9 +19,9 @@
 > are not tracked here, because `make docx` regenerates them from the Markdown
 > sources.
 
-**Safety-oriented benchmarking of gas-hazard monitoring models under class exclusion and sensor degradation.**
+**Process-safety benchmarking of gas-hazard monitoring models under class exclusion and sensor degradation.**
 
-This repository is the research artifact for the manuscript, submitted to *SPE Journal*, Data Science and Engineering Analytics. Every number in the paper is produced by the scripts here, from the raw corpus, with no manual steps.
+This repository is the research artifact for the manuscript, prepared for submission to the *Journal of Loss Prevention in the Process Industries*. Every number in the paper is produced by the scripts here, from the raw corpus, with no manual steps.
 
 ---
 
@@ -147,7 +147,7 @@ The autoencoder at `models/lstm_autoencoder_weights.pth` is shipped and reproduc
 Everything Supplementary Section S19 names is at the path it names.
 
 ```
-ARXIS_Manuscript_v15_SPE.md      the manuscript source; `make docx` builds the .docx
+ARXIS_Manuscript_v15_SPE.md      the manuscript source (the file keeps its v15 name); `make docx` builds the .docx
 ARXIS_Supporting_Information.md  the supporting information, likewise
 Makefile                         one target per row of the provenance table in Supplementary Section S19
 RUN_MANIFEST.json                commit, host, package versions and a hash per file
@@ -203,7 +203,7 @@ The 8:1 loss-weight ratio that appeared in earlier versions of this repository w
 
 ## Citing
 
-Nweke, B. C., Ramezan, G., and Saraji, S. A Safety-Oriented Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation. Manuscript prepared for *SPE Journal*, Data Science and Engineering Analytics.
+Nweke, B. C., Ramezan, G., and Saraji, S. A Process-Safety Benchmark for Learned Gas-Monitoring Models Under Class Exclusion and Sensor Degradation. Manuscript prepared for the *Journal of Loss Prevention in the Process Industries*.
 
 **History.** The commit history of this repository was consolidated on 24 September 2026. Earlier commits are no longer reachable from `main`; the commits after that consolidation are the only ones on `main`.
 

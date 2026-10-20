@@ -152,7 +152,7 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "89aabd40f2a8d4aa"
+   "sha256_16": "af1865b2704b13d7"
   },
   {
    "path": "retrain/run_perturb_perseed.py",
@@ -439,9 +439,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_loco.png": {
-   "bytes": 810612,
-   "sha256_16": "adf08a645fe1a9c8",
-   "modified_utc": "2026-10-20T12:52:50+00:00"
+   "bytes": 841700,
+   "sha256_16": "42dc8811f750773a",
+   "modified_utc": "2026-10-20T13:03:16+00:00"
   },
   "fig_metricdisagreement.png": {
    "bytes": 442295,

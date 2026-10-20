@@ -151,7 +151,7 @@ def fig_loco():
     ax.set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_xticks(np.arange(len(models)))
-    ax.set_xticklabels([("Ordinal\n(supporting)" if m == "Ordinal" else PRETTY[m]) for m in models], rotation=24, ha="right",
+    ax.set_xticklabels([("Ordinal" if m == "Ordinal" else PRETTY[m]) for m in models], rotation=24, ha="right",
                        rotation_mode="anchor")
     ax.set_ylabel("Escalation adequacy\n(a ≥ 3)", labelpad=2.0, linespacing=1.25)
     ax.set_title("(b)", loc="left")
@@ -165,7 +165,7 @@ def fig_loco():
                handlelength=1.4, columnspacing=1.4)
     fig.tight_layout(rect=(0, 0.115, 1, 0.945), h_pad=1.2)
     note(fig, "Bars drawn at the floor of panel (a) are exactly zero. "
-              "Seven of ten models bound their missed-hazard rate on a held-out Mixture class at or below 2.71%, "
+              "Ordinal is a supporting variant, not a primary comparator. Seven of ten models bound their missed-hazard rate on a held-out Mixture class at or below 2.71%, "
               "yet escalate between 0.5% and 100% of the same windows.", y=0.095)
     fig.savefig(os.path.join(FIG, "fig_loco.png"), dpi=600)
     plt.close(fig)

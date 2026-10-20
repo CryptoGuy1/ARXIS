@@ -152,12 +152,17 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "af1865b2704b13d7"
+   "sha256_16": "6463080b62cb80fc"
   },
   {
    "path": "retrain/run_perturb_perseed.py",
    "purpose": "per-partition counts for the one-partition perturbation claims (Table 7, Experiment 6)",
    "sha256_16": "019ab197004cc17b"
+  },
+  {
+   "path": "retrain/run_hazard_gbm.py",
+   "purpose": "gas-keyed gradient boosting variant: 30-run comparison, leave-one-class-out, reproduction check",
+   "sha256_16": "534db8212027b0e3"
   }
  ],
  "results": {
@@ -365,6 +370,31 @@
    "bytes": 1367,
    "sha256_16": "d8cfed3bf9d469a5",
    "modified_utc": "2026-10-20T09:16:14+00:00"
+  },
+  "v3_powered_hazard_gbm.csv": {
+   "bytes": 1052,
+   "sha256_16": "2c2df1fb1df60c52",
+   "modified_utc": "2026-10-20T14:13:37.473251+00:00"
+  },
+  "v3_powered_hazard_gbm_perrun.json": {
+   "bytes": 1439,
+   "sha256_16": "ade4d51e566d3586",
+   "modified_utc": "2026-10-20T14:13:37.475185+00:00"
+  },
+  "v3_powered_hazard_gbm_bayes.json": {
+   "bytes": 2092,
+   "sha256_16": "e7bbc07409df1e23",
+   "modified_utc": "2026-10-20T14:13:37.479934+00:00"
+  },
+  "v3_loco_hazard_gbm.csv": {
+   "bytes": 788,
+   "sha256_16": "9d5b8309e18449bd",
+   "modified_utc": "2026-10-20T14:18:27.835147+00:00"
+  },
+  "v3_loco_hazard_gbm_perseed.csv": {
+   "bytes": 1014,
+   "sha256_16": "cec9d555e9aaa5e3",
+   "modified_utc": "2026-10-20T14:18:27.836145+00:00"
   }
  },
  "figures": {
@@ -419,9 +449,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_decisionlogic.png": {
-   "bytes": 275016,
-   "sha256_16": "cd4d20fdff85b803",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 531936,
+   "sha256_16": "8fc3fe723018495a",
+   "modified_utc": "2026-10-20T14:27:31.557232+00:00"
   },
   "fig_disposition.png": {
    "bytes": 448643,
@@ -434,14 +464,14 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_leakage.png": {
-   "bytes": 340317,
-   "sha256_16": "1f697c99844de968",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 682223,
+   "sha256_16": "9606db70be451358",
+   "modified_utc": "2026-10-20T14:27:21.993232+00:00"
   },
   "fig_loco.png": {
-   "bytes": 841700,
-   "sha256_16": "42dc8811f750773a",
-   "modified_utc": "2026-10-20T13:03:16+00:00"
+   "bytes": 1496806,
+   "sha256_16": "6ef24d6c4d2359e8",
+   "modified_utc": "2026-10-20T14:27:16.433233+00:00"
   },
   "fig_metricdisagreement.png": {
    "bytes": 442295,
@@ -454,14 +484,14 @@
    "modified_utc": "2026-10-15T21:23:17+00:00"
   },
   "fig_perturb.png": {
-   "bytes": 899575,
-   "sha256_16": "841dda2653ecf6cf",
-   "modified_utc": "2026-10-20T12:52:59+00:00"
+   "bytes": 1599360,
+   "sha256_16": "9e4e08dfc409b0ea",
+   "modified_utc": "2026-10-20T14:27:19.849233+00:00"
   },
   "fig_powered.png": {
-   "bytes": 508151,
-   "sha256_16": "85a52a5771ef291d",
-   "modified_utc": "2026-10-20T09:29:44+00:00"
+   "bytes": 900467,
+   "sha256_16": "0798d920eac5f511",
+   "modified_utc": "2026-10-20T14:27:23.773232+00:00"
   },
   "fig_protocol.png": {
    "bytes": 200667,
@@ -474,9 +504,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_workflow.png": {
-   "bytes": 2263484,
-   "sha256_16": "bef32be997253823",
-   "modified_utc": "2026-10-20T12:53:16+00:00"
+   "bytes": 4719469,
+   "sha256_16": "6057e9b3988e16cc",
+   "modified_utc": "2026-10-20T14:27:28.585232+00:00"
   },
   "fig_zoo.png": {
    "bytes": 312677,

@@ -87,6 +87,15 @@ for row in table_after("Table 4—Decision accuracy"):
 pw = pd.read_csv(R + "v3_powered.csv").set_index("model")
 bay = json.load(open(R + "v3_powered_bayes.json"))["vs_cost_weighted"]
 for row in table_after("Table 5—Model comparison"):
+    if row[0].startswith("Gas-keyed gradient boosting"):
+        # supplementary variant row: its own result files, outside the ten comparators
+        hz = pd.read_csv(R + "v3_powered_hazard_gbm.csv").set_index("model")
+        hb = json.load(open(R + "v3_powered_hazard_gbm_bayes.json"))["vs_cost_weighted"]["E_gbm_hazard"]
+        for j, col in enumerate(["decision_acc_mean", "decision_acc_std", "miss_rate_mean",
+                                 "escalation_mean", "fa_per_clean_mean", "expected_cost_mean"]):
+            check(f"T9 E_gbm_hazard {col}", num(row[j + 1]), hz.loc["E_gbm_hazard", col])
+        check("T9 E_gbm_hazard P(eq)", num(row[7]), hb["p_practically_equivalent"])
+        continue
     k = K[row[0]]
     for j, col in enumerate(["decision_acc_mean", "decision_acc_std", "miss_rate_mean",
                              "escalation_mean", "fa_per_clean_mean", "expected_cost_mean"]):
@@ -380,7 +389,7 @@ for m in re.finditer(r"^\*\*Fig\. (\d+)—", TXT, re.M):
     before = TXT[:m.start()].rstrip().split("\n")[-1]
     rule(f"Fig. {m.group(1)} caption sits under its image", before.strip().startswith("!["))
 
-HEADS = ["## Summary", "## Introduction", "## Related Work and Positioning", "## Methodology",
+HEADS = ["## Abstract", "## Introduction", "## Related Work and Positioning", "## Methodology",
          "## Results", "## Process-Safety Implications",
          "## Limitations and Threats to Validity", "## Conclusions",
          "## Acknowledgments", "## References"]
@@ -602,7 +611,7 @@ pos = sorted((TXT.index(h), h) for h in HEADS[:7] if h in TXT)
 # stated target rather than an internal preference. Every other band came down,
 # because the same review asked for a 25 to 30 percent reduction and a band
 # that does not bind is not a check.
-BAND = {"## Summary": (160, 250), "## Introduction": (480, 640),
+BAND = {"## Abstract": (160, 250), "## Introduction": (480, 640),
         "## Related Work and Positioning": (700, 1400),
         "## Methodology": (1800, 3600),
         "## Process-Safety Implications": (700, 1800),

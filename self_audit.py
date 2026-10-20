@@ -130,7 +130,7 @@ if _ess != 1 or "rather than an effective sample size" not in (TXT + SITXT):
 # must be checkable somewhere else in the document. This is the check that would
 # have caught the research-question table keeping "40 times" after the headline
 # ratio moved to 86.
-SUMMARY = section(TXT, "## Summary", ["## Introduction"])
+SUMMARY = section(TXT, "## Abstract", ["## Introduction"])
 # The nomenclature moved to the supporting information, so the Conclusions now end
 # at the Acknowledgments. Without this the section ran on into the reference list
 # and read DOI digits as quoted values.

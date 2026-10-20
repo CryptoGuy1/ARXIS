@@ -18,7 +18,7 @@ FIGS := figures_v2
 .PHONY: all verify selfaudit test check figtext proof docx manifest figures clean-cache release-check perseed \
         comparison classdisjoint leakage calibration anomaly episodes final \
         hazardepisodes blockboot rho rope bounds bootstrap \
-        anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting
+        anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting hazardgbm
 
 ## ---------------------------------------------------------------- experiments
 
@@ -90,6 +90,10 @@ metriccost: comparison
 # the correlation term of Eq. S2, read from the partition rather than hard-coded
 splitcounts:
 	$(PY) -m retrain.run_split_counts
+
+# Table 5 supplementary row and Table 6 variant values: gas-keyed gradient boosting, 30 runs and five seeds
+hazardgbm:
+	$(PY) -m retrain.run_hazard_gbm
 
 # recompute the Bayesian posteriors at the corrected rho, without retraining
 bayes: splitcounts

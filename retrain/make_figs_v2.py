@@ -167,7 +167,7 @@ def fig_loco():
     note(fig, "Bars drawn at the floor of panel (a) are exactly zero. "
               "Ordinal is a supporting variant, not a primary comparator. Seven of ten models bound their missed-hazard rate on a held-out Mixture class at or below 2.71%, "
               "yet escalate between 0.5% and 100% of the same windows.", y=0.095)
-    fig.savefig(os.path.join(FIG, "fig_loco.png"), dpi=600)
+    fig.savefig(os.path.join(FIG, "fig_loco.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_loco.pdf"))
     plt.close(fig)
     print("wrote fig_loco.png")
 
@@ -294,7 +294,7 @@ def fig_perturb():
     # figure title removed: journals carry the statement in the caption
     # A right margin: the widest column label runs past the last panel.
     fig.tight_layout(rect=(0, 0, 0.995, 0.925), h_pad=1.1, w_pad=2.2)
-    fig.savefig(os.path.join(FIG, "fig_perturb.png"), dpi=600)
+    fig.savefig(os.path.join(FIG, "fig_perturb.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_perturb.pdf"))
     plt.close(fig)
     print("wrote fig_perturb.png")
 
@@ -956,7 +956,7 @@ def fig_leakage():
                bbox_to_anchor=(0.5, 1.0), columnspacing=1.4, handlelength=1.3,
                handletextpad=0.5)
     fig.tight_layout(rect=(0, 0, 1, 0.915))
-    fig.savefig(os.path.join(FIG, "fig_leakage.png"), dpi=600); plt.close(fig)
+    fig.savefig(os.path.join(FIG, "fig_leakage.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_leakage.pdf")); plt.close(fig)
     print("wrote fig_leakage.png")
 
 
@@ -1017,7 +1017,7 @@ def fig_powered():
     fig.legend(h_, l_, fontsize=9.7, ncol=3, loc="lower center",
                bbox_to_anchor=(0.5, 0.0), columnspacing=1.4, handlelength=1.5)
     fig.tight_layout(rect=(0, 0.095, 1, 1), w_pad=2.4)
-    fig.savefig(os.path.join(FIG, "fig_powered.png"), dpi=600); plt.close(fig)
+    fig.savefig(os.path.join(FIG, "fig_powered.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_powered.pdf")); plt.close(fig)
     print("wrote fig_powered.png")
 
 
@@ -1136,7 +1136,7 @@ def fig_workflow():
                 bbox=dict(boxstyle="round,pad=0.30", fc="#ffffff", ec="none"))
         S.metric_bar(ax, 3.0, ry - 2.8 - mh, 94.0, mh)   # plus its footnote
 
-        fig.savefig(os.path.join(FIG, "fig_workflow.png"), dpi=600)
+        fig.savefig(os.path.join(FIG, "fig_workflow.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_workflow.pdf"))
         plt.close(fig)
         print("wrote fig_workflow.png")
 
@@ -1233,7 +1233,7 @@ def fig_decisionlogic():
         bracket(ys[1], ys[2] + rh, S.SAND_E, "Under-escalation", "hazardous windows at $a \\in \\{1,2\\}$")
         bracket(ys[0], ys[0] + rh, S.ROSE_E, "Missed hazard", "hazardous windows at $a = 0$")
 
-        fig.savefig(os.path.join(FIG, "fig_decisionlogic.png"), dpi=600)
+        fig.savefig(os.path.join(FIG, "fig_decisionlogic.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_decisionlogic.pdf"))
         plt.close(fig)
         print("wrote fig_decisionlogic.png")
 

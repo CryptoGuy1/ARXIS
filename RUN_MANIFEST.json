@@ -152,7 +152,7 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "2a970284ab8d80a7"
+   "sha256_16": "89aabd40f2a8d4aa"
   },
   {
    "path": "retrain/run_perturb_perseed.py",
@@ -439,9 +439,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_loco.png": {
-   "bytes": 701437,
-   "sha256_16": "6d98933f5bad2ea4",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 810612,
+   "sha256_16": "adf08a645fe1a9c8",
+   "modified_utc": "2026-10-20T12:52:50+00:00"
   },
   "fig_metricdisagreement.png": {
    "bytes": 442295,
@@ -454,9 +454,9 @@
    "modified_utc": "2026-10-15T21:23:17+00:00"
   },
   "fig_perturb.png": {
-   "bytes": 669482,
-   "sha256_16": "cd1c49f89993fb63",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 899575,
+   "sha256_16": "841dda2653ecf6cf",
+   "modified_utc": "2026-10-20T12:52:59+00:00"
   },
   "fig_powered.png": {
    "bytes": 508151,
@@ -474,9 +474,9 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_workflow.png": {
-   "bytes": 2264883,
-   "sha256_16": "1838ab50c4c03a70",
-   "modified_utc": "2026-10-15T21:23:17+00:00"
+   "bytes": 2263484,
+   "sha256_16": "bef32be997253823",
+   "modified_utc": "2026-10-20T12:53:16+00:00"
   },
   "fig_zoo.png": {
    "bytes": 312677,

@@ -60,7 +60,7 @@ REGIMES = [("In distribution", "30 randomized runs"),
            ("Class exclusion", "one hazardous class withheld"),
            ("Graded degradation", "noise, drift, channel loss"),
            ("Raw-space faults", "stuck, zero, clamp, noise"),
-           ("Reject option", "confidence threshold")]
+           ("Closed-set reject", "confidence threshold")]
 METRICS = ("Missed hazard     Escalation adequacy     Under-escalation     "
            "High-severity false alarm     Alarm burden")
 

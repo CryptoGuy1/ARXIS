@@ -145,10 +145,13 @@ def fig_loco():
             ax.text(bi.get_x() + bi.get_width() / 2, bi.get_height() + e + 0.02,
                     f"{v:.2f}", ha="center", va="bottom", fontsize=8.6, color=INK2,
                     rotation=90)
-    ax.set_ylim(0, 1.46)
+    # Escalation is a share, so the axis stops at 100%; the headroom above it is
+    # only for the rotated value labels.
+    ax.set_ylim(0, 1.18)
+    ax.set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.yaxis.set_major_formatter(PercentFormatter(1.0))
     ax.set_xticks(np.arange(len(models)))
-    ax.set_xticklabels([PRETTY[m] for m in models], rotation=24, ha="right",
+    ax.set_xticklabels([("Ordinal\n(supporting)" if m == "Ordinal" else PRETTY[m]) for m in models], rotation=24, ha="right",
                        rotation_mode="anchor")
     ax.set_ylabel("Escalation adequacy\n(a ≥ 3)", labelpad=2.0, linespacing=1.25)
     ax.set_title("(b)", loc="left")
@@ -162,7 +165,7 @@ def fig_loco():
                handlelength=1.4, columnspacing=1.4)
     fig.tight_layout(rect=(0, 0.115, 1, 0.945), h_pad=1.2)
     note(fig, "Bars drawn at the floor of panel (a) are exactly zero. "
-              "Seven of ten models bound their missed-hazard rate on a held-out Mixture class at or below 3.3%, "
+              "Seven of ten models bound their missed-hazard rate on a held-out Mixture class at or below 2.71%, "
               "yet escalate between 0.5% and 100% of the same windows.", y=0.095)
     fig.savefig(os.path.join(FIG, "fig_loco.png"), dpi=600)
     plt.close(fig)
@@ -260,10 +263,17 @@ def fig_perturb():
             for i, m in enumerate(models):
                 sub = df[(df.model == m) & (df.perturbation.isin([kind, "clean"]))]
                 sub = sub.sort_values("level")
+                # Shaded band: +/- 1 SD over the five seed-varying partitions.
+                _y = sub[mk].values
+                _sd = sub[mk.replace("_mean", "_std")].values
+                ax.fill_between(sub.level.values, np.clip(_y - _sd, 0, 1), np.clip(_y + _sd, 0, 1),
+                                color=CAT[i % len(CAT)], alpha=0.13, lw=0, zorder=2)
                 ax.plot(sub.level, sub[mk], "-o", ms=4.2, lw=1.8,
                         color=CAT[i % len(CAT)], label=PRETTY[m], zorder=3)
             ax.grid(axis="y", zorder=0)
             ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+            if kind == "dropout":
+                ax.set_xticks(range(0, 8))   # every k from 0 to 7 is a tested level
             ax.set_ylim(-0.05, 1.08)   # one shared scale per row
             if r == 0:
                 ax.set_title(f"({'abcdefgh'[c]})", loc="left", fontsize=12.5)
@@ -1120,7 +1130,7 @@ def fig_workflow():
                                          shrinkA=1.5, shrinkB=0.0))
             S.box(ax, rx, ry, rw, rh, head + "\n" + sub, S.GRN_F, S.GRN_E, rfs)
             S.tarrow(ax, (rx + rw / 2, ry - 0.2), (rx + rw / 2, ry - 2.3))
-        ax.text(50.0, p2[1] - 3.6, "the same trained models, one fit per condition",
+        ax.text(50.0, p2[1] - 3.6, "the same comparators under one protocol",
                 fontsize=7.8, style="italic", ha="center", va="center",
                 color="#333333", zorder=6,
                 bbox=dict(boxstyle="round,pad=0.30", fc="#ffffff", ec="none"))

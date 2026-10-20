@@ -301,7 +301,7 @@ A single conditional probe supports a narrow reading: the override is synthetic 
 
 ![](figures_v2/fig_anominfluence.png){width=6.50in}
 
-Fig. S5—Dependence of the selected action on the anomaly input, five seed-varying partitions. (a) Share of test windows whose action changes at any point as the anomaly score is swept across [0, 1] with all twenty-one other features held fixed at their observed values, mean ± 1 SD. (b) Missed-hazard rate against the forced anomaly value. Six comparators are flat; gradient boosting moves from 0.0092 to 0.4203 when the channel reads zero.
+Fig. S5—Dependence of the selected action on the anomaly input, five seed-varying partitions. (a) Share of test windows whose action changes at any point as the anomaly score is swept across [0, 1] with all twenty-one other features held fixed at their observed values, mean ± 1 SD. (b) Missed-hazard rate against the forced anomaly value. Six comparators are flat; gradient boosting moves from 0.0092 to 0.4203 when the anomaly value is forced to zero.
 
 
 ---

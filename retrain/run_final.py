@@ -1,7 +1,8 @@
 """Final experiment programme. Closes the open items that are closable.
 
 E10  Powered comparison: 30 randomized runs varying seed, split position and a
-     hyperparameter draw, with a Bayesian correlated t-test over a region of
+     seeded epoch draw only for the two neural policies and ordinal variant,
+     with a Bayesian correlated t-test over a region of
      practical equivalence (Benavoli et al. 2017). Replaces "not statistically
      distinguishable at n = 5" with a positive statement about equivalence.
 E11  Leave-one-class-out extended to every multiclass comparator.
@@ -101,8 +102,9 @@ def expected_cost(gas, action):
 # E10  powered comparison
 # =====================================================================
 def hp_draw(rng, name):
-    """A small hyperparameter perturbation per run, so the comparison varies
-    seed, split AND hyperparameter draw (Bouthillier et al. 2021)."""
+    """Draw epochs in [60, 100] for the two neural policies and ordinal variant.
+    Other model settings stay fixed; this is not a model-family grid search.
+    """
     if name in ("A_cost_weighted", "B_unweighted", "Ordinal"):
         return dict(epochs=int(rng.integers(60, 101)))
     return {}

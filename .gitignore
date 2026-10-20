@@ -83,6 +83,6 @@ retrain/results/real_features.csv.windows.npy
 # ── the document build directory
 build/
 
-# ── built submission documents: `make docx` regenerates them byte-for-byte
+# ── built submission documents: `make docx` builds their content from the Markdown sources
 # from the Markdown sources, and they are attached to the tagged release
 *.docx

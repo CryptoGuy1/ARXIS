@@ -11,7 +11,8 @@ Both are run here under exactly the protocol of run_final.exp_powered (30 runs,
 seeds RUN_SEEDS, split_and_prepare) and run_final.exp_loco_all (five seeds, both
 held-out hazardous classes). The shipped model is refitted too, and its numbers are
 checked against the stored v3_powered.csv and v3_loco_all.csv before the corrected
-variant's numbers are used. Any mismatch stops the run.
+variant's numbers are used. Reproduction differences are reported by check_against();
+they do not abort the run and must be interpreted alongside the recorded outputs.
 
 Writes results_v2/v3_powered_hazard_gbm.csv, v3_powered_hazard_gbm_bayes.json,
 v3_loco_hazard_gbm.csv and v3_loco_hazard_gbm_perseed.csv.

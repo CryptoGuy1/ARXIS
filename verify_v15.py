@@ -1026,19 +1026,19 @@ rule("the availability statement names the repository",
 # copy names the tag and the submitted copy names the hash the tag resolves to.
 _AVAIL = TXT[TXT.index(_AVAIL_HEAD):] if _AVAIL_HEAD in TXT else ""
 _cited = re.findall(r"`([0-9a-f]{40})`", _AVAIL)
-_defers = "`v18.1-final`" in _AVAIL
+_defers = "`v18.1-jlppi-reviewed-2026-10-20`" in _AVAIL
 rule("the release state is cited as a full hash, or as the tag that resolves to it",
      len(_cited) == 1 or _defers, f"{_cited}")
 if _cited:
     import subprocess as _sp2
     try:
-        _resolved = _sp2.run(["git", "rev-parse", "v18.1-final^{commit}"],
+        _resolved = _sp2.run(["git", "rev-parse", "v18.1-jlppi-reviewed-2026-10-20^{commit}"],
                              capture_output=True, text=True, timeout=30,
                              cwd=os.path.dirname(os.path.abspath(__file__))).stdout.strip()
     except Exception:
         _resolved = ""
     if re.fullmatch(r"[0-9a-f]{40}", _resolved or ""):
-        rule("the cited commit is the one the v18.1-final tag points at",
+        rule("the cited commit is the one the v18.1-jlppi-reviewed-2026-10-20 tag points at",
              _resolved == _cited[0], f"tag is {_resolved}, paper says {_cited[0]}")
 # every surname cited in the body must have an entry, and every entry must be cited
 _ORG = {"EEMUA", "IEC", "ISA", "Gemma"}
@@ -1418,7 +1418,8 @@ _ACK = TXT[TXT.index("## Declaration of Generative AI"):TXT.index("## Acknowledg
 rule("the use of a generative AI tool is disclosed",
      "During the preparation of this work the author(s) used" in _ACK)
 rule("the disclosure says what the tool was not used for",
-     "not used to generate data, results or references" in _ACK)
+     "did not generate experimental observations" in _ACK
+     and "no new model-training results" in _ACK)
 rule("the disclosure places responsibility with the authors",
      "take full responsibility" in _ACK)
 

@@ -43,6 +43,9 @@ DRIVERS = [
     ("retrain/run_rope_sensitivity.py", "sweep of the region of practical equivalence"),
     ("retrain/run_partition_bounds.py", "partition-level binomial bounds"),
     ("retrain/run_paired_bootstrap.py", "paired bootstrap over runs"),
+    ("retrain/run_hazard_gbm.py", "gas-keyed gradient boosting, 30 runs and class exclusion"),
+    ("retrain/run_perturb_perseed.py", "per-seed perturbation results"),
+    ("retrain/run_rung_check.py", "held-out-class escalation rungs"),
     ("retrain/make_figs_v2.py", "all figures"),
 ]
 

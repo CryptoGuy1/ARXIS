@@ -18,7 +18,7 @@ FIGS := figures_v2
 .PHONY: all verify selfaudit test check figtext proof docx manifest figures clean-cache release-check perseed \
         comparison classdisjoint leakage calibration anomaly episodes final \
         hazardepisodes blockboot rho rope bounds bootstrap \
-        anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting hazardgbm
+        anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting hazardgbm nonhazard rungcheck thermal
 
 ## ---------------------------------------------------------------- experiments
 
@@ -92,11 +92,11 @@ splitcounts:
 	$(PY) -m retrain.run_split_counts
 
 # Table 5 supplementary row and Table 6 variant values: gas-keyed gradient boosting, 30 runs and five seeds
-hazardgbm:
+hazardgbm: bayes classdisjoint
 	$(PY) -m retrain.run_hazard_gbm
 
 # recompute the Bayesian posteriors at the corrected rho, without retraining
-bayes: splitcounts
+bayes: final splitcounts
 	$(PY) -m retrain.run_bayes_recompute
 
 # Tables S9 and S13: what a confidence-threshold reject option buys and costs
@@ -173,7 +173,10 @@ manifest:
 all: comparison classdisjoint leakage calibration anomaly episodes hazardepisodes \
      blockboot anomalyclass metriccost persistence reject rawfaults overlap \
      final splitcounts bayes rho rope bounds bootstrap weighting nonhazard \
-     figures manifest check
+     perseed rungcheck hazardgbm figures manifest check
+
+# Preserve experiment/product ordering even when the caller uses make -j.
+.NOTPARALLEL: all
 
 ## ----------------------------------------------------------------- housekeeping
 
@@ -182,23 +185,6 @@ clean-cache:
 	      retrain/results/real_features.csv.windows.npy
 
 # Fails loudly if the tree is not in a releasable state.
-release-check: manifest verify
-	@$(PY) - <<'EOF'
-	import json, subprocess, sys
-	m = json.load(open("RUN_MANIFEST.json"))
-	problems = []
-	if m["git"]["commit"] is None:
-	    problems.append("not a git repository; cannot tag a release")
-	elif m["git"]["dirty"]:
-	    problems.append("working tree is dirty; commit before tagging")
-	if not m["results"]:
-	    problems.append("no result files found in retrain/results_v2")
-	if len(m["figures"]) < 20:
-	    problems.append(f"only {len(m['figures'])} figures present, expected 20")
-	for p in m["drivers"]:
-	    if p["sha256_16"] is None:
-	        problems.append(f"driver missing: {p['path']}")
-	if problems:
-	    print("NOT RELEASABLE:"); [print("  -", p) for p in problems]; sys.exit(1)
-	print("releasable: tree clean, manifest written, all drivers and figures present")
-	EOF
+release-check: verify
+	$(PY) audit_release.py
+	$(PY) -c "import subprocess; p=subprocess.run(['git','status','--porcelain'],capture_output=True,text=True,check=True); assert not p.stdout.strip(), 'working tree is dirty; commit before tagging'; print('releasable: tree clean and released artifacts verified')"

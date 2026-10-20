@@ -1,0 +1,4 @@
+# The release manifest fingerprints exact artifact bytes. Preserve the authored
+# line endings on every platform, including Windows with core.autocrlf=true.
+# This also retains the few historical scripts already stored with CRLF endings.
+* -text

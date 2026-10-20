@@ -65,7 +65,7 @@ METRICS = ("Missed hazard     Escalation adequacy     Under-escalation     "
            "High-severity false alarm     Alarm burden")
 
 RC = {
-    "font.family": "Liberation Serif",
+    "font.family": ["Liberation Serif", "Times New Roman", "DejaVu Serif"],
     "mathtext.fontset": "stix",
     "figure.facecolor": "#ffffff", "savefig.facecolor": "#ffffff",
     "figure.dpi": DPI, "savefig.dpi": DPI,

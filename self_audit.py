@@ -352,6 +352,51 @@ rule("G", "the Conclusion does not claim deployment readiness",
      not any(x in CONCL for x in ("ready for deployment", "fit for service", "qualifies")))
 
 
+# Regression gates for the reviewed JLPPI release.
+import ast as _ast
+_driver = open("retrain/run_final.py", encoding="utf-8").read()
+_hpnode = next(n for n in _ast.parse(_driver).body
+               if isinstance(n, _ast.FunctionDef) and n.name == "hp_draw")
+_hpns = {}
+exec(compile(_ast.Module(body=[_hpnode], type_ignores=[]), "hp_draw", "exec"), _hpns)
+class _EpochProbe:
+    def integers(self, lo, hi):
+        assert (lo, hi) == (60, 101)
+        return 80
+rule("G", "epoch variation is limited to the two policies and ordinal variant",
+     all(_hpns["hp_draw"](_EpochProbe(), n) == {"epochs": 80}
+         for n in ("A_cost_weighted", "B_unweighted", "Ordinal"))
+     and all(_hpns["hp_draw"](_EpochProbe(), n) == {}
+             for n in ("D_mlp", "E_gbm", "F_rf", "G_svm", "H_knn", "I_rnn", "C_cql")))
+rule("G", "the supplement describes the limited training variation",
+     "No equal-size search grid across model families was run" in SITXT
+     and "60 through 100" in SITXT)
+rule("G", "action 2 retains its evaluation semantics",
+     "acceptable evaluation response for Perfume" in SITXT
+     and "Neither action 1 nor action 2 notifies an operator" in TXT)
+rule("G", "the conclusion retains closed-set reject scope",
+     "no dedicated open-set or out-of-distribution detector was evaluated" in CONCL
+     and "only open-set element" not in TXT)
+_mk = open("Makefile", encoding="utf-8").read().replace("\\\n", " ")
+_deps = {}
+for _ln in _mk.splitlines():
+    if _ln and not _ln[0].isspace() and ":" in _ln and not _ln.startswith("#"):
+        _name, _rest = _ln.split(":", 1)
+        _deps[_name] = _rest.split()
+_seen = set()
+def _reach(name):
+    if name in _seen: return
+    _seen.add(name)
+    for dep in _deps.get(name, []): _reach(dep)
+_reach("all")
+rule("G", "the full workflow reaches all new supporting analyses",
+     {"hazardgbm", "perseed", "rungcheck"} <= _seen
+     and {"bayes", "classdisjoint"} <= set(_deps.get("hazardgbm", []))
+     and "final" in _deps.get("bayes", []))
+rule("G", "all four JLPPI literature additions remain in the manuscript",
+     all(doi in TXT for doi in ("10.1016/j.jlp.2024.105449", "10.1016/j.jlp.2025.105767",
+                               "10.1016/j.jlp.2026.106010", "10.1016/j.jlp.2020.104208")))
+
 # ============================ report ============================
 print(f"{N[0]} checks run, {len(FAIL)} failure(s), {len(WARN)} warning(s)\n")
 for f in FAIL:

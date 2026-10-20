@@ -127,7 +127,7 @@
   {
    "path": "retrain/run_final.py",
    "purpose": "30-run comparison, Bayesian equivalence, ordinal objective",
-   "sha256_16": "f3e0fae0cab0155f"
+   "sha256_16": "f96759bef748a792"
   },
   {
    "path": "retrain/run_rho_sensitivity.py",
@@ -152,7 +152,7 @@
   {
    "path": "retrain/make_figs_v2.py",
    "purpose": "all figures",
-   "sha256_16": "6463080b62cb80fc"
+   "sha256_16": "b9a231bffa0f3a9d"
   },
   {
    "path": "retrain/run_perturb_perseed.py",
@@ -162,7 +162,12 @@
   {
    "path": "retrain/run_hazard_gbm.py",
    "purpose": "gas-keyed gradient boosting variant: 30-run comparison, leave-one-class-out, reproduction check",
-   "sha256_16": "534db8212027b0e3"
+   "sha256_16": "e7ff4eccf34c5f22"
+  },
+  {
+   "path": "retrain/run_rung_check.py",
+   "purpose": "held-out-class escalation rungs",
+   "sha256_16": "a8f1844cb1d8e543"
   }
  ],
  "results": {
@@ -504,14 +509,20 @@
    "modified_utc": "2026-10-12T13:59:51+00:00"
   },
   "fig_workflow.png": {
-   "bytes": 4719469,
-   "sha256_16": "6057e9b3988e16cc",
-   "modified_utc": "2026-10-20T14:27:28.585232+00:00"
+   "bytes": 4673749,
+   "sha256_16": "28bad1073e02a093",
+   "modified_utc": "2026-10-20T17:23:03.553608+00:00"
   },
   "fig_zoo.png": {
    "bytes": 312677,
    "sha256_16": "381117622740595b",
    "modified_utc": "2026-10-12T13:59:51+00:00"
   }
+ },
+ "editorial_update": {
+  "date": "2026-10-20",
+  "base_commit": "b7cc472c3899a69ee1f64044f1ed9bfde3e56444",
+  "release_tag": "v18.1-jlppi-reviewed-2026-10-20",
+  "note": "Method descriptions, release and reproduction workflow, action-2 and closed-set scope, JLPPI literature and document formatting corrected. Workflow figure font fallback and box geometry corrected. Original experiment environment and all stored experimental result files retained; no new training performed."
  }
 }

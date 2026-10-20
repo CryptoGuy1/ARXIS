@@ -1068,7 +1068,7 @@ def fig_workflow():
     with plt.rc_context(S.RC):          # a serif figure, sealed off from the plots
         fh, fsn, fss = 11.8, 8.2, 7.0
         h1 = 3.4 + 2.6 + fh + S.caption_h(fsn, fss) + 1.5
-        ph, chip_h = 8.0, 11.6
+        ph, chip_h = 11.0, 11.6
         AUX_H, AUX_GAP = 2.6, 0.9           # the auxiliary reference, drawn apart
         h2 = 3.4 + ph + 3.0 + chip_h + AUX_GAP + AUX_H + 1.8
         GAP1, FAN, rh, mh = 7.4, 13.4, 7.2, 3.6
@@ -1093,8 +1093,8 @@ def fig_workflow():
               S.BLU_F, S.BLU_E, 7.4)
         S.barrow(ax, bx + bw + 1.7, by + ph / 2, 2.8, 3.6, "right")
         S.box(ax, bx + bw + 3.4, by, bw, ph,
-              "Block-wise holdout\ncontiguous 20% per class, 20-window\n"
-              "embargo, seed-varying position", S.BLU_F, S.BLU_E, 7.4)
+              "Block-wise holdout\ncontiguous 20% per class\n"
+              "20-window embargo\nseed-varying position", S.BLU_F, S.BLU_E, 7.4)
         S.barrow(ax, bx + 2 * bw + 5.1, by + ph / 2, 2.8, 3.6, "right")
         S.cyl(ax, bx + 2 * (bw + 3.4), by, bw, ph,
               "4,900 train / 1,264 test\n316 windows per class", 7.4)

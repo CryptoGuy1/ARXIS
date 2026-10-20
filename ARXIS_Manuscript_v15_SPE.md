@@ -243,7 +243,7 @@ The thermal classifier's 98.8% top-1 accuracy on 1,280 held-out images comes fro
 
 ### 4.2 Experiment 1: Sensitivity of Reported Accuracy to the Partitioning Protocol
 
-Random splitting over overlapping sliding windows is standard in this literature and places near-duplicates in both partitions (Dennler et al., 2022), but that was shown on a different MOX benchmark, so it is measured here. Six models were trained under four protocols (**Table 4**, **Fig. 3**): a uniformly random 80/20 split; a contiguous per-class block with no separation band; that block with the 20-window embargo used everywhere else here; and training on the first 60% of each class block, testing on the last 20%, discarding the middle 20%.
+Random splitting over overlapping sliding windows is standard in this literature and places near-duplicates in both partitions (Dennler et al., 2022), but that was shown on a different MOX benchmark, so it is measured here. Six models were trained under four protocols (**Table 4**, **Fig. 3**): a uniformly random 80/20 split; a contiguous per-class block with no separation band; that block with the 20-window embargo used everywhere else here; and training on the first 60% of each class block, testing on the last 20%, discarding the middle 20%. That arm holds 317 windows per class rather than 316, from rounding.
 
 | Model | Random split | Blocked, no embargo | Blocked + embargo | Train early, test late |
 |---|---|---|---|---|
@@ -282,7 +282,7 @@ Every comparator was trained 30 times under the protocol above and evaluated on 
 | k-nearest neighbors | 0.9443 | 0.0196 | 0.0000 | 1.000 | 0.0000 | 0.0939 | 0.367 |
 | Shallow decision tree | 0.9183 | 0.0445 | 0.0000 | 1.000 | 0.0000 | 0.1233 | 0.027 |
 
-Table 5—Model comparison over 30 randomized runs.
+Table 5—Model comparison over 30 randomized runs. The cost-weighted accuracy here, 0.9573, comes from this 30-run comparison. The 0.9625 in Table 4 is a separate five-run blocked-with-embargo result, and the 0.9630 at the reference ratio in Supplementary Table S2 is a separate five-seed sweep; the three are not directly comparable.
 
 Measured by Eq. 4, the ten comparators span 4.43 accuracy points, from 0.9183 to 0.9625. The random forest has the highest accuracy and lowest expected cost, and the shallow decision tree on seven raw sensor values sits 4.4 points behind the best learned model. The safety metrics are weakly discriminative here, because almost every model produces the same safety outcome under the nominal distribution. Eight of ten comparators record no observed missed hazard, and escalation adequacy lies between 0.993 and 1.000 for all ten; the two that miss, gradient boosting and the perceptron, miss at most 0.33% of hazardous windows. No comparator in **Table 5** produces an observed high-severity false alarm across 30 runs, but CUSUM, run over five seeds and outside **Table 5**, does, at 0.1861. Its decision accuracy of 0.4535 ± 0.1010 is not comparable, since a two-state output is scored against a four-class target map. Full escalation costs alarming on roughly one clean window in five, and the observed zeros bound the worst-partition rates at 0.47% and 0.94%.
 
@@ -296,7 +296,7 @@ Two sensitivity analyses bound how much of that reading depends on analysis choi
 
 Where the actions land makes the saturation concrete (Fig. S11): every comparator sends essentially all Smoke windows to *Raise alarm* and all Mixture windows to *Recommend ESD assessment*, and the only visible spread is on the NoGas and Perfume boundary. Action 2, *Request verification*, is never selected by any of the seven comparators on any run, because the target map sends Perfume to action 1 and action 2 is never a positive training target.
 
-Resolving decision accuracy by class locates the whole between-model spread on NoGas and Perfume, which span 10.3 and 9.1 points across the seven models, while every model assigns the correct action to every Mixture window and to at least 98.0% of Smoke windows. The ordering on clean air reverses the aggregate: gradient boosting, sixth by decision accuracy in **Table 5**, is last here, assigning Monitor to 84.0% of clean windows against 94.2% for the support-vector classifier, the in-distribution face of the weighting defect reported under Experiment 8.
+Resolving decision accuracy by class locates the whole between-model spread on NoGas and Perfume, which span 10.3 and 9.1 points across the seven models of Fig. S11, while every model assigns the correct action to every Mixture window and to at least 98.0% of Smoke windows. The ordering on clean air reverses the aggregate: gradient boosting, sixth by decision accuracy in **Table 5**, is last here, assigning Monitor to 84.0% of clean windows against 94.2% for the support-vector classifier, the in-distribution face of the weighting defect reported under Experiment 8.
 
 ### 4.4 Experiment 3: Class-Disjoint Hazard Evaluation
 
@@ -330,7 +330,7 @@ Fig. 5—Behavior on a hazardous class withheld from training. (a) Missed-hazard
 
 ### 4.5 What the held-out class separates
 
-In-distribution accuracy does not order held-out-class missed-hazard rate. On the held-out Smoke class the multilayer perceptron, third of ten by point accuracy in **Table 5**, misses 6.41% of hazardous windows, its five partitions producing 4, 23, 30, 216 and 234 misses, while six models record no miss on any partition. The alarm denominator hides a nuisance: two comparators that alarm on no clean window do send alarm-grade actions to Perfume, so the narrow denominator of Eq. 8 and a companion rate over all nonhazardous windows can disagree. On the held-out Mixture class seven of ten comparators have worst-partition bounds at or below 3.3% on missed hazards while their escalation adequacy runs from 0.0049 to 1.000, a factor of about 200. Moving the alarm boundary down one rung collapses that spread to 0.751 to 1.000, which locates the separation in the sub-alarm band.
+In-distribution accuracy does not order held-out-class missed-hazard rate. On the held-out Smoke class the multilayer perceptron, third of ten by point accuracy in **Table 5**, misses 6.41% of hazardous windows, its five partitions producing 4, 23, 30, 216 and 234 misses, while six models record no miss on any partition. The alarm denominator hides a nuisance: two comparators that alarm on no clean window do send alarm-grade actions to Perfume, so the narrow denominator of Eq. 8 and a companion rate over all nonhazardous windows can disagree. On the held-out Mixture class seven of ten comparators have worst-partition bounds at or below 3.3% on missed hazards while their escalation adequacy runs from 0.0049 to 1.000, a factor of about 200. Lowering the boundary to any action above Monitor (*a* ≥ 1) raises the minimum for those seven to 0.992, because escalation at that boundary equals one minus the missed-hazard rate. Across all ten comparators the same boundary gives 0.751 to 1.000, where 0.751 is the shallow decision tree. The separation therefore lies in the sub-alarm band.
 
 ### 4.6 Supporting Experiments 4 and 5
 
@@ -338,11 +338,11 @@ Two experiments support the main sequence without carrying a research question. 
 
 ### 4.7 Cost asymmetry returns a clean negative
 
-(Supplementary Section S3). Sweeping the loss-weight ratio *C* across nine values leaves missed-hazard rate at zero and escalation adequacy at 1.000 at every ratio, while accuracy falls from 0.9646 at 1:1 to 0.9090 at 20:1. The target action is a deterministic function of a well-separated class label, so the miss rate is on the floor before any weighting. That is evidence about this benchmark, not against cost-sensitive learning (Elkan, 2001). The reference *C* = 8:1 was chosen on test-partition dispersion, which is not defensible; re-selecting it on an embargoed validation band gives 6:1. An ordinal objective that prices distance along the ladder does move escalation on the held-out Mixture class, from 0.259 ± 0.188 to 0.386 ± 0.192 at a cost of 21 accuracy points, but its zero missed hazards carry no information, because it never emits Monitor.
+(Supplementary Section S3). Sweeping the loss-weight ratio *C* across nine values leaves missed-hazard rate at zero and escalation adequacy at 1.000 at every ratio, while five-seed accuracy falls from 0.9646 at 1:1 to 0.9090 at 20:1 (Supplementary Table S2). The target action is a deterministic function of a well-separated class label, so the miss rate is on the floor before any weighting. That is evidence about this benchmark, not against cost-sensitive learning (Elkan, 2001). The reference *C* = 8:1 was chosen on test-partition dispersion, which is not defensible; re-selecting it on an embargoed validation band gives 6:1. An ordinal objective that prices distance along the ladder does move escalation on the held-out Mixture class, from 0.259 ± 0.188 to 0.386 ± 0.192 at a cost of 21 accuracy points, but its zero missed hazards carry no information, because it never emits Monitor.
 
 ### 4.8 One upstream input is load-bearing for one model
 
-(Supplementary Section S7). Ablating the decision state by feature group shows the 22-dimensional state is not minimal, but no group changes the in-distribution safety metrics. Sweeping the anomaly input with the other twenty-one features held at their observed values is the consequential test: dependence runs from 0.00% of windows for the decision tree to 64.22 ± 7.65% for gradient boosting. Forcing that input to zero, as a failed autoencoder would, leaves every other comparator's missed-hazard rate at zero while gradient boosting moves from 0.0092 to 0.4203 and its escalation adequacy falls from 0.991 to 0.497.
+(Supplementary Section S7). Ablating the decision state by feature group shows the 22-dimensional state is not minimal, but no group changes the in-distribution safety metrics. Sweeping the anomaly input with the other twenty-one features held at their observed values is the consequential test: dependence runs from 0.00% of windows for the decision tree to 64.22 ± 7.65% for gradient boosting. Forcing that input to zero, as a failed autoencoder would, leaves every other comparator's missed-hazard rate at zero while gradient boosting moves from 0.0092 to 0.4203 in the five-seed comparison (**Table 5** gives its 30-run miss rate as 0.0033) and its escalation adequacy falls from 0.991 to 0.497.
 
 ### 4.9 That dependence is partly, not wholly, a weighting defect
 
@@ -382,7 +382,7 @@ Single-channel loss is a plausible fault mode for a fixed array, and Experiment 
 | Single-channel loss | Re-measure all three safety metrics with *k* = 1 of 7 channels zeroed | One lost channel moved alarm burden from 0 to between 128 and 200 per 1,000 windows for three of six models, pooled over five partitions with all of the alarms in one partition of five, and to 7 per 1,000 for a fourth |
 | Failure-mode declaration | Require the supplier to state whether the model is alarm-biased or silent under total sensor loss, shown by partition | At *k* = 7 the cost-weighted policy, the unweighted network and the decision tree reach zero missed hazard by alarming on every window, a mode a mean hides |
 | Held-out-class response | Evaluate on a hazardous class withheld from training, reporting escalation adequacy beside missed-hazard rate | Seven of ten models hold worst-partition miss bounds at or below 3.3% on the held-out Mixture class while escalation adequacy across them runs from 0.0049 to 1.000 |
-| Upstream-input failure | Force each upstream input to a failure value and re-measure | One model's missed-hazard rate moved from 0.0092 to 0.4203 when a single input read zero, and to 0.3307 after its training weights were corrected |
+| Upstream-input failure | Force each upstream input to a failure value and re-measure | One model's five-seed missed-hazard rate moved from 0.0092 to 0.4203 when the anomaly input was forced to zero, and to 0.3307 after its training weights were corrected |
 
 Table 7—A proposed evaluation screen for a learned gas-monitoring component.
 
@@ -390,7 +390,7 @@ The screen is deliberately inexpensive. Every row but the fourth re-evaluates an
 
 ### 5.3 Expressing False Alarms in Reviewable Units
 
-A fraction cannot be placed against the envelopes an operator works inside. Two steps are needed: a rate per clean window becomes a count per 1,000 clean windows, a property of the model, and then a count per hour under an assumed duty cycle, a property of the deployment. The comparison with EEMUA (2024) and ISA (2016) is contextual, not a compliance test, since those standards describe what a whole operator position can absorb whereas *B* is a property of one detector. A single lost channel producing roughly 231 indications per hour is an order-of-magnitude screen, not a prediction of operator load, and it belongs in the alarm-management review.
+A fraction cannot be placed against the envelopes an operator works inside. Two steps are needed: a rate per clean window becomes a count per 1,000 clean windows, a property of the model, and then a count per hour under an assumed duty cycle, a property of the deployment. The comparison with EEMUA (2024) and ISA (2016) is contextual, not a compliance test, since those standards describe what a whole operator position can absorb whereas *B* is a property of one detector. A single lost channel producing roughly 231 indications per hour under the cost-weighted policy (Supplementary Table S11) is an order-of-magnitude screen, not a prediction of operator load, and it belongs in the alarm-management review.
 
 The most transferable point is not specific to gas monitoring. Wherever a graded response hierarchy is learned, a metric defined on the most extreme failure can be satisfied by systematic under-response one rung above it, which Eqs. 6 and 7 make visible and a miss metric alone collapses. The fix is to define the metric at the operationally meaningful threshold, here whether an operator is notified. Under complete sensor loss the same metrics reward opposite behaviors: escalating everything, or going silent, each reaching 0.0000 on one metric while failing another.
 
@@ -424,7 +424,7 @@ Each class was recorded as one continuous steady-state run, so a hazardous episo
 
 ### 6.5 Metric Scope and the Alarm Boundary
 
-Missed-hazard rate counts only the fully passive action, which is why escalation adequacy is reported beside it. Escalation adequacy depends on the alarm boundary at *a* ≥ 3. Experiment 3 shows the spread on the held-out Mixture class collapses from a factor of about 200 to 1.3 at *a* ≥ 1, a boundary defensible only where actions 1 and 2 place nothing in front of an operator.
+Missed-hazard rate counts only the fully passive action, which is why escalation adequacy is reported beside it. Escalation adequacy depends on the alarm boundary at *a* ≥ 3. Experiment 3 shows the spread on the held-out Mixture class collapses from a factor of about 200 to about 1.01 for the seven low-miss comparators at *a* ≥ 1, a boundary defensible only where actions 1 and 2 place nothing in front of an operator.
 
 ### 6.6 The Persistence Rule and the Action Ladder Are Conventions
 
@@ -448,7 +448,7 @@ First, the partitioning protocol materially changes reported accuracy. A random 
 
 Second, in-distribution accuracy does not reliably predict safety behavior under a class-disjoint shift. Across 30 randomized runs ten comparators lie within 4.43 accuracy points, so the safety metrics barely discriminate under the nominal distribution. Withholding a hazardous surrogate class separates those models by their counts. On Smoke, six record no missed hazard in any partition, and in the worst partition the perceptron misses 234 of 1,581 held-out windows while ranking third of ten by accuracy; on Mixture the worst partition, for a decision tree, misses 988 of 1,581. Removing the cost weighting is practically equivalent to keeping it at every equivalence width tested.
 
-Third, missed-hazard rate alone can reward under-escalation. On a second held-out hazardous class, seven of ten comparators hold worst-partition bounds at or below 3.3% on missed hazards while escalation adequacy across them runs from 0.0049 to 1.000, a factor of about 200. The spread lives in the sub-alarm band: moving the boundary down one rung lifts escalation to between 0.751 and 1.000.
+Third, missed-hazard rate alone can reward under-escalation. On a second held-out hazardous class, seven of ten comparators hold worst-partition bounds at or below 3.3% on missed hazards while escalation adequacy across them runs from 0.0049 to 1.000, a factor of about 200. The spread lives in the sub-alarm band: lowering the boundary to any action above Monitor lifts escalation for those seven to between 0.992 and 1.000, and the shallow decision tree, the one comparator outside the seven, rises from 0.567 to 0.751.
 
 Fourth, imposed sensor degradation produces distinct failure modes invisible in nominal accuracy. Alarm-biased models raise an alarm-grade indication on every clean window while recording no observed missed hazard; silent-failure models record no false alarm while missing a large share of hazardous windows; and a third pattern degrades gracefully to a threshold and then abruptly. Losing one channel of seven moved the cost-weighted policy from zero to 128 alarm-grade indications per 1,000 clean windows, pooled over five partitions with all of it in one partition of five, and the random forest only to 7.
 
@@ -562,7 +562,7 @@ Sharma, A., Khullar, V., Kansal, I., et al., 2024. Gas Detection and Classificat
 
 Vergara, A., Vembu, S., Ayhan, T., et al., 2012. Chemical Gas Sensor Drift Compensation Using Classifier Ensembles. *Sens. Actuators B Chem.* 166–167, 320–329. https://doi.org/10.1016/j.snb.2012.01.074.
 
-Wang, J., Yang, F., Chen, T., et al., 2016. An Overview of Industrial Alarm Systems: Main Causes for Alarm Overloading, Research Status, and Open Problems. *IEEE Trans. Autom. Sci. Eng.* 13, 1045–1061.
+Wang, J., Yang, F., Chen, T., et al., 2016. An Overview of Industrial Alarm Systems: Main Causes for Alarm Overloading, Research Status, and Open Problems. *IEEE Trans. Autom. Sci. Eng.* 13, 1045–1061. https://doi.org/10.1109/TASE.2015.2464234.
 
 Wang, Z., Schaul, T., Hessel, M., et al., 2016. Dueling Network Architectures for Deep Reinforcement Learning. In: *Proceedings of the 33rd International Conference on Machine Learning (ICML)*, New York City, New York, 19–24 June, pp. 1995–2003.
 

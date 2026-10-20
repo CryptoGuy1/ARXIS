@@ -958,23 +958,26 @@ def fig_powered():
     fig, axes = plt.subplots(1, 2, figsize=(6.90, 3.28), gridspec_kw={"width_ratios": [1.18, 1]})
     ax = axes[0]
     order = d.decision_acc_mean.sort_values(ascending=False).index.tolist()
-    x = np.arange(len(order))
+    y = np.arange(len(order))
     v = [d.loc[m, "decision_acc_mean"] for m in order]
     e = [d.loc[m, "decision_acc_std"] for m in order]
     cols = [ORANGE if m == "A_cost_weighted" else ("#1f8f5f" if m == "Ordinal" else "#9fb4c4") for m in order]
-    bb = ax.bar(x, v, 0.64, yerr=e, color=cols, ec=SURFACE, lw=1.2, zorder=3,
-                error_kw=dict(ecolor=INK2, elinewidth=1.0, capsize=2.6))
-    for bi, vv, ee in zip(bb, v, e):
-        # Eleven comparators sit within four accuracy points of one another, so
-        # horizontal value labels overlapped; they are set upright instead.
-        ax.text(bi.get_x() + bi.get_width() / 2, vv + ee + 0.006, f"{vv:.3f}",
-                ha="center", va="bottom", fontsize=8.4, color=INK2, rotation=90)
-    ax.set_xticks(x); ax.set_xticklabels([("Ordinal objective\n(supporting variant)" if m == "Ordinal" else PRETTY.get(m, m)) for m in order], rotation=40,
-                       ha="right", fontsize=10.2, rotation_mode="anchor")
-    ax.set_ylim(0.70, 1.10); ax.yaxis.set_major_formatter(PercentFormatter(1.0))
-    ax.set_ylabel("Decision accuracy", labelpad=1.5)
+    # Horizontal bars: rotated category labels on a vertical axis collided with one
+    # another, so model names are read across rather than along a slanted baseline.
+    ax.barh(y, v, 0.64, xerr=e, color=cols, ec=SURFACE, lw=1.2, zorder=3,
+            error_kw=dict(ecolor=INK2, elinewidth=1.0, capsize=2.6))
+    for yi, vv, ee in zip(y, v, e):
+        ax.text(vv + ee + 0.008, yi, f"{vv:.3f}", ha="left", va="center",
+                fontsize=8.4, color=INK2)
+    ax.set_yticks(y)
+    ax.set_yticklabels([("Ordinal (supporting variant)" if m == "Ordinal" else PRETTY.get(m, m)) for m in order],
+                       fontsize=9.6)
+    ax.invert_yaxis()
+    ax.set_xlim(0.70, 1.04); ax.xaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
+    ax.set_xticks([0.70, 0.80, 0.90, 1.00])
+    ax.set_xlabel("Decision accuracy")
     ax.set_title("(a)", loc="left")
-    ax.grid(axis="y", zorder=0)
+    ax.grid(axis="x", zorder=0)
 
     ax = axes[1]
     names = [m for m in order if m in sig]

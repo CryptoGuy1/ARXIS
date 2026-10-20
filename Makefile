@@ -119,6 +119,10 @@ nonhazard: calibration
 persistence: comparison
 	$(PY) -m retrain.run_persistence_sweep
 
+# Escalation at a >= 3, 2 and 1 on the held-out Mixture class (Section S27)
+rungcheck: final
+	$(PY) -m retrain.run_rung_check
+
 ## ------------------------------------------------------------------- products
 
 # Figs. 1 to 6 and Figs. S1 to S6, S11 to S16; Figs. S7 to S9 come from make_figs_arch

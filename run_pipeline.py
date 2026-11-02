@@ -125,6 +125,9 @@ def run_target(name, commands):
             # UTF-8 for the children's piped output: on Windows a pipe otherwise
             # takes the ANSI code page, and a printed "≤" or "±" would crash a driver
             env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
+            # joblib cannot count physical cores on some Windows machines and
+            # prints a traceback for every pool it starts; give it the answer
+            env.setdefault("LOKY_MAX_CPU_COUNT", str(os.cpu_count() or 1))
             p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                  text=True, encoding="utf-8", errors="replace", env=env)
             for line in p.stdout:

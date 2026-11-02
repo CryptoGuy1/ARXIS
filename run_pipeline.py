@@ -122,7 +122,9 @@ def run_target(name, commands):
             cmd = [sys.executable] + args
             log.write(f"\n[{now()}] $ {' '.join(cmd)}\n"); log.flush()
             print(f"[{now()}] {name}: {' '.join(args)}  (log: {os.path.relpath(path, ROOT)})", flush=True)
-            env = dict(os.environ, PYTHONUNBUFFERED="1")
+            # UTF-8 for the children's piped output: on Windows a pipe otherwise
+            # takes the ANSI code page, and a printed "≤" or "±" would crash a driver
+            env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
             p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                  text=True, encoding="utf-8", errors="replace", env=env)
             for line in p.stdout:
@@ -137,6 +139,11 @@ def run_target(name, commands):
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--from", dest="start", choices=NAMES)

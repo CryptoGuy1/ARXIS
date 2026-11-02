@@ -18,7 +18,7 @@ FIGS := figures_v2
 .PHONY: all verify selfaudit test check figtext proof docx manifest figures clean-cache release-check perseed \
         comparison classdisjoint leakage calibration anomaly episodes final \
         hazardepisodes blockboot rho rope bounds bootstrap \
-        anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting hazardgbm nonhazard rungcheck thermal
+        anomalyclass metriccost persistence splitcounts bayes reject rawfaults overlap weighting ratiocheck nonhazard rungcheck thermal
 
 ## ---------------------------------------------------------------- experiments
 
@@ -91,9 +91,11 @@ metriccost: comparison
 splitcounts:
 	$(PY) -m retrain.run_split_counts
 
-# Table 5 supplementary row and Table 6 variant values: gas-keyed gradient boosting, 30 runs and five seeds
-hazardgbm: bayes classdisjoint
-	$(PY) -m retrain.run_hazard_gbm
+# Reviewer comments 144 and 215: the cost-weighted policy at the validation-
+# selected 6:1 beside the reference 8:1, under class exclusion, feature-space
+# perturbation and raw-signal faults
+ratiocheck: comparison
+	$(PY) -m retrain.run_ratio_check
 
 # recompute the Bayesian posteriors at the corrected rho, without retraining
 bayes: final splitcounts
@@ -149,6 +151,7 @@ selfaudit:
 # the metric module the tables run through
 test:
 	$(PY) test_safety_metrics.py
+	$(PY) test_rerun_fixes.py
 
 # everything a reviewer would want green before reading the paper
 check: verify selfaudit test figtext proof thermal
@@ -173,7 +176,7 @@ manifest:
 all: comparison classdisjoint leakage calibration anomaly episodes hazardepisodes \
      blockboot anomalyclass metriccost persistence reject rawfaults overlap \
      final splitcounts bayes rho rope bounds bootstrap weighting nonhazard \
-     perseed rungcheck hazardgbm figures manifest check
+     perseed rungcheck ratiocheck figures manifest check
 
 # Preserve experiment/product ordering even when the caller uses make -j.
 .NOTPARALLEL: all

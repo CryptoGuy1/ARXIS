@@ -146,8 +146,17 @@ class RawWindowLSTM:
                 out[i] = chunk
         return out
 
-    def fit(self, X, y_action, groups=None, epochs=40, batch=256):
-        if groups is None:
+    def fit(self, X, y_action, groups=None, segments=None, epochs=40, batch=256):
+        """`segments` (rp.segment_ids of the training frame) takes precedence over
+        `groups`. Fix of November 2026 (review comment 62): grouping by gas joined
+        each class's leading and trailing training segments into one run, so up to
+        K-1 training sequences per class spliced rows from both sides of the
+        removed test block. No test row was ever involved, but the history was not
+        a real one. With segments, every history is a contiguous stretch of one
+        recording."""
+        if segments is not None:
+            groups = segments
+        elif groups is None:
             groups = y_action  # blocks of one action == blocks of one class here
         Xw = self._windows_within_runs(X, groups)
         yw = np.asarray(y_action, dtype=np.int64)
@@ -217,7 +226,26 @@ class CQLAgent:
         # simple 1-step shift; last row has no next state (masked out)
         return torch.cat([X[1:], X[-1:]], dim=0)
 
-    def fit(self, X, y_action, g_class=None, epochs=80, batch=256):
+    @staticmethod
+    def _has_next(n, segments=None, g_class=None):
+        """True where row i+1 is the real successor of row i.
+
+        Fix of November 2026 (review comment 75): the successor was the next row of
+        the concatenated training array with only the final row masked, so the
+        bootstrapped target linked the last NoGas window to the first Smoke window,
+        and each class's leading segment to its trailing one across the removed
+        test block. Rows are now terminal at every segment boundary. Without
+        segments the class boundaries are still masked."""
+        has_next = np.ones(n, dtype=bool)
+        if n:
+            has_next[-1] = False
+        key = segments if segments is not None else g_class
+        if key is not None and n > 1:
+            key = np.asarray(key)
+            has_next[:-1] &= key[1:] == key[:-1]
+        return has_next
+
+    def fit(self, X, y_action, g_class=None, segments=None, epochs=80, batch=256):
         Xt = torch.from_numpy(np.asarray(X, dtype=np.float32)).float().to(self.device)
         yt = torch.from_numpy(np.asarray(y_action, dtype=np.int64)).to(self.device)
         nxt = self._next_states(Xt)
@@ -235,8 +263,11 @@ class CQLAgent:
         self.net.train()
         n = len(Xt)
         # mask rows that are the final row of their trajectory (no next state)
-        has_next = torch.ones(n, dtype=torch.bool, device=self.device)
-        has_next[-1] = False
+        has_next = torch.as_tensor(
+            self._has_next(n, segments=segments,
+                           g_class=None if g_np is None else g_np),
+            dtype=torch.bool, device=self.device)
+        self.n_terminal_ = int((~has_next).sum().item())
         for ep in range(epochs):
             perm = torch.randperm(n)
             for s in range(0, n, batch):

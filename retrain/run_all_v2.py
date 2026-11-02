@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
-from retrain.comparators import SupervisedDQN, SupervisedMLP, CostSensitiveGBM
+from retrain.comparators import SupervisedDQN, SupervisedMLP, HazardWeightedGBM
 from retrain.comparators import cost_weighted_sample_weight
 from retrain.zoo import SVMClassifier, RandomForest, RawWindowLSTM, CQLAgent
 from retrain.new_baselines import KNN, ThresholdRule, CusumDetector
@@ -52,7 +52,7 @@ def registry(sw):
                             lambda s, g: dict(sample_weight=cost_weighted_sample_weight(g, 8, 1), epochs=EPOCHS)),
         "B_unweighted":    (lambda s: SupervisedDQN(seed=s), lambda s, g: dict(sample_weight=None, epochs=EPOCHS)),
         "D_mlp":           (lambda s: SupervisedMLP(seed=s), lambda s, g: {}),
-        "E_gbm":           (lambda s: CostSensitiveGBM(seed=s), lambda s, g: {}),
+        "E_gbm":           (lambda s: HazardWeightedGBM(seed=s), lambda s, g: {}),
         "SVM":             (lambda s: SVMClassifier(seed=s), lambda s, g: {}),
         "RF":              (lambda s: RandomForest(seed=s), lambda s, g: {}),
         "LSTM":            (lambda s: RawWindowLSTM(seed=s, K=10), lambda s, g: dict(epochs=40)),
@@ -63,10 +63,18 @@ def registry(sw):
     }
 
 
-def fit_predict(m, Xtr, ytr, gtr, Xte, gte, kw):
+def fit_predict(m, Xtr, ytr, gtr, Xte, gte, kw, seg=None):
+    """`seg` = rp.segment_ids of the training frame. Models whose fit takes
+    `segments` (RawWindowLSTM, CQLAgent) refuse to fit without it, so no driver
+    can silently fall back to histories or successors that cross a gap."""
     kw = dict(kw)
-    if "groups" in inspect.signature(m.fit).parameters:
+    params = inspect.signature(m.fit).parameters
+    if "groups" in params:
         kw.setdefault("groups", gtr)
+    if "segments" in params:
+        if seg is None:
+            raise ValueError(f"{type(m).__name__} needs training segment ids (rp.segment_ids)")
+        kw["segments"] = np.asarray(seg)
     m.fit(Xtr, ytr, **kw)
     if "groups" in inspect.signature(m.predict).parameters:
         return m.predict(Xte, groups=gte), m
@@ -83,8 +91,9 @@ def exp_zoo(ds):
         t0 = time.time()
         evs = []
         for s in SEEDS:
-            _, _, Xtr, gtr, ytr, Xte, gte = rp.split_and_prepare(ds, seed=s)
-            acts, _ = fit_predict(mk(s), Xtr, ytr, gtr, Xte, gte, kwf(s, gtr))
+            tr_df, _, Xtr, gtr, ytr, Xte, gte = rp.split_and_prepare(ds, seed=s)
+            acts, _ = fit_predict(mk(s), Xtr, ytr, gtr, Xte, gte, kwf(s, gtr),
+                                  seg=rp.segment_ids(tr_df))
             evs.append(evaluate_safety(gte, acts))
         a = agg(evs, AGG_KEYS)
         a["model"] = name

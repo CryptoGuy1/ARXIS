@@ -377,6 +377,23 @@ def get_state(row):
                     dtype=np.float32)
 
 
+def segment_ids(df):
+    """Integer id of each row's contiguous segment, row-aligned with to_arrays(df).
+
+    A segment is a maximal run of consecutive window ids (win_id). Windows are
+    built at stride 1, so consecutive rows of one recording have consecutive ids;
+    a gap marks a class boundary, the removed test block plus its two embargo
+    bands, or any other excised range. Sequence models (RawWindowLSTM) and
+    bootstrapped value targets (CQLAgent) must not link rows across a gap:
+    rows on either side of one were not adjacent in time.
+    """
+    ids = np.asarray(df["win_id"], dtype=np.int64)
+    if len(ids) == 0:
+        return np.zeros(0, dtype=np.int64)
+    breaks = np.diff(ids) != 1
+    return np.concatenate([[0], np.cumsum(breaks)]).astype(np.int64)
+
+
 def to_arrays(df):
     X = np.stack([get_state(r) for _, r in df.iterrows()], 0)
     y = df["gas_id"].astype(int).values

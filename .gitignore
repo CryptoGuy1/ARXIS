@@ -86,3 +86,8 @@ build/
 # ── built submission documents: `make docx` builds their content from the Markdown sources
 # from the Markdown sources, and they are attached to the tagged release
 *.docx
+
+# resumable-run checkpoints (run_final.exp_powered)
+retrain/results_v2/.v3_powered_checkpoint.pkl
+retrain/results_v2/.v3_powered_checkpoint.pkl.tmp
+run_records/pipeline_state.json.tmp

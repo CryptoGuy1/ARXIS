@@ -116,6 +116,14 @@ def main():
                     Xc, _ = rp.to_arrays(clean_s)
                 else:
                     Xc = None
+                # ... and the held-out Perfume windows, the other nonhazardous class
+                # (review comment 177: report the final alarm rate over all
+                # nonhazardous windows, not only the rejection rate on clean air)
+                perf_df = te_df[te_df["gas_id"] == rp.GAS_MAP["Perfume"]].reset_index(drop=True)
+                if len(perf_df):
+                    Xp, _ = rp.to_arrays(scale_with(perf_df, sc, p1, p99))
+                else:
+                    Xp = None
 
                 # Carve the calibration band before anything is fitted: a
                 # contiguous per-class tail, held off by the usual embargo.
@@ -148,7 +156,10 @@ def main():
                     break
                 acts_h = np.asarray(m.predict(Xh))
                 c_c = confidence(m, Xc) if Xc is not None else None
-                per_seed.append((c_tr, c_h, acts_h, gh, c_c))
+                a_c = np.asarray(m.predict(Xc)) if Xc is not None else None
+                c_p = confidence(m, Xp) if Xp is not None else None
+                a_p = np.asarray(m.predict(Xp)) if Xp is not None else None
+                per_seed.append((c_tr, c_h, acts_h, gh, c_c, a_c, c_p, a_p))
 
             if not per_seed:
                 print(f"  {held:8s}{name:16s} no usable confidence, skipped", flush=True)
@@ -157,9 +168,29 @@ def main():
             for q in QUANTILES:
                 for pol, act_on_reject in REJECT_POLICIES.items():
                     miss, esc, und, rej_h, rej_c = [], [], [], [], []
-                    for c_tr, c_h, acts_h, gh, c_c in per_seed:
+                    fa_c, fa_p, fa_n = [], [], []
+                    for c_tr, c_h, acts_h, gh, c_c, a_c, c_p, a_p in per_seed:
+                        # tau is the q-th percentile of confidence on the calibration
+                        # band; a window is rejected when its confidence is strictly
+                        # below tau, so ties at tau are kept, and the realized
+                        # calibration rejection rate can fall short of q% when
+                        # confidence takes few distinct values (e.g. KNN).
                         tau = -np.inf if q == 0 else float(np.percentile(c_tr, q))
                         rejected = c_h < tau
+                        # final alarm-grade indications on nonhazardous windows:
+                        # a rejected window takes the fallback action, an accepted
+                        # one keeps the model's own action
+                        finals = []
+                        for c_x, a_x in ((c_c, a_c), (c_p, a_p)):
+                            if c_x is None:
+                                finals.append(None); continue
+                            fin = np.asarray(a_x).copy()
+                            fin[c_x < tau] = act_on_reject
+                            finals.append(fin >= 3)
+                        fa_c.append(float(finals[0].mean()) if finals[0] is not None else np.nan)
+                        fa_p.append(float(finals[1].mean()) if finals[1] is not None else np.nan)
+                        both = [f for f in finals if f is not None]
+                        fa_n.append(float(np.concatenate(both).mean()) if both else np.nan)
                         a = acts_h.copy()
                         a[rejected] = act_on_reject
                         e = evaluate_safety(gh, a)
@@ -174,7 +205,10 @@ def main():
                         reject_rate_clean=float(np.nanmean(rej_c)),
                         miss_rate_mean=float(np.mean(miss)), miss_rate_std=float(np.std(miss)),
                         escalation_mean=float(np.mean(esc)), escalation_std=float(np.std(esc)),
-                        under_escalation_mean=float(np.mean(und))))
+                        under_escalation_mean=float(np.mean(und)),
+                        alarm_rate_clean_final=float(np.nanmean(fa_c)),
+                        alarm_rate_perfume_final=float(np.nanmean(fa_p)),
+                        alarm_rate_nonhazard_final=float(np.nanmean(fa_n))))
             r0 = [r for r in rows if r["held_out"] == held and r["model"] == name
                   and r["reject_quantile"] == 0 and r["reject_policy"] == "monitor"][0]
             r30 = [r for r in rows if r["held_out"] == held and r["model"] == name

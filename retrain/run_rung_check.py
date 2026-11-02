@@ -53,7 +53,8 @@ def main():
             ytr = np.array([RW.rule_oracle_action(int(g)) for g in gtr])
             Xh, gh = rp.to_arrays(held_s)
             m, kw = make(name, s, gtr)
-            acts = np.asarray(fit_pred(m, Xtr, ytr, gtr, Xh, gh, kw)).astype(int)
+            acts = np.asarray(fit_pred(m, Xtr, ytr, gtr, Xh, gh, kw,
+                                       seg=rp.segment_ids(tr3s))).astype(int)
             n = len(acts)
             rec = dict(model=name, seed=s, n_hazard=n)
             for k in BOUNDARIES:

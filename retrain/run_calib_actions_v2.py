@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
-from retrain.comparators import SupervisedDQN, SupervisedMLP, CostSensitiveGBM
+from retrain.comparators import SupervisedDQN, SupervisedMLP, HazardWeightedGBM
 from retrain.comparators import cost_weighted_sample_weight
 from retrain.zoo import SVMClassifier, RandomForest
 from retrain.new_baselines import KNN, ThresholdRule
@@ -221,7 +221,7 @@ def exp_action_matrix(ds):
         "A_cost_weighted": lambda s, g: (SupervisedDQN(seed=s),
                                          dict(sample_weight=cost_weighted_sample_weight(g, 8, 1), epochs=EPOCHS)),
         "D_mlp": lambda s, g: (SupervisedMLP(seed=s), {}),
-        "E_gbm": lambda s, g: (CostSensitiveGBM(seed=s), {}),
+        "E_gbm": lambda s, g: (HazardWeightedGBM(seed=s), {}),
         "RF": lambda s, g: (RandomForest(seed=s), {}),
         "SVM": lambda s, g: (SVMClassifier(seed=s), {}),
         "KNN": lambda s, g: (KNN(seed=s), {}),

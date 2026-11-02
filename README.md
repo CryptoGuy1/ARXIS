@@ -224,3 +224,40 @@ Code under the MIT License, in `LICENSE` at the repository root. The corpus is C
 ## Reviewed JLPPI snapshot dated 20 October 2026
 
 This release preserves the latest gas-keyed GBM analyses and corrects method descriptions, action-2 semantics and the closed-set scope. The 30-run driver varies epochs only for the two neural policies and supporting ordinal variant; it does not run equal-size model-family search grids. The historical `v18.1-final` tag is unchanged. The reviewed Word/PDF copies accompany the bundle as submission files. Complete the Fides postal-address placeholder before submission. An archival DOI is pending; no DOI has been assigned in this repository. The complete `make all` workflow includes per-seed perturbation, escalation-rung and hazard-GBM analyses before figures, manifest generation and checks. GNU Make and the dependencies in requirements.lock are required; document builds also require Pandoc.
+
+## Code corrections and full rerun, November 2026 (in progress)
+
+The co-author review of 28 to 29 October 2026 found three defects in the code
+behind the v18.1 results. They are corrected on branch `jlppi` after the tag
+`v18.1-jlppi-reviewed-2026-10-20`, and every result file is being regenerated
+in one environment. Until that rerun is committed, the manuscript at the tag
+still quotes the v18.1 numbers, which are kept for provenance in
+`retrain/results_v2_prior_v18.1/`.
+
+| Defect | Correction |
+| --- | --- |
+| Gradient boosting was weighted 2.5 to 1 toward clean air (NoGas 3.0, Smoke and Mixture 1.2) while described as cost-sensitive | `HazardWeightedGBM` (NoGas 1.0, Perfume 1.0, Smoke 2.5, Mixture 2.5) is the primary comparator everywhere; the old configuration survives only as `CleanAirWeightedGBM` in the weighting probe |
+| Conservative Q-learning bootstrapped across class boundaries and across the removed test block | `rp.segment_ids` marks every gap in the recording; each segment's last row is terminal |
+| The recurrent model's training histories spliced the leading and trailing training segments of a class | Histories are built within segments; the fit helpers refuse to fit either model without segment ids |
+
+Added for the same review: retained-class alarm counts for every
+class-exclusion fit (`v3_loco_specificity.csv`), final nonhazardous alarm rates
+under each rejection policy (`v3_reject_option.csv`), the share of faulted
+windows above the anomaly component's own threshold (`v3_raw_faults.csv`),
+per-run safety counts for the 30-run comparison (`v3_powered_perrun.csv`), and
+the cost-weighted policy at the validation-selected 6:1 beside 8:1
+(`retrain/run_ratio_check.py`, `v3_ratio_check.csv`). `test_rerun_fixes.py`
+covers the corrections.
+
+To run everything in one environment, with or without GNU Make:
+
+```bash
+pip install -r requirements.txt
+python run_pipeline.py            # resumable; python run_pipeline.py --status shows progress
+```
+
+`run_pipeline.py` runs the `make all` targets in dependency order up to the
+manifest and the unit tests, logs each to `run_records/logs/`, and refuses to
+continue a run in a different Python or library environment from the one it
+started in. It stops before `make check`, which will fail until the manuscript
+is revised from the new result files.

@@ -1,0 +1,8 @@
+{
+ "n_windows": 1264,
+ "ms_accuracy_only": 0.2903656550000733,
+ "ms_full_metric_set": 0.4553856799998357,
+ "ratio": 1.5683179885710683,
+ "repeats": 200,
+ "seed": 42
+}

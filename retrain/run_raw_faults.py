@@ -112,9 +112,14 @@ def main():
             te_ids = te["win_id"].astype(int).values
             ch_max = wins[tr_ids].reshape(-1, 7).max(axis=0)
             ch_sd = wins[tr_ids].reshape(-1, 7).std(axis=0)
+            # The anomaly component's own operating threshold, as Section S21
+            # defines it: the 95th percentile of raw reconstruction error on this
+            # partition's NoGas training windows (review comments 180 and S30:
+            # judge faulted scores against the threshold, not against a mean).
+            tau = float(np.percentile(rp.score_anomaly(ae, ae_sc, wins[nom_ids]), 95))
             fitted.append(dict(seed=s, model=m, te_ids=te_ids, gte=te["gas_id"].values,
                                ae=ae, ae_sc=ae_sc, feat_sc=feat_sc, p1=p1, p99=p99,
-                               ch_max=ch_max, ch_sd=ch_sd))
+                               ch_max=ch_max, ch_sd=ch_sd, tau=tau))
 
         for kind, level in FAULTS:
             evs = []
@@ -131,9 +136,18 @@ def main():
                         else f["model"].predict(X))
                 e = evaluate_safety(gte, acts)
                 e["anomaly_mean"] = float(anom_n.mean())
+                # share of faulted windows the one-sided detector would flag
+                above = np.asarray(anom) > f["tau"]
+                g_arr = np.asarray(gte)
+                haz = np.isin(g_arr, (rp.GAS_MAP["Smoke"], rp.GAS_MAP["Mixture"]))
+                e["anom_above_tau"] = float(above.mean())
+                e["anom_above_tau_hazard"] = float(above[haz].mean()) if haz.any() else np.nan
+                e["anom_above_tau_nogas"] = (float(above[g_arr == rp.GAS_MAP["NoGas"]].mean())
+                                             if (g_arr == rp.GAS_MAP["NoGas"]).any() else np.nan)
                 evs.append(e)
             keys = ["decision_acc", "miss_rate", "escalation", "under_escalation",
-                    "fa_per_clean", "anomaly_mean"]
+                    "fa_per_clean", "anomaly_mean", "anom_above_tau",
+                    "anom_above_tau_hazard", "anom_above_tau_nogas"]
             row = dict(model=name, fault=kind, level=level)
             for k in keys:
                 v = np.array([e[k] for e in evs], float)

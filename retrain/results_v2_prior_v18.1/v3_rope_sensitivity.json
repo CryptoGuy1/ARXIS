@@ -1,0 +1,462 @@
+{
+ "Ordinal": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.9999999999997586,
+    "p_practically_equivalent": 1.66644475996236e-13,
+    "p_other_better": 7.466384686292419e-14,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 1.0,
+    "p_equivalent": 0.0,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.9999999999995596,
+    "p_practically_equivalent": 3.9823699893304365e-13,
+    "p_other_better": 4.2134972605130815e-14,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 1.0,
+    "p_equivalent": 0.0,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.9999999999984871,
+    "p_practically_equivalent": 1.4991341501513489e-12,
+    "p_other_better": 1.3796926983157029e-14,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 1.0,
+    "p_equivalent": 0.0,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  }
+ },
+ "B_unweighted": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.06448108875778169,
+    "p_practically_equivalent": 0.8345362446024674,
+    "p_other_better": 0.10098266663975089,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 0.99995,
+    "p_other_better": 5e-05,
+    "most_probable": "equiv"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.002771029705566641,
+    "p_practically_equivalent": 0.9920240173562589,
+    "p_other_better": 0.005204952938174414,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 1.0,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 1.1535268140683286e-06,
+    "p_practically_equivalent": 0.999996500717099,
+    "p_other_better": 2.3457560869589927e-06,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 1.0,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "D_mlp": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.14718245730653123,
+    "p_practically_equivalent": 0.3885296293649053,
+    "p_other_better": 0.46428791332856345,
+    "most_probable": "other"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 0.6434,
+    "p_other_better": 0.3566,
+    "most_probable": "equiv"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.05516701696784698,
+    "p_practically_equivalent": 0.6906250866084268,
+    "p_other_better": 0.25420789642372615,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 0.9651,
+    "p_other_better": 0.0349,
+    "most_probable": "equiv"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.004440181098165019,
+    "p_practically_equivalent": 0.9566272065806452,
+    "p_other_better": 0.038932612321189844,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 0.99995,
+    "p_other_better": 5e-05,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "E_gbm": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.479845123464388,
+    "p_practically_equivalent": 0.31737073616651934,
+    "p_other_better": 0.2027841403690927,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.4411,
+    "p_equivalent": 0.55245,
+    "p_other_better": 0.00645,
+    "most_probable": "equiv"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.31095270547481624,
+    "p_practically_equivalent": 0.5856853689347216,
+    "p_other_better": 0.10336192559046217,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0664,
+    "p_equivalent": 0.93355,
+    "p_other_better": 5e-05,
+    "most_probable": "equiv"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.08703189620076723,
+    "p_practically_equivalent": 0.894471117443542,
+    "p_other_better": 0.018496986355690713,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 1.0,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "SVM": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.6619710695025147,
+    "p_practically_equivalent": 0.22810847318322625,
+    "p_other_better": 0.10992045731425908,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.8962,
+    "p_equivalent": 0.10365,
+    "p_other_better": 0.00015,
+    "most_probable": "ref"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.5024296433308504,
+    "p_practically_equivalent": 0.44473137402695706,
+    "p_other_better": 0.05283898264219259,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.5142,
+    "p_equivalent": 0.4858,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.20783245494495017,
+    "p_practically_equivalent": 0.7830459516267796,
+    "p_other_better": 0.009121593428270241,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0058,
+    "p_equivalent": 0.9942,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "RF": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.2047462885185296,
+    "p_practically_equivalent": 0.28808053727123906,
+    "p_other_better": 0.5071731742102313,
+    "most_probable": "other"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.01005,
+    "p_equivalent": 0.4444,
+    "p_other_better": 0.54555,
+    "most_probable": "other"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.11131746184344904,
+    "p_practically_equivalent": 0.5394442566570878,
+    "p_other_better": 0.3492382814994631,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0004,
+    "p_equivalent": 0.8839,
+    "p_other_better": 0.1157,
+    "most_probable": "equiv"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.023980357010243036,
+    "p_practically_equivalent": 0.8579960624817187,
+    "p_other_better": 0.11802358050803834,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 1.0,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "LSTM": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.08033244181479904,
+    "p_practically_equivalent": 0.4523398322165276,
+    "p_other_better": 0.46732772596867334,
+    "most_probable": "other"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 0.60635,
+    "p_other_better": 0.39365,
+    "most_probable": "equiv"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.017929079254153657,
+    "p_practically_equivalent": 0.7792538049172572,
+    "p_other_better": 0.20281711582858925,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 0.9927,
+    "p_other_better": 0.0073,
+    "most_probable": "equiv"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.00042170246423101077,
+    "p_practically_equivalent": 0.9871467865634372,
+    "p_other_better": 0.01243151097233177,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 1.0,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "CQL": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.525692282839493,
+    "p_practically_equivalent": 0.4210340117009854,
+    "p_other_better": 0.05327370545952162,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.5684,
+    "p_equivalent": 0.4316,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.23402348664857897,
+    "p_practically_equivalent": 0.7560674019657259,
+    "p_other_better": 0.00990911138569516,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.01835,
+    "p_equivalent": 0.98165,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.013306646139093381,
+    "p_practically_equivalent": 0.9865264912764246,
+    "p_other_better": 0.00016686258448207666,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.0,
+    "p_equivalent": 1.0,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "KNN": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.7367566147203644,
+    "p_practically_equivalent": 0.182920973890349,
+    "p_other_better": 0.08032241138928665,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.9612,
+    "p_equivalent": 0.0385,
+    "p_other_better": 0.0003,
+    "most_probable": "ref"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.5946757039033674,
+    "p_practically_equivalent": 0.367242567719143,
+    "p_other_better": 0.038081728377489535,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.78115,
+    "p_equivalent": 0.2188,
+    "p_other_better": 5e-05,
+    "most_probable": "ref"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.2909467745033347,
+    "p_practically_equivalent": 0.7024140624139669,
+    "p_other_better": 0.006639163082698413,
+    "most_probable": "equiv"
+   },
+   "bootstrap": {
+    "p_ref_better": 0.02975,
+    "p_equivalent": 0.97025,
+    "p_other_better": 0.0,
+    "most_probable": "equiv"
+   }
+  }
+ },
+ "ThresholdRule": {
+  "0.005": {
+   "bayes": {
+    "p_ref_better": 0.98671807726658,
+    "p_practically_equivalent": 0.010689286954477129,
+    "p_other_better": 0.002592635778942873,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 1.0,
+    "p_equivalent": 0.0,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  },
+  "0.010": {
+   "bayes": {
+    "p_ref_better": 0.9721539641003072,
+    "p_practically_equivalent": 0.026766649703467094,
+    "p_other_better": 0.001079386196225748,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 1.0,
+    "p_equivalent": 0.0,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  },
+  "0.020": {
+   "bayes": {
+    "p_ref_better": 0.8992193862800625,
+    "p_practically_equivalent": 0.10060769780788881,
+    "p_other_better": 0.00017291591204872855,
+    "most_probable": "ref"
+   },
+   "bootstrap": {
+    "p_ref_better": 1.0,
+    "p_equivalent": 0.0,
+    "p_other_better": 0.0,
+    "most_probable": "ref"
+   }
+  }
+ },
+ "_meta": {
+  "rope_widths": [
+   0.005,
+   0.01,
+   0.02
+  ],
+  "rho": 0.20506164828033743,
+  "n_runs": 30,
+  "bootstrap_replicates": 20000,
+  "n_flipping": 7,
+  "flipping": [
+   "D_mlp",
+   "E_gbm",
+   "SVM",
+   "RF",
+   "LSTM",
+   "CQL",
+   "KNN"
+  ]
+ }
+}

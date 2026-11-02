@@ -1,6 +1,11 @@
 """Does the cost-sensitive GBM weight the thing it says it weights, and does the
 ordinal objective's zero-miss result mean anything?
 
+Provenance note (November 2026). This probe found that the configuration
+released up to v18.1 weighted clean air, not hazards. That configuration is now
+`CleanAirWeightedGBM` and is used only here; the primary comparator everywhere
+else is `HazardWeightedGBM` (retrain/comparators.py).
+
 Two review findings are answered here with measurements rather than argument.
 
 The first. `CostSensitiveGBM` in retrain/comparators.py applies
@@ -49,7 +54,8 @@ torch.set_num_threads(2)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
-from retrain.run_all_v2 import registry, SEEDS, OUT, CACHE
+from retrain.run_all_v2 import SEEDS, OUT, CACHE
+from retrain.comparators import CleanAirWeightedGBM
 from retrain.run_raw_faults import apply_fault, features_from
 from retrain.safety_metrics import evaluate_safety
 
@@ -93,10 +99,11 @@ def main():
     am, asc = rp.build_anomaly_model()
     ds = rp.build_dataset(am, asc, cache_path=CACHE)
     wins = rp.raw_windows()
-    reg = registry(None)
-
     arms = {
-        "E_gbm_as_shipped": reg["E_gbm"],
+        # The configuration released up to v18.1. From the November 2026 rerun the
+        # primary E_gbm in registry() is the hazard-weighted model, so the shipped
+        # arm is built explicitly here to keep this probe a provenance comparison.
+        "E_gbm_as_shipped": (lambda s: CleanAirWeightedGBM(seed=s), lambda s, g: {}),
         "E_gbm_hazard_weighted": (lambda s: HazardWeightedGBM(s), lambda s, g: {}),
     }
 

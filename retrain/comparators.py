@@ -2,8 +2,16 @@
 
 1. SupervisedMLP        - plain classifier, same hidden capacity as the DQN
                           features block, trained with cross-entropy.
-2. CostSensitiveGBM     - gradient-boosted trees with class_weight that
-                          up-weights dangerous-gas misclassification.
+2. HazardWeightedGBM    - gradient-boosted trees whose hazardous training rows
+                          (Smoke, Mixture) carry 2.5 times the weight of the
+                          nonhazardous rows (NoGas, Perfume). The primary
+                          gradient-boosting comparator from the November 2026
+                          rerun onwards.
+   CleanAirWeightedGBM  - the configuration released up to v18.1, which weighted
+                          by target action (NoGas 3.0, Perfume 1.0, Smoke and
+                          Mixture 1.2), i.e. 2.5 to 1 toward clean air. It was
+                          described as cost-sensitive but weighted the wrong
+                          direction; it is kept only for provenance.
 3. UnweightedDQN        - identical DuelingDQN architecture BUT trained with a
                           SYMMETRIC reward (+1/-1), isolating whether the
                           fail-safe skew comes from the REWARD, not the net.
@@ -40,26 +48,53 @@ class SupervisedMLP:
         return self.clf.predict_proba(X)
 
 
-# ------------------------- Cost-sensitive GBM -------------------------
-# class_weight keys are ACTION classes (0..4). We up-weight severe/rare-but-critical
-# actions. Danger-miss is action 0 on danger gas; that is the worst case, so we
-# heavily weight action 0 miss via sample_weight on training rows.
-ACTION_WEIGHT = {0: 3.0, 1: 1.0, 2: 1.0, 3: 1.2, 4: 1.2}
+# ----------------------- Gradient-boosting comparators -----------------------
+# Sample weights are keyed on the training target action, which is a deterministic
+# function of the gas class (NoGas -> 0, Perfume -> 1, Smoke -> 3, Mixture -> 4),
+# so an action key and a gas key give identical weights on training rows.
+#
+# HAZARD_ACTION_WEIGHT (primary): hazardous rows 2.5, nonhazardous rows 1.0.
+#     NoGas 1.0, Perfume 1.0, Smoke 2.5, Mixture 2.5.
+# CLEAN_AIR_ACTION_WEIGHT (released up to v18.1, provenance only):
+#     NoGas 3.0, Perfume 1.0, Smoke 1.2, Mixture 1.2, i.e. 2.5 to 1 toward clean air.
+HAZARD_ACTION_WEIGHT = {0: 1.0, 1: 1.0, 2: 1.0, 3: 2.5, 4: 2.5}
+CLEAN_AIR_ACTION_WEIGHT = {0: 3.0, 1: 1.0, 2: 1.0, 3: 1.2, 4: 1.2}
+ACTION_WEIGHT = CLEAN_AIR_ACTION_WEIGHT   # historical name, kept for the provenance probes
 
 
-class CostSensitiveGBM:
+class _WeightedGBM:
+    WEIGHTS = None
+
     def __init__(self, seed=42):
         self.clf = GradientBoostingClassifier(random_state=seed, n_estimators=300)
 
+    def sample_weight(self, y_action):
+        return np.array([self.WEIGHTS.get(int(a), 1.0) for a in y_action], dtype=float)
+
     def fit(self, X, y_action):
-        sw = np.array([ACTION_WEIGHT.get(int(a), 1.0) for a in y_action])
-        self.clf.fit(X, y_action, sample_weight=sw)
+        self.clf.fit(X, y_action, sample_weight=self.sample_weight(y_action))
 
     def predict(self, X):
         return self.clf.predict(X)
 
     def predict_proba(self, X):
         return self.clf.predict_proba(X)
+
+
+class HazardWeightedGBM(_WeightedGBM):
+    """Primary gradient-boosting comparator: hazardous rows weighted 2.5 to 1."""
+    WEIGHTS = HAZARD_ACTION_WEIGHT
+
+
+class CleanAirWeightedGBM(_WeightedGBM):
+    """Configuration released up to v18.1 (2.5 to 1 toward clean air); provenance only."""
+    WEIGHTS = CLEAN_AIR_ACTION_WEIGHT
+
+
+# Deprecated name. The deprecated drivers run_exp2_real, run_exp3_loco and
+# run_expzoo still import it and keep their historical behaviour; no active
+# driver uses it.
+CostSensitiveGBM = CleanAirWeightedGBM
 
 
 # --------------------- Supervised DuelingDQN (CE) ---------------------

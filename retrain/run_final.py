@@ -11,7 +11,7 @@ E12  Ordinal cost-matrix objective: under- and over-escalation priced
 E13  Cost ratio re-selected on a validation split rather than on test dispersion.
 E14  Reliability curves for the calibration estimators.
 """
-import os, sys, json, time, inspect, warnings
+import os, sys, json, time, inspect, warnings, pickle
 warnings.filterwarnings("ignore")
 import numpy as np, pandas as pd, torch, torch.nn.functional as F
 from scipy.stats import t as student_t
@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
-from retrain.comparators import SupervisedDQN, SupervisedMLP, CostSensitiveGBM
+from retrain.comparators import SupervisedDQN, SupervisedMLP, HazardWeightedGBM
 from retrain.comparators import cost_weighted_sample_weight
 from retrain.zoo import SVMClassifier, RandomForest, RawWindowLSTM, CQLAgent
 from retrain.new_baselines import KNN, ThresholdRule
@@ -101,6 +101,24 @@ def expected_cost(gas, action):
 # =====================================================================
 # E10  powered comparison
 # =====================================================================
+def _code_fingerprint():
+    """Hash of the code a checkpointed run depends on, so a checkpoint written by
+    older code is never resumed into newer code."""
+    import hashlib
+    h = hashlib.sha256()
+    here = os.path.dirname(os.path.abspath(__file__))
+    for f in ("run_final.py", "comparators.py", "zoo.py", "new_baselines.py",
+              "raw_pipeline.py", "agent_rl.py", "safety_metrics.py", "rewards.py"):
+        with open(os.path.join(here, f), "rb") as fh:
+            h.update(fh.read())
+    # and the environment: a checkpoint from another interpreter or library build
+    # must not be mixed into this one's results
+    import sklearn, scipy
+    h.update(f"{sys.version}|{np.__version__}|{pd.__version__}|{scipy.__version__}|"
+             f"{sklearn.__version__}|{torch.__version__}".encode())
+    return h.hexdigest()[:16]
+
+
 def hp_draw(rng, name):
     """Draw epochs in [60, 100] for the two neural policies and ordinal variant.
     Other model settings stay fixed; this is not a model-family grid search.
@@ -116,7 +134,7 @@ def make(name, seed, gtr, C=8):
     if name == "B_unweighted":  return SupervisedDQN(seed=seed), dict(sample_weight=None)
     if name == "Ordinal":       return OrdinalCostNet(seed=seed), dict(g_class=gtr)
     if name == "D_mlp":         return SupervisedMLP(seed=seed), {}
-    if name == "E_gbm":         return CostSensitiveGBM(seed=seed), {}
+    if name == "E_gbm":         return HazardWeightedGBM(seed=seed), {}
     if name == "SVM":           return SVMClassifier(seed=seed), {}
     if name == "RF":            return RandomForest(seed=seed), {}
     if name == "LSTM":          return RawWindowLSTM(seed=seed, K=10), dict(epochs=40)
@@ -130,10 +148,17 @@ POWERED = ["A_cost_weighted", "Ordinal", "B_unweighted", "D_mlp", "E_gbm",
            "SVM", "RF", "LSTM", "CQL", "KNN", "ThresholdRule"]
 
 
-def fit_pred(m, Xtr, ytr, gtr, Xte, gte, kw):
+def fit_pred(m, Xtr, ytr, gtr, Xte, gte, kw, seg=None):
+    """`seg` = rp.segment_ids of the training frame; required by models whose fit
+    takes `segments` (RawWindowLSTM, CQLAgent). See run_all_v2.fit_predict."""
     kw = dict(kw)
-    if "groups" in inspect.signature(m.fit).parameters:
+    params = inspect.signature(m.fit).parameters
+    if "groups" in params:
         kw.setdefault("groups", gtr)
+    if "segments" in params:
+        if seg is None:
+            raise ValueError(f"{type(m).__name__} needs training segment ids (rp.segment_ids)")
+        kw["segments"] = np.asarray(seg)
     m.fit(Xtr, ytr, **kw)
     if "groups" in inspect.signature(m.predict).parameters:
         return m.predict(Xte, groups=gte)
@@ -157,18 +182,46 @@ def bayes_correlated_t(diff, rho, rope=0.01):
 def exp_powered(ds):
     log(f"\n=== E10  powered comparison, {N_RUNS} randomized runs ===")
     per_run = {n: [] for n in POWERED}
+    # Resumable: the 30-run comparison takes many hours on a CPU, so each finished
+    # run is checkpointed and a restart continues after the last one. A run's
+    # result depends only on its own seed (partition, initialization and
+    # hyperparameter draw are all drawn from it), so resuming changes nothing.
+    checkpoint = os.path.join(OUT, ".v3_powered_checkpoint.pkl")
+    completed = []
+    if os.path.isfile(checkpoint):
+        try:
+            with open(checkpoint, "rb") as f:
+                saved = pickle.load(f)
+            if saved.get("seeds") == RUN_SEEDS and saved.get("models") == POWERED \
+                    and saved.get("code") == _code_fingerprint():
+                per_run = saved["per_run"]
+                completed = list(saved["completed"])
+                log(f"  resuming after {len(completed)}/{N_RUNS} completed runs")
+            else:
+                log("  checkpoint is from different code or settings; starting from run 1")
+        except (OSError, EOFError, pickle.PickleError, AttributeError, KeyError, TypeError):
+            log("  checkpoint unreadable; starting from run 1")
     for r, seed in enumerate(RUN_SEEDS):
+        if seed in completed:
+            continue
         rng = np.random.default_rng(seed)
-        _, _, Xtr, gtr, ytr, Xte, gte = rp.split_and_prepare(ds, seed=seed)
+        tr_df, _, Xtr, gtr, ytr, Xte, gte = rp.split_and_prepare(ds, seed=seed)
+        seg = rp.segment_ids(tr_df)
         for name in POWERED:
             m, kw = make(name, seed, gtr)
             kw.update(hp_draw(rng, name))
-            acts = fit_pred(m, Xtr, ytr, gtr, Xte, gte, kw)
+            acts = fit_pred(m, Xtr, ytr, gtr, Xte, gte, kw, seg=seg)
             ev = evaluate_safety(gte, acts)
             ev["expected_cost"] = expected_cost(gte, acts)
             per_run[name].append(ev)
-        if (r + 1) % 5 == 0:
-            log(f"  run {r+1}/{N_RUNS} done")
+        completed.append(seed)
+        tmp = checkpoint + ".tmp"
+        with open(tmp, "wb") as f:
+            pickle.dump(dict(seeds=RUN_SEEDS, models=POWERED, completed=completed,
+                             per_run=per_run, code=_code_fingerprint()), f,
+                        protocol=pickle.HIGHEST_PROTOCOL)
+        os.replace(tmp, checkpoint)
+        log(f"  run {r+1}/{N_RUNS} done")
     rows = []
     for name in POWERED:
         a = agg(per_run[name], AGG_KEYS + ["expected_cost"])
@@ -176,6 +229,12 @@ def exp_powered(ds):
         rows.append(a)
     df = pd.DataFrame(rows)
     df.to_csv(os.path.join(OUT, "v3_powered.csv"), index=False)
+    # per-run safety counts, so run-level spread of every metric can be reported
+    # (review comment 110), not only of accuracy
+    pd.DataFrame([dict(model=n, seed=sd, **{k: v for k, v in e.items()
+                                            if isinstance(v, (int, float, np.integer, np.floating))})
+                  for n in POWERED for sd, e in zip(RUN_SEEDS, per_run[n])]
+                 ).to_csv(os.path.join(OUT, "v3_powered_perrun.csv"), index=False)
 
     # Bayesian equivalence, reference = cost-weighted policy.
     # Plan item A5: rho comes from the partition this run actually produced, not
@@ -227,25 +286,44 @@ def exp_loco_all(ds):
     # back to a count is not the same thing, and where the seeds disagree it is
     # optimistic. Per-seed counts are written alongside the aggregate so the bound
     # can be recomputed without rerunning anything.
-    rows, per_seed = [], []
+    rows, per_seed, spec = [], [], []
     for held in ["Smoke", "Mixture"]:
         hid = rp.GAS_MAP[held]
         for name in LOCO_ALL:
             evs, t0 = [], time.time()
             for s in SEEDS5:
-                tr_df, _ = rp.block_wise_holdout(ds, seed=s)
+                tr_df, te_df = rp.block_wise_holdout(ds, seed=s)
                 tr3 = tr_df[tr_df["gas_id"] != hid].reset_index(drop=True)
                 held_raw = ds[ds["gas_id"] == hid].reset_index(drop=True)
-                tr3, held_raw = rp.partition_anomaly(tr3, held_raw, seed=s)   # fix 4.2
+                # the retained classes' own held-out windows, for specificity
+                # (review comment 120): the same fit, scored on NoGas, Perfume and
+                # the other hazardous class
+                te3 = te_df[te_df["gas_id"] != hid].reset_index(drop=True)
+                tr3, held_raw, te3 = rp.partition_anomaly(tr3, held_raw, te3, seed=s)   # fix 4.2
                 sc = StandardScaler().fit(tr3[rp.ALL_FEAT_COLS])
                 p1 = float(np.percentile(tr3["anomaly"], 1)); p99 = float(np.percentile(tr3["anomaly"], 99))
                 tr3s = scale_with(tr3, sc, p1, p99)
                 held_s = scale_with(held_raw, sc, p1, p99)
+                te3s = scale_with(te3, sc, p1, p99)
                 Xtr, gtr = rp.to_arrays(tr3s)
                 ytr = np.array([RW.rule_oracle_action(int(g)) for g in gtr])
                 Xh, gh = rp.to_arrays(held_s)
+                Xr, gr = rp.to_arrays(te3s)
                 m, kw = make(name, s, gtr)
-                acts = fit_pred(m, Xtr, ytr, gtr, Xh, gh, kw)
+                acts = fit_pred(m, Xtr, ytr, gtr, Xh, gh, kw, seg=rp.segment_ids(tr3s))
+                acts_r = np.asarray(m.predict(Xr, groups=gr)
+                                    if "groups" in inspect.signature(m.predict).parameters
+                                    else m.predict(Xr)).astype(int)
+                rec = dict(held_out=held, model=name, seed=s)
+                for cls in ("NoGas", "Perfume", "Smoke", "Mixture"):
+                    if cls == held:
+                        continue
+                    mask = gr == rp.GAS_MAP[cls]
+                    a_c = acts_r[mask]
+                    rec[f"n_{cls}"] = int(mask.sum())
+                    rec[f"alarm_k_{cls}"] = int((a_c >= 3).sum())
+                    rec[f"monitor_k_{cls}"] = int((a_c == 0).sum())
+                spec.append(rec)
                 e = evaluate_safety(gh, acts)
                 evs.append(e)
                 per_seed.append(dict(held_out=held, model=name, seed=s,
@@ -263,6 +341,10 @@ def exp_loco_all(ds):
                 f"±{a['escalation_std']:.4f} [{time.time()-t0:.0f}s]")
     pd.DataFrame(rows).to_csv(os.path.join(OUT, "v3_loco_all.csv"), index=False)
     pd.DataFrame(per_seed).to_csv(os.path.join(OUT, "v3_loco_perseed.csv"), index=False)
+    # alarm-grade (a >= 3) and Monitor (a = 0) counts on the retained classes'
+    # held-out windows, per fit; NoGas and Perfume alarm counts are the false-alarm
+    # side of each class-exclusion fit
+    pd.DataFrame(spec).to_csv(os.path.join(OUT, "v3_loco_specificity.csv"), index=False)
 
 
 # =====================================================================

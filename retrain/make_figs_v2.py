@@ -73,6 +73,9 @@ def note(fig, text, y=-0.06, fs=9.7, color=None, style="italic"):
     column. Wrapping to the figure width keeps the rendered extent equal to
     the authored extent.
     """
+    # Review (Nov 2026): explanatory text belongs in the caption, not in the
+    # figure, so footnotes are no longer drawn.
+    return None
     width_in = fig.get_size_inches()[0]
     ncols = max(40, int(width_in * 72 / (fs * 0.52)))
     fig.text(0.005, y, textwrap.fill(text, ncols), ha="left", va="top",
@@ -123,7 +126,7 @@ def fig_loco():
     ax.set_ylim(floor * 0.7, 12.0)
     ax.set_yticks([1e-4, 1e-3, 1e-2, 1e-1])
     ax.set_yticklabels(["0.01%", "0.1%", "1%", "10%"])
-    ax.set_ylabel("Missed-hazard\nrate (log)", labelpad=2.0, linespacing=1.25)
+    ax.set_ylabel("Passive-miss\nrate (log)", labelpad=2.0, linespacing=1.25)
     ax.set_title("(a)", loc="left")
     ax.grid(axis="y", zorder=0)
     # The legend sits above the panels rather than inside one: every corner of
@@ -153,14 +156,14 @@ def fig_loco():
     ax.set_xticks(np.arange(len(models)))
     ax.set_xticklabels([("Ordinal" if m == "Ordinal" else PRETTY[m]) for m in models], rotation=24, ha="right",
                        rotation_mode="anchor")
-    ax.set_ylabel("Escalation adequacy\n(a ≥ 3)", labelpad=2.0, linespacing=1.25)
+    ax.set_ylabel("Alarm-grade notification\nrate (a ≥ 3)", labelpad=2.0, linespacing=1.25)
     ax.set_title("(b)", loc="left")
     ax.grid(axis="y", zorder=0)
 
     # The footnote sits inside a reserved strip rather than below the canvas:
     # a note placed outside the figure grows the tight bounding box, and the
     # figure then arrives in the document scaled down by that much.
-    fig.legend(_lh, _ll, title="Held-out class", ncol=3, loc="upper center",
+    fig.legend(_lh, _ll, title="Withheld class", ncol=3, loc="upper center",
                bbox_to_anchor=(0.5, 1.0), fontsize=9.6, title_fontsize=10.2,
                handlelength=1.4, columnspacing=1.4)
     fig.tight_layout(rect=(0, 0.115, 1, 0.945), h_pad=1.2)
@@ -185,25 +188,25 @@ def fig_costsweep():
                     df.decision_acc_mean + df.decision_acc_std,
                     color=BLUE, alpha=0.16, lw=0, zorder=2)
     ax.plot(df.C, df.escalation_mean, "-s", color=GREEN, lw=2, ms=6.5,
-            label="Escalation adequacy", zorder=3)
+            label="Notification rate", zorder=3)
     ax.plot(df.C, df.miss_rate_mean, "-^", color=ORANGE, lw=2, ms=6.5,
-            label="Missed-hazard rate", zorder=3)
+            label="Passive-miss rate", zorder=3)
     best = df.loc[df.decision_acc_mean.idxmax()]
     ax.annotate(f"accuracy peak\nC = {int(best.C)}:1", (best.C, best.decision_acc_mean),
                 textcoords="offset points", xytext=(4, 20), fontsize=10.0, color=INK2,
                 arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.8))
     dep = df[df.C == 8].iloc[0]
-    ax.annotate("deployed\nC = 8:1", (8, dep.decision_acc_mean),
+    ax.annotate("reference\nC = 8:1", (8, dep.decision_acc_mean),
                 textcoords="offset points", xytext=(6, -32), fontsize=10.0, color=INK2,
                 arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.8))
     ax.text(df.C.iloc[-1], df.miss_rate_mean.iloc[-1] + 0.03,
-            "missed-hazard rate is flat at this level for every ratio",
+            "",
             ha="right", fontsize=9.5, color=MUTED, style="italic")
     ax.set_xscale("log"); ax.set_xticks(df.C.tolist())
     ax.set_xticklabels([f"{c}:1" for c in df.C], fontsize=10.7)
     ax.set_ylim(-0.04, 1.12)
     ax.yaxis.set_major_formatter(PercentFormatter(1.0))
-    ax.set_xlabel("Cost ratio  C = c_miss : c_false")
+    ax.set_xlabel("Loss-weight ratio C = w_haz : w_non (Eq. 3)")
     ax.set_ylabel("Rate")
     # panel title removed: the caption carries the statement
     ax.grid(axis="y", zorder=0); ax.legend(loc="center left", fontsize=10.8)
@@ -253,7 +256,7 @@ def fig_perturb():
     # panel this short and used to run into its neighbours.
     metrics = [("decision_acc_mean", "Decision\naccuracy"),
                ("escalation_mean", "Escalation\nadequacy"),
-               ("fa_per_clean_mean", "High-severity\nfalse-alarm rate")]
+               ("fa_per_clean_mean", "Clean-air\nalarm rate")]
     models = [m for m in ["A_cost_weighted", "B_unweighted", "D_mlp", "E_gbm", "RF", "ThresholdRule"]
               if m in set(df.model)]          # 6 series: hues assigned, never cycled
     fig, axes = plt.subplots(3, 3, figsize=(6.90, 6.04), sharex="col")
@@ -439,7 +442,7 @@ def fig_dissociation():
     fig, axes = plt.subplots(1, 2, figsize=(6.90, 3.47))
     for pi, (ax, (cls, ycol, ylab, logy)) in enumerate(zip(
             axes, [("Smoke", "miss_rate_mean", "Miss rate,\nheld-out Smoke", True),
-                   ("Mixture", "escalation_mean", "Escalation adequacy,\nheld-out Mixture", False)])):
+                   ("Mixture", "escalation_mean", "Notification rate,\nwithheld Mixture", False)])):
         sub = l[l.held_out == cls]
         xs, ys, names = [], [], []
         for _, r in sub.iterrows():
@@ -549,11 +552,12 @@ def fig_disposition():
             if u > 0.14:
                 ax.text(xi, e + u / 2, f"{u:.2f}", ha="center", va="center", fontsize=8.8,
                         color="white", rotation=90)
-        ax.set_xticks(x); ax.set_xticklabels([PRETTY[m] for m in models], rotation=28, ha="right")
+        ax.set_xticks(x); ax.set_xticklabels([PRETTY[m] for m in models], rotation=40, ha="right",
+                                             rotation_mode="anchor")
         ax.set_ylim(0, 1.03); ax.yaxis.set_major_formatter(PercentFormatter(1.0))
-        ax.set_title(f"({'ab'[ci]})", loc="left")
+        ax.set_title(f"({'ab'[ci]}) {cls} withheld", loc="left")
         ax.grid(axis="y", zorder=0)
-    axes[0].set_ylabel("Share of hazardous windows", labelpad=1.5)
+    axes[0].set_ylabel("Share of\nwithheld windows", labelpad=1.5, linespacing=1.25)
     h, lb = axes[0].get_legend_handles_labels()
     fig.legend(h[::-1], lb[::-1], ncol=3, loc="upper center", bbox_to_anchor=(0.5, 0.955), fontsize=11.3)
     # figure title removed: journals carry the statement in the caption
@@ -579,7 +583,7 @@ def fig_alarmburden():
     ax.set_yticks([0.05, 1, 10, 100, 1000])
     ax.set_yticklabels(["0 (floor)", "1", "10", "100", "1,000"])
     ax.set_xlabel("Sensor channels removed (k of 7)")
-    ax.set_ylabel("High-severity alarms per\n1,000 clean windows (log)",
+    ax.set_ylabel("Clean-air alarms per\n1,000 clean-air windows (log)",
                   fontsize=10.2, labelpad=2.0, linespacing=1.25)
     # panel title removed: the caption carries the statement
     ax.grid(axis="y", zorder=0); ax.legend(fontsize=10.8, loc="lower right", ncol=2)
@@ -868,8 +872,9 @@ def fig_anominfluence():
     ax.errorbar(x, fr, yerr=sd, fmt="none", ecolor=INK2, elinewidth=1.0, capsize=3, zorder=4)
     for bi, v, e in zip(b, fr, sd):
         ax.text(bi.get_x() + bi.get_width() / 2, v + e + 1.4, f"{v:.1f}%",
-                ha="center", va="bottom", fontsize=9.5, color=INK2)
-    ax.set_xticks(x); ax.set_xticklabels([PRETTY[m] for m in order], rotation=28, ha="right")
+                ha="center", va="bottom", fontsize=8.4, color=INK2)
+    ax.set_xticks(x); ax.set_xticklabels([PRETTY[m] for m in order], rotation=40, ha="right",
+                                         rotation_mode="anchor")
     ax.set_ylim(0, max(fr) * 1.30)
     ax.yaxis.set_major_formatter(lambda v, pos: f"{v:.0f}%")
     ax.set_ylabel("Test windows whose\naction changes", fontsize=10.2,
@@ -882,21 +887,23 @@ def fig_anominfluence():
     others = [m for m in order if m != "E_gbm"]
     for i, m in enumerate(others):
         sub = d[d.model == m].sort_values("level")
-        ax.plot(sub.level, sub.miss_rate_mean, "-o", ms=4, lw=1.6, color="#b8c4ce", zorder=2,
-                label="six other models" if i == 0 else None)
+        ax.plot(sub.level, 100 * sub.miss_rate_mean, "-o", ms=4, lw=1.6, color="#b8c4ce", zorder=2,
+                label="Six other models" if i == 0 else None)
     sub = d[d.model == "E_gbm"].sort_values("level")
-    ax.plot(sub.level, sub.miss_rate_mean, "-o", ms=7, lw=2.4, color=CRIT, zorder=4,
-            label="Gradient boosting")
-    ax.annotate(f"{sub.miss_rate_mean.iloc[0]:.4f}", (0.0, sub.miss_rate_mean.iloc[0]),
+    gy = 100 * sub.miss_rate_mean.values
+    ax.plot(sub.level, gy, "-o", ms=7, lw=2.4, color=CRIT, zorder=4,
+            label="Gradient boosting\n(clean-air-weighted)")
+    ax.annotate(f"{gy[0]:.2f}%", (0.0, gy[0]),
                 textcoords="offset points", xytext=(10, -4), fontsize=10.0, color=CRIT)
-    ax.annotate(f"{sub.miss_rate_mean.iloc[-1]:.4f}", (1.0, sub.miss_rate_mean.iloc[-1]),
+    ax.annotate(f"{gy[-1]:.2f}%", (1.0, gy[-1]),
                 textcoords="offset points", xytext=(-6, 12), fontsize=10.0, color=CRIT, ha="right")
     ax.set_xlabel("Anomaly score forced to this value")
-    ax.set_ylabel("Missed-hazard rate")
-    ax.set_ylim(-0.02, 0.40)
-    ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+    ax.set_ylabel("Passive-miss rate (%)")
+    ax.set_ylim(-2, 1.15 * max(gy.max(), 1.0))
+    ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
+    ax.yaxis.set_major_formatter(lambda v, pos: f"{v:.0f}%")
     ax.set_title("(b)", loc="left")
-    ax.grid(zorder=0); ax.legend(fontsize=10.6, loc="center right")
+    ax.grid(zorder=0); ax.legend(fontsize=10.0, loc="center right")
     fig.tight_layout()
     fig.savefig(os.path.join(FIG, "fig_anominfluence.png"), dpi=600); plt.close(fig)
     print("wrote fig_anominfluence.png")
@@ -1168,8 +1175,8 @@ def fig_decisionlogic():
         # not fit between the chain of boxes and the panel edge.
         rungs = [(4, "Recommend ESD assessment"), (3, "Raise alarm"),
                  (2, "Request verification"), (1, "Increase sampling"), (0, "Monitor")]
-        BR_TITLES = ["Escalation adequacy", "High-severity false alarm",
-                     "Under-escalation", "Missed hazard"]
+        BR_TITLES = ["Notification rate", "Clean-air alarm rate",
+                     "Sub-alarm response rate", "Passive-miss rate"]
         BR_SUBS = ["hazardous windows at $a \\geq 3$", "clean windows at $a \\geq 3$",
                    "hazardous windows at $a \\in \\{1,2\\}$",
                    "hazardous windows at $a = 0$"]
@@ -1222,16 +1229,16 @@ def fig_decisionlogic():
         # Two metrics read these same two rungs: one on hazardous windows and one
         # on clean windows. They are stacked in the bracket rather than written
         # over it, which is what used to collide.
-        ax.text(bx + BR_PAD, _esc_c + 3.0, "Escalation adequacy", fontsize=BFS_T,
+        ax.text(bx + BR_PAD, _esc_c + 3.0, "Notification rate", fontsize=BFS_T,
                 color=S.INK, va="center", zorder=6, fontweight="bold")
         ax.text(bx + BR_PAD, _esc_c + 1.2, "hazardous windows at $a \\geq 3$",
                 fontsize=BFS_S, color=S.MUTED, va="center", zorder=6)
-        ax.text(bx + BR_PAD, _esc_c - 1.2, "High-severity false alarm", fontsize=BFS_T,
+        ax.text(bx + BR_PAD, _esc_c - 1.2, "Clean-air alarm rate", fontsize=BFS_T,
                 color=S.BLUE_E, va="center", zorder=6, fontweight="bold")
         ax.text(bx + BR_PAD, _esc_c - 3.0, "clean windows at $a \\geq 3$",
                 fontsize=BFS_S, color=S.BLUE_E, va="center", zorder=6)
         bracket(ys[1], ys[2] + rh, S.SAND_E, "Under-escalation", "hazardous windows at $a \\in \\{1,2\\}$")
-        bracket(ys[0], ys[0] + rh, S.ROSE_E, "Missed hazard", "hazardous windows at $a = 0$")
+        bracket(ys[0], ys[0] + rh, S.ROSE_E, "Passive miss", "hazardous windows at $a = 0$")
 
         fig.savefig(os.path.join(FIG, "fig_decisionlogic.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_decisionlogic.pdf"))
         plt.close(fig)
@@ -1277,8 +1284,8 @@ def fig_metricdisagreement():
         rows.append((name, [best(s, "decision_acc_mean", True), best(s, "miss_rate_mean", False),
                             best(s, "escalation_mean", True), best(s, "fa_per_clean_mean", False)]))
 
-    cols = ["Decision\naccuracy", "Missed-hazard\nrate", "Escalation\nadequacy",
-            "High-severity\nfalse alarms"]
+    cols = ["Decision\naccuracy", "Passive-miss\nrate", "Notification\nrate",
+            "Clean-air\nalarms"]
     STATE = {"none":  (SURFACE,   "#e0e0e0", MUTED),
              "flat":  ("#f2f0e6", "#cfc7a8", INK2),
              "agree": ("#e3efe9", "#a8cbbb", INK),

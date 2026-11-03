@@ -227,7 +227,7 @@ def _shrink_runs(table_xml: str, pt: float) -> str:
 
 
 PARA = re.compile(r"<w:p>(?:(?!</w:p>).)*?</w:p>", re.S)
-CAPTION = re.compile(r"^(?:Fig\.|Table)\s(?:\d+|[A-Z]-\d+|S\d+)—")
+CAPTION = re.compile(r"^(?:Fig\.|Table)\s(?:\d+|[A-Z]-\d+|S\d+)(?:—|\.\s)")
 
 
 def _style_captions(xml: str) -> int:
@@ -328,6 +328,9 @@ EQUATIONS_LATEX = {
     "8": r"R_{\mathrm{fa}} = \frac{1}{|Z|}\sum_{t\in Z}\mathbb{1}\left[a_t \ge 3\right],",
     "9": r"B = 1000 \cdot R_{\mathrm{fa}}.",
     "10": r"U(k, N_{\mathrm{opp}}) = \mathrm{BetaInv}\!\left(c;\; k+1,\; N_{\mathrm{opp}}-k\right),",
+    "11": r"x' = x + \varepsilon,\quad \varepsilon \sim \mathcal{N}(0, \sigma_n^2)\quad \text{(noise; all 21 sensor features)}",
+    "12": r"x'_c = x_c\,(1 + s_c d) + s'_c d\quad \text{(drift; the seven current readings)}",
+    "13": r"x' = 0\quad \text{(masking; current reading, change and SD of } k \text{ channels)}",
 }
 EQ_TAB = "⇥"   # marks the centre tab and the right tab in the marked source
 EQ_LINE = re.compile(r"^&nbsp;&nbsp;&nbsp;&nbsp;.*?[ \t]*\.{4,}[ \t]*\(([0-9]+[a-z]?)\)[ \t]*$", re.M)

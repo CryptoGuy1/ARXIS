@@ -95,11 +95,11 @@ def fig_dqn():
     S.group(ax, 1.5, 3.0, 97.0, H - 5.0, label="Decision component", ec=S.MINT_E)
 
     yc = H * 0.555
-    # decision state, drawn as the 22 cells grouped 7/7/7/1
+    # decision state, drawn as the 22 cells in the order of Eq. 1, grouped 1/7/7/7
     x = 4.6
     cw, gap = 0.95, 0.30
-    groups = [("current", 7, S.BLUE_F, S.BLUE_E), ("Δ", 7, S.MINT_F, S.MINT_E),
-              ("SD", 7, "#e4e0c8", "#8a7a1a"), (r"$\tilde{\rho}$", 1, S.ROSE_F, S.ROSE_E)]
+    groups = [(r"$\tilde{\rho}$", 1, S.ROSE_F, S.ROSE_E), ("current", 7, S.BLUE_F, S.BLUE_E),
+              ("Δ", 7, S.MINT_F, S.MINT_E), ("SD", 7, "#e4e0c8", "#8a7a1a")]
     for name, n, fc, ec in groups:
         gx0 = x
         for _ in range(n):
@@ -145,11 +145,11 @@ def fig_dqn():
 
     S.arrow(ax, (rx + 5.4, yc), (rx + 8.6, yc))
     S.box(ax, rx + 8.6, yc - 5.0, 10.2, 10.0,
-          "Action scores\n$Q(\\varphi, a)$", fc=S.SAND_F, ec=S.SAND_E, fs=6.9)
+          "Action scores\n$Q(\\varphi, a)$", fc=S.SAND_F, ec=S.SAND_E, fs=6.2)
 
     # the ladder
-    lx = rx + 19.4
-    S.arrow(ax, (rx + 18.8, yc), (lx - 0.2, yc))
+    lx = rx + 21.2
+    S.arrow(ax, (rx + 18.8, yc), (lx - 0.9, yc))
     labels = ["4  ESD assess", "3  Alarm", "2  Verify", "1  Sample", "0  Monitor"]
     cmap = plt.cm.YlOrRd
     BGAP = 3.6                      # extra room so the boundary label has its own band
@@ -164,7 +164,7 @@ def fig_dqn():
     yb = (ys[1] - 1.25 + ys[2] + 1.25) / 2
     # The rule starts clear of the action-scores box: drawn from its edge it read
     # as part of the box, and the label sat on top of the "3  Alarm" row.
-    ax.plot([lx - 0.2, lx + 9.4], [yb, yb], color=S.INK2, lw=0.9,
+    ax.plot([lx + 0.4, lx + 9.4], [yb, yb], color=S.INK2, lw=0.9,
             ls=(0, (3.2, 2.2)), zorder=7)
     ax.text(lx + 9.4, yb + 0.45, "alarm boundary", fontsize=6.1, color=S.INK2,
             va="bottom", ha="right", zorder=7, style="italic")
@@ -204,35 +204,44 @@ def fig_yolo():
 
     S.arrow(ax, (12.4, yc), (15.6, yc))
 
-    # backbone: CSP stages with decreasing spatial size
-    stages = [("Stem\nConv", 6.6, 12.6), ("C2f\n×1", 6.0, 11.0),
-              ("C2f\n×2", 5.6, 9.4), ("C2f\n×2", 5.2, 7.8), ("SPPF", 5.0, 6.4)]
-    x = 15.6
+    # Backbone and head as given by the stock yolov8-cls.yaml, scale n
+    # (depth 0.33, width 0.25): Conv 16 /2; then Conv 32, 64, 128, 256 (each
+    # stride 2) followed by C2f x1, x2, x2, x1. There is no SPPF block.
+    stages = [("Conv 16\nstride 2", 5.8, 12.6),
+              ("Conv 32\nstride 2\nC2f ×1", 6.0, 11.6),
+              ("Conv 64\nstride 2\nC2f ×2", 6.0, 10.6),
+              ("Conv 128\nstride 2\nC2f ×2", 6.0, 9.6),
+              ("Conv 256\nstride 2\nC2f ×1", 6.0, 8.6)]
+    x = 15.4
     for i, (lab, w, h) in enumerate(stages):
-        S.box(ax, x, yc - h / 2, w, h, lab, fc=S.MINT_F, ec=S.MINT_E, fs=6.4)
+        S.box(ax, x, yc - h / 2, w, h, lab, fc=S.MINT_F, ec=S.MINT_E, fs=5.3)
         if i < len(stages) - 1:
-            S.arrow(ax, (x + w, yc), (x + w + 2.0, yc))
-        x += w + 2.0
-    S.span(ax, 15.6, x - 2.0, yc + 9.4, "Backbone", color=S.MINT_E, fs=6.9, drop=-2.4)
+            S.arrow(ax, (x + w, yc), (x + w + 1.6, yc))
+        x += w + 1.6
+    S.span(ax, 15.4, x - 1.6, yc + 9.4, "Backbone", color=S.MINT_E, fs=6.9, drop=-2.4)
 
-    S.arrow(ax, (x - 2.0, yc), (x + 1.2, yc))
-    x += 1.2
-
-    S.box(ax, x, yc - 4.2, 9.2, 8.4, "Global\naverage pool", fc=S.BLUE_F,
-          ec=S.BLUE_E, fs=6.7)
-    S.arrow(ax, (x + 9.2, yc), (x + 12.4, yc))
-    x += 12.4
-    S.box(ax, x, yc - 4.2, 8.0, 8.4, "Linear\n1280 → 4", fc=S.BLUE_F,
-          ec=S.BLUE_E, fs=6.7)
-    S.arrow(ax, (x + 8.0, yc), (x + 11.0, yc))
-    S.span(ax, x - 12.4, x + 8.0, yc + 9.4, "Classification head", color=S.BLUE_E,
+    S.arrow(ax, (x - 1.6, yc), (x - 0.4, yc))
+    x += -0.4
+    h0 = x
+    S.box(ax, x, yc - 4.2, 8.6, 8.4, "Conv 1×1\n256 → 1280", fc=S.BLUE_F,
+          ec=S.BLUE_E, fs=5.4)
+    S.arrow(ax, (x + 8.6, yc), (x + 10.4, yc))
+    x += 10.4
+    S.box(ax, x, yc - 4.2, 8.6, 8.4, "Global\naverage\npool", fc=S.BLUE_F,
+          ec=S.BLUE_E, fs=5.4)
+    S.arrow(ax, (x + 8.6, yc), (x + 10.4, yc))
+    x += 10.4
+    S.box(ax, x, yc - 4.2, 7.4, 8.4, "Linear\n1280 → 4", fc=S.BLUE_F,
+          ec=S.BLUE_E, fs=5.4)
+    S.arrow(ax, (x + 7.4, yc), (x + 10.0, yc))
+    S.span(ax, h0, x + 7.4, yc + 9.4, "Classify head", color=S.BLUE_E,
            fs=6.9, drop=-2.4)
-    x += 11.0
+    x += 10.0
 
     # four-class posterior, illustrative shape only
     classes = ["NoGas", "Perfume", "Smoke", "Mixture"]
     bars = [0.04, 0.07, 0.11, 0.78]
-    bx0, bw = x + 4.6, 7.2
+    bx0, bw = x + 6.4, 7.0
     for i, (c, v) in enumerate(zip(classes, bars)):
         yy = yc + 4.6 - i * 3.1
         ax.add_patch(Rectangle((bx0, yy - 1.05), bw, 2.1, fc="none",
@@ -244,8 +253,8 @@ def fig_yolo():
     ax.text(bx0 + bw / 2, yc + 7.2, "class posterior", fontsize=6.6,
             color=S.INK2, ha="center", va="bottom", zorder=6)
 
-    ax.text(50.0, 6.0, "the class posterior reaches the explanation path only; it contributes no term to "
-                       r"$\varphi_t$ and no safety result depends on it",
+    ax.text(50.0, 6.0, "drawn from the stock yolov8n-cls configuration (Ultralytics 8.4.14); the class posterior "
+                       r"contributes no term to $\varphi_t$",
             fontsize=6.7, color=S.MUTED, ha="center", va="center", zorder=9)
     return S.save(fig, os.path.join(FIG, "fig_arch_yolo.png"))
 

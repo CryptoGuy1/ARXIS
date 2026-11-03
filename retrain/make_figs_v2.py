@@ -409,7 +409,7 @@ CRIT, WARN_, GOOD = "#a83226", "#bf8a12", "#1f7a52"   # status palette, validate
 
 def fig_protocol():
     """Schematic of the corpus layout and the block-wise holdout."""
-    fig, ax = plt.subplots(figsize=(6.90, 2.71))
+    fig, ax = plt.subplots(figsize=(6.90, 3.05))
     classes = ["NoGas", "Smoke", "Mixture", "Perfume"]
     n = 1581
     for i, c in enumerate(classes):
@@ -427,16 +427,16 @@ def fig_protocol():
     ax.annotate("held-out block\n(20%, position drawn from the run seed)",
                 (int(0.52 * n), 3.42), ha="center", fontsize=10.0, color=INK2)
     from matplotlib.patches import Patch
-    ax.legend(handles=[Patch(color="#dfe6ec", label="training windows"),
+    fig.legend(handles=[Patch(color="#dfe6ec", label="training windows"),
                        Patch(color=WARN_, label="20-window embargo"),
                        Patch(color=BLUE, label="held-out test windows")],
-              ncol=3, loc="lower center", bbox_to_anchor=(0.5, -0.52), fontsize=10.7)
+              ncol=3, loc="lower center", bbox_to_anchor=(0.5, 0.0), fontsize=10.7, frameon=False)
     ax.set_xlim(-300, n + 30); ax.set_ylim(-0.55, 4.15)
     ax.set_xticks([0, 400, 800, 1200, 1581])
     ax.set_xlabel("window index within each class block (1,581 windows per class)")
     ax.set_yticks([]); ax.spines["left"].set_visible(False); ax.spines["bottom"].set_visible(False)
     # panel title removed: the caption carries the statement
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0.13, 1, 1])
     fig.savefig(os.path.join(FIG, "fig_protocol.png"), dpi=600); plt.close(fig)
     print("wrote fig_protocol.png")
 

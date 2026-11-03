@@ -991,7 +991,7 @@ def fig_powered():
                        fontsize=9.6)
     ax.invert_yaxis()
     ax.set_xlim(0.70, 1.04); ax.xaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
-    ax.set_xticks([0.70, 0.80, 0.90, 1.00])
+    ax.set_xticks([0.70, 0.85, 1.00])
     ax.set_xlabel("Decision accuracy")
     ax.set_title("(a)", loc="left")
     ax.grid(axis="x", zorder=0)
@@ -1078,7 +1078,7 @@ def fig_workflow():
         ph, chip_h = 11.0, 11.6
         AUX_H, AUX_GAP = 2.6, 0.9           # the auxiliary reference, drawn apart
         h2 = 3.4 + ph + 3.0 + chip_h + AUX_GAP + AUX_H + 1.8
-        GAP1, FAN, rh, mh = 7.4, 13.4, 7.2, 3.6
+        GAP1, FAN, rh, mh = 7.4, 13.4, 7.2, 5.6
         FOOT = 2.6              # the line under the metric bar
         H = 1.2 + FOOT + h1 + GAP1 + h2 + FAN + rh + 2.8 + mh + 1.5
         fig, ax = S.canvas(H)
@@ -1237,8 +1237,8 @@ def fig_decisionlogic():
                 color=S.BLUE_E, va="center", zorder=6, fontweight="bold")
         ax.text(bx + BR_PAD, _esc_c - 3.0, "clean windows at $a \\geq 3$",
                 fontsize=BFS_S, color=S.BLUE_E, va="center", zorder=6)
-        bracket(ys[1], ys[2] + rh, S.SAND_E, "Under-escalation", "hazardous windows at $a \\in \\{1,2\\}$")
-        bracket(ys[0], ys[0] + rh, S.ROSE_E, "Passive miss", "hazardous windows at $a = 0$")
+        bracket(ys[1], ys[2] + rh, S.SAND_E, "Sub-alarm response rate", "hazardous windows at $a \\in \\{1,2\\}$")
+        bracket(ys[0], ys[0] + rh, S.ROSE_E, "Passive-miss rate", "hazardous windows at $a = 0$")
 
         fig.savefig(os.path.join(FIG, "fig_decisionlogic.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_decisionlogic.pdf"))
         plt.close(fig)

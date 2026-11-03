@@ -6,6 +6,8 @@
    segment ids.
 2. The primary gradient-boosting comparator weights hazardous rows, not clean
    air (review comments 158 and 216).
+3. The calibration band is carved before any upstream fitting, and no fitting
+   window shares a raw reading with a band window (review comment 63).
 
     python3 test_rerun_fixes.py
 """
@@ -16,6 +18,7 @@ import pandas as pd
 
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
+from retrain import calband as CB
 from retrain.comparators import (HazardWeightedGBM, CleanAirWeightedGBM,
                                  HAZARD_ACTION_WEIGHT, CLEAN_AIR_ACTION_WEIGHT)
 from retrain.zoo import CQLAgent, RawWindowLSTM
@@ -93,6 +96,27 @@ for helper, nm in ((fit_pred, "run_final.fit_pred"), (fit_predict, "run_all_v2.f
         except ValueError:
             ok = True
         check(f"{nm} refuses to fit {type(model).__name__} without segment ids", ok)
+
+# ---------------------------------------------------------------- calibration band
+for s in (42, 1337, 7, 2024, 99):
+    tr, te = rp.block_wise_holdout(df, seed=s)
+    fit, cal = CB.carve_calibration_band(tr, frac=0.2)
+    check(f"seed {s}: fitting and band windows are disjoint and cover the retained rows",
+          set(fit["win_id"]).isdisjoint(set(cal["win_id"])) and len(fit) + len(cal) <= len(tr)
+          and set(fit["win_id"]) | set(cal["win_id"]) <= set(tr["win_id"]))
+    ok_gap = True
+    for g in rp.GAS_MAP.values():
+        f_ids = np.sort(fit.loc[fit["gas_id"] == g, "win_id"].values)
+        c_ids = np.sort(cal.loc[cal["gas_id"] == g, "win_id"].values)
+        if len(f_ids) and len(c_ids):
+            d = np.abs(f_ids[:, None] - c_ids[None, :]).min()
+            ok_gap &= bool(d >= rp.WINDOW_SIZE)       # no shared raw reading
+    check(f"seed {s}: no fitting window shares a raw reading with a band window", ok_gap)
+    n_cal_expected = {g: max(1, int(round(0.2 * (tr["gas_id"] == g).sum()))) for g in rp.GAS_MAP.values()}
+    check(f"seed {s}: the band is the last 20% of each class in acquisition order",
+          all((cal["gas_id"] == g).sum() == n_cal_expected[g]
+              and cal.loc[cal["gas_id"] == g, "win_id"].min()
+              > fit.loc[fit["gas_id"] == g, "win_id"].max() for g in rp.GAS_MAP.values()))
 
 # ---------------------------------------------------------------- GBM weights
 acts = [RW.rule_oracle_action(rp.GAS_MAP[c]) for c in ("NoGas", "Perfume", "Smoke", "Mixture")]

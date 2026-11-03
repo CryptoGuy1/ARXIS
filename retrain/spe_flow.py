@@ -61,8 +61,8 @@ REGIMES = [("In distribution", "30 randomized runs"),
            ("Graded degradation", "noise, drift, channel loss"),
            ("Raw-space faults", "stuck, zero, clamp, noise"),
            ("Closed-set reject", "confidence threshold")]
-METRICS = ("Missed hazard     Escalation adequacy     Under-escalation     "
-           "High-severity false alarm     Alarm burden")
+METRICS = ("Passive-miss rate     Alarm-grade notification rate     Sub-alarm response rate     "
+           "Clean-air alarm rate     Alarm burden")
 
 RC = {
     "font.family": ["Liberation Serif", "Times New Roman", "DejaVu Serif"],
@@ -332,11 +332,11 @@ def source(ax, x, y, w, h, fs=8.4):
     cyl(ax, x, y, w, h, "MultimodalGasData corpus, 6,400 labeled samples", fs)
 
 
-# The five rows of Table 5: decision accuracy beside four safety-relevant rates.
-# Alarm burden is not a sixth quantity, it is the false-alarm rate in operational
+# The five quantities of Table 3: decision accuracy beside four safety-relevant rates.
+# Alarm burden is not a sixth quantity, it is the clean-air alarm rate in operational
 # units by Eq. 9, so it is noted under the bar rather than given a cell.
-METRIC_CELLS = ["Decision accuracy", "Missed hazard", "Escalation adequacy",
-                "Under-escalation", "High-severity false alarm"]
+METRIC_CELLS = ["Decision\naccuracy", "Passive-miss\nrate", "Alarm-grade\nnotification rate",
+                "Sub-alarm\nresponse rate", "Clean-air\nalarm rate"]
 
 
 def metric_bar(ax, x, y, w, h, fs=None):
@@ -353,7 +353,7 @@ def metric_bar(ax, x, y, w, h, fs=None):
         ax.text(x + (i + 0.5) * cw, y + h / 2, m, fontsize=fs, fontweight="bold",
                 ha="center", va="center", color=INK, zorder=5)
     ax.text(x + w / 2, y - 0.8,
-            "alarm burden (Eq. 9) is the high-severity false-alarm rate in "
+            "alarm burden (Eq. 9) is the clean-air alarm rate in "
             "operational units, not a sixth quantity",
             fontsize=7.0, style="italic", ha="center", va="top", color="#333333",
             zorder=5)

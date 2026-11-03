@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
+from retrain import calband as CB
 from retrain.comparators import SupervisedDQN, SupervisedMLP, HazardWeightedGBM
 from retrain.comparators import cost_weighted_sample_weight
 from retrain.zoo import SVMClassifier, RandomForest
@@ -127,32 +128,29 @@ def exp_calibration(ds):
     print("\n=== E7  calibration, corrected pipeline ===", flush=True)
     rows, sweep_rows, bin_rows = [], [], []
     for s in SEEDS:
-        tr_df, te_df = rp.block_wise_holdout(ds, seed=s)
-        tr_df, te_df, _, _ = rp.prepare(tr_df, te_df, anomaly_seed=s)
-        tr_df = tr_df.sort_values("win_id").reset_index(drop=True)
-        te_df = te_df.sort_values("win_id").reset_index(drop=True)   # acquisition order
-        Xtr_all, gtr_all = rp.to_arrays(tr_df)
-        Xte, gte = rp.to_arrays(te_df)
-        ytr_all = np.array([RW.rule_oracle_action(int(g)) for g in gtr_all])
-        yte = np.array([RW.rule_oracle_action(int(g)) for g in gte])
+        tr_raw, te_raw = rp.block_wise_holdout(ds, seed=s)
 
         # Carve the calibration split out of TRAIN as a CONTIGUOUS band per class,
         # with the same embargo used for the outer holdout. A uniformly random
         # calibration subset over overlapping windows is the leakage this paper is
         # about: the earlier version used rng.permutation here, so the temperature
         # was fitted on windows sharing 19 of 20 raw rows with the fitting set.
-        cal, fit = [], []
-        for lab in rp.GAS_ORDER:
-            pos = np.flatnonzero((tr_df["label"] == lab).values)
-            if len(pos) == 0:
-                continue
-            ncal_c = max(1, int(round(0.2 * len(pos))))
-            gap = min(rp.WINDOW_SIZE, max(0, len(pos) - ncal_c))
-            cal.extend(pos[-ncal_c:])                       # tail band of the class
-            fit.extend(pos[:max(0, len(pos) - ncal_c - gap)])  # embargo between them
-        cal, fit = np.array(cal, int), np.array(fit, int)
-        Xfit, yfit, gfit = Xtr_all[fit], ytr_all[fit], gtr_all[fit]
-        Xcal, ycal = Xtr_all[cal], ytr_all[cal]
+        # The band is carved before anything is fitted, and the input scaler, the
+        # autoencoder and the anomaly normalization use the fitting windows only,
+        # so the band is out-of-sample for the whole pipeline.
+        fit_raw, cal_raw = CB.carve_calibration_band(tr_raw, frac=0.2)
+        ev_raw = pd.concat([te_raw.assign(_part="test"), cal_raw.assign(_part="cal")],
+                           ignore_index=True)
+        fit_df, ev, _, _ = rp.prepare(fit_raw, ev_raw, anomaly_seed=s)
+        fit_df = fit_df.sort_values("win_id").reset_index(drop=True)
+        te_df = ev[ev["_part"] == "test"].sort_values("win_id").reset_index(drop=True)
+        cal_df = ev[ev["_part"] == "cal"].sort_values("win_id").reset_index(drop=True)
+        Xfit, gfit = rp.to_arrays(fit_df)
+        Xte, gte = rp.to_arrays(te_df)
+        Xcal, gcal = rp.to_arrays(cal_df)
+        yfit = np.array([RW.rule_oracle_action(int(g)) for g in gfit])
+        ycal = np.array([RW.rule_oracle_action(int(g)) for g in gcal])
+        yte = np.array([RW.rule_oracle_action(int(g)) for g in gte])
 
         sw = cost_weighted_sample_weight(gfit, 8, 1)
         base = SupervisedDQN(seed=s); base.fit(Xfit, yfit, sample_weight=sw, epochs=EPOCHS)

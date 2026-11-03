@@ -52,6 +52,7 @@ torch.set_num_threads(2)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from retrain import raw_pipeline as rp
 from retrain import rewards as RW
+from retrain import calband as CB
 from retrain.run_all_v2 import SEEDS, OUT, CACHE
 from retrain.run_final import make          # the same constructor the class-disjoint table uses
 from retrain.safety_metrics import evaluate_safety
@@ -103,11 +104,23 @@ def main():
                 tr_df, te_df = rp.block_wise_holdout(ds, seed=s)
                 tr3 = tr_df[tr_df["gas_id"] != hid].reset_index(drop=True)
                 held_raw = ds[ds["gas_id"] == hid].reset_index(drop=True)
-                tr3, held_raw = rp.partition_anomaly(tr3, held_raw, seed=s)
-                sc = StandardScaler().fit(tr3[rp.ALL_FEAT_COLS])
-                p1 = float(np.percentile(tr3["anomaly"], 1))
-                p99 = float(np.percentile(tr3["anomaly"], 99))
-                tr3s = scale_with(tr3, sc, p1, p99)
+                # Carve the calibration band before anything is fitted: a
+                # contiguous per-class tail, held off by the usual embargo. The
+                # input scaler, the autoencoder and the anomaly normalization
+                # are then fitted on the fitting windows alone, so the band is
+                # out-of-sample for the whole pipeline and not only for the
+                # classifier. Every frame scored afterwards, the withheld class
+                # and the held-out retained-class windows included, passes
+                # through that one fitted pipeline.
+                fit_raw, cal_raw = CB.carve_calibration_band(tr3, frac=CAL_FRAC)
+                te_df = te_df.reset_index(drop=True)
+                fit_df, cal_df, held_raw, te_df = rp.partition_anomaly(
+                    fit_raw, cal_raw, held_raw, te_df, seed=s)
+                sc = StandardScaler().fit(fit_df[rp.ALL_FEAT_COLS])
+                p1 = float(np.percentile(fit_df["anomaly"], 1))
+                p99 = float(np.percentile(fit_df["anomaly"], 99))
+                fit_df = scale_with(fit_df, sc, p1, p99)
+                cal_df = scale_with(cal_df, sc, p1, p99)
                 held_s = scale_with(held_raw, sc, p1, p99)
                 # the clean windows this seed held out, for the cost side
                 clean_df = te_df[te_df["gas_id"] == 0].reset_index(drop=True)
@@ -124,18 +137,6 @@ def main():
                     Xp, _ = rp.to_arrays(scale_with(perf_df, sc, p1, p99))
                 else:
                     Xp = None
-
-                # Carve the calibration band before anything is fitted: a
-                # contiguous per-class tail, held off by the usual embargo.
-                fit_ids, cal_ids = [], []
-                for _, g in tr3s.groupby("gas_id"):
-                    g = g.sort_values("win_id")
-                    n_cal = int(round(CAL_FRAC * len(g)))
-                    cut = len(g) - n_cal
-                    fit_ids.extend(g.index[:max(0, cut - rp.WINDOW_SIZE)])
-                    cal_ids.extend(g.index[cut:])
-                fit_df = tr3s.loc[fit_ids]
-                cal_df = tr3s.loc[cal_ids]
 
                 Xtr, gtr = rp.to_arrays(fit_df)
                 Xcal, _ = rp.to_arrays(cal_df)

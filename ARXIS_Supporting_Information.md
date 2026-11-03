@@ -823,9 +823,9 @@ Fig. S10—Anomaly component. (a) Mean reconstruction error by class. (b) Operat
 | Narkhede et al. (2021, 2022a), MGD | 4-class gas identity, MOX and thermal fusion; 96 / 82 / 93% accuracy | randomized train/test split | none | none | not reported |
 | Sharma et al. (2024), MGD | 4-class, federated multimodal; 99.7% validation accuracy | validation split | none | none | not reported |
 | El Barkani et al. (2024), MGD thermal | 4-class, thermal on embedded hardware; 91.7% | test split | none | none | not reported |
-| [Wang, X. et al. (2025), MGD]{.mark} | [gas-leak classification by heterogeneous fusion; 99.22% accuracy]{.mark} | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} |
+| Wang, X. et al. (2025) | gas-leak identification, thermal-image and gas-sensor fusion (SCGA); 99.22% accuracy | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} |
 | Zhang and Zhang (2025) | binary leak, MOX and thermal; 98.9% simulated, 95.4% field | own simulated and field sets | none | none | not reported |
-| [Wang, Y. et al. (2026)]{.mark} | [graded flammable-gas hazard assessment]{.mark} | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} |
+| Wang, Y. et al. (2026) | flammable-gas hazard assessment (HGD-Net), photoionization and airflow sensing | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} | [TBD]{.mark} |
 | Qu et al. (2022) | open-set gas recognition, electronic nose | [TBD]{.mark} | unknown gases withheld | none | not reported |
 | Yao et al. (2024) | drift compensation and unknown-gas recognition, electronic nose | [TBD]{.mark} | unknown gases withheld | drift | not reported |
 | Dennler et al. (2022), another MOX dataset | drift analysis of a classification benchmark | re-partitioned by time | none | drift (observed) | not applicable |

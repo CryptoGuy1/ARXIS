@@ -327,7 +327,12 @@ def fig_ablation():
                 f"{v:.3f}" + ("  (reference)" if abs(d) < 1e-9 else f"   {d:+.2f} pp"),
                 va="center", ha="left", fontsize=9.7, color=INK2)
     ax.set_yticks(y)
-    ax.set_yticklabels([s.replace("_", " ") for s in df.state])
+    # Labels follow the row names of Table S6 so the figure and the table can be matched.
+    _NAMES = {"full_22": "Full state (22)", "no_anomaly_21": "Without anomaly score (21)",
+              "no_delta_std_8": "Without δ and σ (8)", "no_std_15": "Without per-sensor σ (15)",
+              "no_delta_15": "Without per-sensor δ (15)", "anomaly_only_1": "Anomaly score only (1)",
+              "current_only_7": "Current readings only (7)"}
+    ax.set_yticklabels([_NAMES.get(s, s.replace("_", " ")) for s in df.state])
     ax.set_xlim(0, 1.42)
     ax.set_xticks([0, .2, .4, .6, .8, 1.0])
     ax.xaxis.set_major_formatter(PercentFormatter(1.0))
@@ -554,7 +559,7 @@ def fig_disposition():
         ax.bar(x, esc, 0.62, color=GOOD, label="Alarm-grade (a ≥ 3)", ec=SURFACE, lw=1.4, zorder=3)
         ax.bar(x, und, 0.62, bottom=esc, color=WARN_, label="Sub-alarm (a ∈ {1,2})", ec=SURFACE, lw=1.4, zorder=3)
         ax.bar(x, miss, 0.62, bottom=esc + und, color=CRIT, label="Monitor (a = 0)", ec=SURFACE, lw=1.4, zorder=3)
-        for xi, e, u in zip(x, esc, und):
+        for xi, e, u, mm in zip(x, esc, und, miss):
             # Set upright: horizontal labels were wider than the bars, so the
             # white type ran off the coloured segment and vanished on the page.
             if e > 0.10:
@@ -562,6 +567,9 @@ def fig_disposition():
                         color="white", rotation=90)
             if u > 0.14:
                 ax.text(xi, e + u / 2, f"{u:.2f}", ha="center", va="center", fontsize=8.8,
+                        color="white", rotation=90)
+            if mm > 0.10:
+                ax.text(xi, e + u + mm / 2, f"{mm:.2f}", ha="center", va="center", fontsize=8.8,
                         color="white", rotation=90)
         ax.set_xticks(x); ax.set_xticklabels([PRETTY[m] for m in models], rotation=40, ha="right",
                                              rotation_mode="anchor")

@@ -117,8 +117,8 @@ def fig_dqn():
 
     # shared trunk
     tx = x_end + 4.2
-    S.box(ax, tx, yc - 5.0, 11.0, 10.0, "Shared trunk\n2 × 128, ReLU",
-          fc=S.MINT_F, ec=S.MINT_E, fs=7.0)
+    S.box(ax, tx, yc - 5.0, 11.0, 10.0, "Shared trunk\n256-256-128,\nLayerNorm, ReLU",
+          fc=S.MINT_F, ec=S.MINT_E, fs=5.6)
 
     # split into value and advantage
     bx = tx + 11.0
@@ -129,8 +129,8 @@ def fig_dqn():
 
     # One size for both streams, taken from the wider of the two labels: set by
     # eye, "Advantage stream" ran out of its box.
-    _vs = "Value stream\n$V(\\varphi)$, 1 unit"
-    _as = "Advantage stream\n$A(\\varphi,a)$, 5 units"
+    _vs = "Value stream\n$V(\\varphi)$, 64 → 1"
+    _as = "Advantage stream\n$A(\\varphi,a)$, 64 → 5"
     _sfs = S.fit_fontsize(ax, [_vs, _as], 11.6, start=6.8, floor=5.2, margin=0.5)
     S.box(ax, bx + 6.6, yc + 3.8, 11.6, 7.2, _vs, fc=S.BLUE_F, ec=S.BLUE_E, fs=_sfs)
     S.box(ax, bx + 6.6, yc - 11.0, 11.6, 7.2, _as, fc=S.BLUE_F, ec=S.BLUE_E, fs=_sfs)

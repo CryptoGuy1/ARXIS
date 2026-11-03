@@ -162,17 +162,17 @@
   {
    "held_out": "Smoke",
    "model": "LSTM",
-   "miss": 0.0073371283997469,
+   "miss": 0.006831119544592,
    "k_per_partition": [
     0,
     0,
     0,
-    27,
+    23,
     31
    ],
    "k_part": 31,
-   "pooled_pct": 0.9122332734798301,
-   "mean_pseudocount_pct": 1.2268690013768606,
+   "pooled_pct": 0.8561816053539401,
+   "mean_pseudocount_pct": 1.1490201891597716,
    "partition_pct": 2.637185158096765
   },
   {
@@ -338,16 +338,16 @@
   {
    "held_out": "Mixture",
    "model": "LSTM",
-   "miss": 0.0075901328273244,
+   "miss": 0.0074636306135357,
    "k_per_partition": [
     0,
     0,
-    11,
+    10,
     17,
     32
    ],
    "k_part": 32,
-   "pooled_pct": 0.94018776593794,
+   "pooled_pct": 0.92621621520736,
    "mean_pseudocount_pct": 1.2268690013768606,
    "partition_pct": 2.7092217498691293
   },

@@ -250,16 +250,20 @@ def fig_zoo():
 # ------------------------------------------------------------ perturbation
 def fig_perturb():
     df = pd.read_csv(os.path.join(RES, "v2_perturb.csv"))
-    kinds = [("noise", "Additive noise (σ)"), ("drift", "Calibration drift (±)"),
-             ("dropout", "Channel dropout, k")]
-    # Row labels are set on two lines: the third one is too long to sit beside a
-    # panel this short and used to run into its neighbours.
+    kinds = [("noise", "Additive noise (σₙ, training SDs)"), ("drift", "Calibration drift (d)"),
+             ("dropout", "Masked channels, k of 7")]
+    # Row labels are set on two lines: a long one does not fit beside a short panel.
     metrics = [("decision_acc_mean", "Decision\naccuracy"),
-               ("escalation_mean", "Escalation\nadequacy"),
+               ("miss_rate_mean", "Passive-miss\nrate"),
+               ("escalation_mean", "Alarm-grade\nnotification"),
                ("fa_per_clean_mean", "Clean-air\nalarm rate")]
     models = [m for m in ["A_cost_weighted", "B_unweighted", "D_mlp", "E_gbm", "RF", "ThresholdRule"]
               if m in set(df.model)]          # 6 series: hues assigned, never cycled
-    fig, axes = plt.subplots(3, 3, figsize=(6.90, 6.04), sharex="col")
+    # Colour alone is not enough where six lines overlap near 0% or 100%, so each
+    # series also has its own marker and dash pattern.
+    MARK = ["o", "s", "^", "D", "v", "P"]
+    DASH = ["-", (0, (5, 1.6)), (0, (1.2, 1.2)), (0, (6, 1.6, 1.2, 1.6)), (0, (3, 1.2)), (0, (8, 2))]
+    fig, axes = plt.subplots(4, 3, figsize=(6.90, 7.60), sharex="col")
     for r, (mk, mlabel) in enumerate(metrics):
         for c, (kind, klabel) in enumerate(kinds):
             ax = axes[r, c]
@@ -270,33 +274,40 @@ def fig_perturb():
                 _y = sub[mk].values
                 _sd = sub[mk.replace("_mean", "_std")].values
                 ax.fill_between(sub.level.values, np.clip(_y - _sd, 0, 1), np.clip(_y + _sd, 0, 1),
-                                color=CAT[i % len(CAT)], alpha=0.13, lw=0, zorder=2)
-                ax.plot(sub.level, sub[mk], "-o", ms=4.2, lw=1.8,
+                                color=CAT[i % len(CAT)], alpha=0.11, lw=0, zorder=2)
+                ax.plot(sub.level, sub[mk], linestyle=DASH[i], marker=MARK[i], ms=3.6, lw=1.5,
                         color=CAT[i % len(CAT)], label=PRETTY[m], zorder=3)
             ax.grid(axis="y", zorder=0)
-            ax.yaxis.set_major_formatter(PercentFormatter(1.0))
+            ax.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
             if kind == "dropout":
                 ax.set_xticks(range(0, 8))   # every k from 0 to 7 is a tested level
             ax.set_ylim(-0.05, 1.08)   # one shared scale per row
             if r == 0:
-                ax.set_title(f"({'abcdefgh'[c]})", loc="left", fontsize=12.5)
-            if r == 2:
-                ax.set_xlabel(klabel, fontsize=9.8, labelpad=2.0)
+                ax.set_title(f"({'abc'[c]})", loc="left", fontsize=12.5)
+            if r == len(metrics) - 1:
+                ax.set_xlabel(klabel, fontsize=9.2, labelpad=2.0)
             if c == 0:
                 ax.set_ylabel(mlabel, labelpad=2.0, linespacing=1.25)
+    # Inset: the clean-air alarm rate under drift is small, so it is redrawn on an
+    # expanded scale where the models can be told apart.
+    _dr = axes[3, 1]
+    ins = _dr.inset_axes([0.27, 0.30, 0.68, 0.62])
     _peak = df[df.perturbation == "drift"].fa_per_clean_mean.max()
-    axes[2, 1].text(0.5, 0.62, f"peak false-alarm rate\nunder drift is {_peak * 100:.2f}%",
-                    transform=axes[2, 1].transAxes, ha="center", fontsize=9.5,
-                    color=MUTED, style="italic", linespacing=1.3)
+    for i, m in enumerate(models):
+        sub = df[(df.model == m) & (df.perturbation.isin(["drift", "clean"]))].sort_values("level")
+        ins.plot(sub.level, sub.fa_per_clean_mean, linestyle=DASH[i], marker=MARK[i], ms=3.0, lw=1.2,
+                 color=CAT[i % len(CAT)], zorder=3)
+    ins.set_ylim(-0.0003, max(_peak * 1.25, 0.002))
+    ins.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=2))
+    ins.tick_params(labelsize=7.0, length=2.5, pad=1.5)
+    ins.set_xticks([0, 0.25, 0.5]); ins.set_xticklabels(["0", "0.25", "0.5"])
+    ins.grid(axis="y", lw=0.4)
+    ins.set_title("expanded scale", fontsize=7.4, pad=2, color=MUTED)
     h, l = axes[0, 0].get_legend_handles_labels()
-    # Six series now, so the legend is given its own band and the panels are
-    # pushed down to clear it; at ncol=5 the sixth entry wrapped onto the
-    # panel row and landed on the (a) label.
-    fig.legend(h, l, ncol=6, loc="upper center", bbox_to_anchor=(0.5, 0.995),
-               fontsize=9.2, columnspacing=0.9, handlelength=1.3)
+    fig.legend(h, l, ncol=6, loc="upper center", bbox_to_anchor=(0.5, 0.997),
+               fontsize=8.6, columnspacing=0.8, handlelength=2.4)
     # figure title removed: journals carry the statement in the caption
-    # A right margin: the widest column label runs past the last panel.
-    fig.tight_layout(rect=(0, 0, 0.995, 0.925), h_pad=1.1, w_pad=2.2)
+    fig.tight_layout(rect=(0, 0, 0.995, 0.945), h_pad=0.9, w_pad=2.0)
     fig.savefig(os.path.join(FIG, "fig_perturb.png"), dpi=1000); fig.savefig(os.path.join(FIG, "fig_perturb.pdf"))
     plt.close(fig)
     print("wrote fig_perturb.png")
@@ -892,7 +903,7 @@ def fig_anominfluence():
     sub = d[d.model == "E_gbm"].sort_values("level")
     gy = 100 * sub.miss_rate_mean.values
     ax.plot(sub.level, gy, "-o", ms=7, lw=2.4, color=CRIT, zorder=4,
-            label="Gradient boosting\n(clean-air-weighted)")
+            label="Gradient boosting\n(hazard-weighted)")
     ax.annotate(f"{gy[0]:.2f}%", (0.0, gy[0]),
                 textcoords="offset points", xytext=(10, -4), fontsize=10.0, color=CRIT)
     ax.annotate(f"{gy[-1]:.2f}%", (1.0, gy[-1]),

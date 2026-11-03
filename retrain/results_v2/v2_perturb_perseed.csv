@@ -32,5 +32,5 @@ ThresholdRule,dropout,7,99,316,316,632,0
 E_gbm,dropout,7,42,316,0,632,0
 E_gbm,dropout,7,1337,316,0,632,0
 E_gbm,dropout,7,7,316,0,632,0
-E_gbm,dropout,7,2024,316,0,632,0
-E_gbm,dropout,7,99,316,0,632,617
+E_gbm,dropout,7,2024,316,1,632,0
+E_gbm,dropout,7,99,316,0,632,0

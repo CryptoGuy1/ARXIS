@@ -1,28 +1,28 @@
 {
- "generated_utc": "2026-10-15T00:10:56+00:00",
+ "generated_utc": "2026-11-03T19:57:14+00:00",
  "git": {
-  "commit": "298b2a64a925ba1f3519ca2f48893d95b88de528",
-  "branch": "HEAD",
-  "describe": "v17-submission-dirty",
+  "commit": "bcd213b2e30ed076fc5a3e73b4a254c398fba4a8",
+  "branch": "jlppi",
+  "describe": "v18.1-jlppi-reviewed-2026-10-20-5-gbcd213b-dirty",
   "dirty": true,
-  "remote": "/mnt/user-data/outputs/ARXIS-v16-submission.bundle"
+  "remote": "/tmp/bundle_check"
  },
  "host": {
-  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+  "platform": "Linux-6.18.44-fc-v230-x86_64-with-glibc2.39",
   "machine": "x86_64",
   "processor": "x86_64",
   "node": "vm",
   "cpu_count": 2,
-  "python": "3.11.17",
+  "python": "3.13.16",
   "python_implementation": "CPython"
  },
  "packages": {
-  "numpy": "2.4.4",
-  "pandas": "3.0.2",
-  "scipy": "1.17.1",
-  "scikit-learn": "1.8.0",
-  "torch": "2.14.0+cu130",
-  "matplotlib": "3.10.9",
+  "numpy": "2.5.3",
+  "pandas": "3.0.5",
+  "scipy": "1.18.1",
+  "scikit-learn": "1.9.1",
+  "torch": "2.14.1+cu130",
+  "matplotlib": "3.11.2",
   "ultralytics": "not installed"
  },
  "seeds": {
@@ -82,7 +82,7 @@
   {
    "path": "retrain/run_all_v2.py",
    "purpose": "model comparison, cost sweep, perturbation, ablation, anomaly",
-   "sha256_16": "36fa8cecd2421e57"
+   "sha256_16": "81b982c6beba33e8"
   },
   {
    "path": "retrain/run_loco_v3.py",
@@ -92,17 +92,17 @@
   {
    "path": "retrain/run_leakage.py",
    "purpose": "partitioning-protocol comparison, blocked validation",
-   "sha256_16": "435566dc9e4ca0bf"
+   "sha256_16": "852ed4d1c7016ba8"
   },
   {
    "path": "retrain/run_calib_actions_v2.py",
    "purpose": "calibration, action matrices, ROC curves",
-   "sha256_16": "7e4a0a4fa45b872f"
+   "sha256_16": "0e9cc080b9be8bdb"
   },
   {
    "path": "retrain/run_anomaly_influence.py",
    "purpose": "anomaly-input sensitivity",
-   "sha256_16": "8f5272df236fe70c"
+   "sha256_16": "7a97ad1f3661b62c"
   },
   {
    "path": "retrain/run_alarm_episodes.py",
@@ -127,7 +127,7 @@
   {
    "path": "retrain/run_final.py",
    "purpose": "30-run comparison, Bayesian equivalence, ordinal objective",
-   "sha256_16": "f96759bef748a792"
+   "sha256_16": "ebf39d520b189fa8"
   },
   {
    "path": "retrain/run_rho_sensitivity.py",
@@ -150,379 +150,398 @@
    "sha256_16": "68da57a8001e930d"
   },
   {
-   "path": "retrain/make_figs_v2.py",
-   "purpose": "all figures",
-   "sha256_16": "b9a231bffa0f3a9d"
+   "path": "retrain/run_hazard_gbm.py",
+   "purpose": "gas-keyed gradient boosting, 30 runs and class exclusion",
+   "sha256_16": null
   },
   {
    "path": "retrain/run_perturb_perseed.py",
-   "purpose": "per-partition counts for the one-partition perturbation claims (Table 7, Experiment 6)",
+   "purpose": "per-seed perturbation results",
    "sha256_16": "019ab197004cc17b"
-  },
-  {
-   "path": "retrain/run_hazard_gbm.py",
-   "purpose": "gas-keyed gradient boosting variant: 30-run comparison, leave-one-class-out, reproduction check",
-   "sha256_16": "e7ff4eccf34c5f22"
   },
   {
    "path": "retrain/run_rung_check.py",
    "purpose": "held-out-class escalation rungs",
-   "sha256_16": "a8f1844cb1d8e543"
+   "sha256_16": "1ce2af6f75791bff"
+  },
+  {
+   "path": "retrain/make_figs_v2.py",
+   "purpose": "all figures",
+   "sha256_16": "a3ceaf76e5cc307b"
   }
  ],
  "results": {
   "v2_ablation.csv": {
    "bytes": 1647,
    "sha256_16": "4fe89396e5211599",
-   "modified_utc": "2026-10-10T12:13:10+00:00"
+   "modified_utc": "2026-11-03T17:30:52+00:00"
   },
   "v2_action_matrix.csv": {
-   "bytes": 3463,
-   "sha256_16": "9c30603980ac3842",
-   "modified_utc": "2026-10-10T13:32:07+00:00"
+   "bytes": 3431,
+   "sha256_16": "3fc6c031d15ad4fc",
+   "modified_utc": "2026-11-03T18:20:33+00:00"
   },
   "v2_anomaly.json": {
    "bytes": 2371,
    "sha256_16": "40281b059e1377ae",
-   "modified_utc": "2026-10-10T14:04:00+00:00"
+   "modified_utc": "2026-11-03T19:27:19+00:00"
   },
   "v2_anomaly_influence.csv": {
-   "bytes": 3947,
-   "sha256_16": "a7303e07e16b3158",
-   "modified_utc": "2026-10-10T13:43:36+00:00"
+   "bytes": 3772,
+   "sha256_16": "a7bf59c1e3ee174c",
+   "modified_utc": "2026-11-03T18:27:25+00:00"
   },
   "v2_calibration.csv": {
-   "bytes": 991,
-   "sha256_16": "ab4cc2cb9d3bfadf",
-   "modified_utc": "2026-10-12T13:26:19+00:00"
+   "bytes": 988,
+   "sha256_16": "3eb6890922420879",
+   "modified_utc": "2026-11-03T18:24:03+00:00"
   },
   "v2_calibration_binsweep.csv": {
    "bytes": 4080,
-   "sha256_16": "a7e668630092ffa5",
-   "modified_utc": "2026-10-12T13:26:19+00:00"
+   "sha256_16": "7be44c0516594464",
+   "modified_utc": "2026-11-03T18:24:03+00:00"
   },
   "v2_calibration_perseed.csv": {
-   "bytes": 3347,
-   "sha256_16": "9db3dd180a9ece5e",
-   "modified_utc": "2026-10-12T13:26:19+00:00"
+   "bytes": 3351,
+   "sha256_16": "7ff4f4146ee912ec",
+   "modified_utc": "2026-11-03T18:24:03+00:00"
   },
   "v2_calibration_reliability.csv": {
-   "bytes": 15370,
-   "sha256_16": "a10bfc0b761df051",
-   "modified_utc": "2026-10-12T13:26:19+00:00"
+   "bytes": 15259,
+   "sha256_16": "e952551fbfa95371",
+   "modified_utc": "2026-11-03T18:24:03+00:00"
   },
   "v2_costsweep.csv": {
    "bytes": 1817,
    "sha256_16": "5e878b67dd1c3ef1",
-   "modified_utc": "2026-10-10T12:34:44+00:00"
+   "modified_utc": "2026-11-03T17:42:35+00:00"
   },
   "v2_loco.csv": {
    "bytes": 3408,
    "sha256_16": "1bb335a2ec8d6c9b",
-   "modified_utc": "2026-10-10T12:58:43+00:00"
+   "modified_utc": "2026-11-03T18:00:21+00:00"
   },
   "v2_perturb.csv": {
-   "bytes": 25401,
-   "sha256_16": "df31c1d0a7ccf86d",
-   "modified_utc": "2026-10-10T12:49:37+00:00"
+   "bytes": 24421,
+   "sha256_16": "dcfef0f1261fc781",
+   "modified_utc": "2026-11-03T17:51:37+00:00"
+  },
+  "v2_perturb_perseed.csv": {
+   "bytes": 1451,
+   "sha256_16": "2b95b80ca821b7bb",
+   "modified_utc": "2026-11-03T17:54:54+00:00"
   },
   "v2_roc.json": {
    "bytes": 175447,
    "sha256_16": "a506a8a09e68682e",
-   "modified_utc": "2026-10-10T13:27:33+00:00"
+   "modified_utc": "2026-11-03T18:17:38+00:00"
   },
   "v2_zoo.csv": {
-   "bytes": 2198,
-   "sha256_16": "360d82ff23150efb",
-   "modified_utc": "2026-10-10T12:22:05+00:00"
+   "bytes": 2112,
+   "sha256_16": "45473987e4fbbc7d",
+   "modified_utc": "2026-11-03T17:36:01+00:00"
   },
   "v2_zoo_sig.json": {
-   "bytes": 9627,
-   "sha256_16": "ef1242d599458795",
-   "modified_utc": "2026-10-10T12:22:05+00:00"
+   "bytes": 9591,
+   "sha256_16": "781178cc0f068913",
+   "modified_utc": "2026-11-03T17:36:01+00:00"
   },
   "v3_alarm_episodes.csv": {
-   "bytes": 4892,
-   "sha256_16": "fc910c9ef279d520",
-   "modified_utc": "2026-10-10T13:49:52+00:00"
+   "bytes": 4947,
+   "sha256_16": "d76c2c192d88cd1f",
+   "modified_utc": "2026-11-03T18:31:21+00:00"
   },
   "v3_block_bootstrap.json": {
-   "bytes": 4838,
-   "sha256_16": "5ae52e161f4729f9",
-   "modified_utc": "2026-10-10T14:03:25+00:00"
+   "bytes": 4735,
+   "sha256_16": "41eb797bb8ea59c3",
+   "modified_utc": "2026-11-03T18:39:17+00:00"
   },
   "v3_cost_blocked_validation.csv": {
    "bytes": 995,
    "sha256_16": "76b810ac9bdd9c6e",
-   "modified_utc": "2026-10-10T13:27:03+00:00"
+   "modified_utc": "2026-11-03T18:17:20+00:00"
   },
   "v3_cost_validation.csv": {
    "bytes": 994,
    "sha256_16": "efdb3ad829047cd1",
-   "modified_utc": "2026-10-12T10:03:07+00:00"
+   "modified_utc": "2026-11-03T18:44:53+00:00"
   },
   "v3_episode_metrics.csv": {
-   "bytes": 5596,
-   "sha256_16": "6bb64bb94aa00778",
-   "modified_utc": "2026-10-10T13:56:27+00:00"
+   "bytes": 5512,
+   "sha256_16": "01ce77b7738c3f32",
+   "modified_utc": "2026-11-03T18:35:13+00:00"
   },
   "v3_leakage.csv": {
-   "bytes": 4989,
-   "sha256_16": "e7b841a4d6d6316e",
-   "modified_utc": "2026-10-10T13:16:55+00:00"
+   "bytes": 4859,
+   "sha256_16": "816072d69931e8af",
+   "modified_utc": "2026-11-03T18:12:07+00:00"
   },
   "v3_loco_all.csv": {
-   "bytes": 4466,
-   "sha256_16": "aa4114335da5aed1",
-   "modified_utc": "2026-10-12T10:11:53+00:00"
+   "bytes": 4464,
+   "sha256_16": "f0daf5d30b29c610",
+   "modified_utc": "2026-11-03T18:53:10+00:00"
   },
   "v3_loco_perseed.csv": {
-   "bytes": 7733,
-   "sha256_16": "9af4827b3467d008",
-   "modified_utc": "2026-10-12T10:11:53+00:00"
+   "bytes": 7731,
+   "sha256_16": "0ea29b3a01b2ca93",
+   "modified_utc": "2026-11-03T18:53:10+00:00"
+  },
+  "v3_loco_specificity.csv": {
+   "bytes": 6335,
+   "sha256_16": "f606e07c62dbebb5",
+   "modified_utc": "2026-11-03T18:53:10+00:00"
   },
   "v3_metric_cost.json": {
-   "bytes": 166,
-   "sha256_16": "9d87be0e0a87eb6d",
-   "modified_utc": "2026-10-12T11:08:08+00:00"
+   "bytes": 168,
+   "sha256_16": "17b1ee82b0522db7",
+   "modified_utc": "2026-11-03T19:27:27+00:00"
   },
   "v3_nonhazard_alarm.csv": {
    "bytes": 395,
    "sha256_16": "4ee395b2abeffa28",
-   "modified_utc": "2026-10-12T10:54:26+00:00"
+   "modified_utc": "2026-11-03T19:47:18+00:00"
   },
   "v3_ordinal_actions.csv": {
    "bytes": 1925,
    "sha256_16": "63ee08da2b5a8fe3",
-   "modified_utc": "2026-10-12T10:54:22+00:00"
+   "modified_utc": "2026-11-03T19:47:14+00:00"
   },
   "v3_overlap_isolation.csv": {
-   "bytes": 2224,
-   "sha256_16": "6e3254bcd4a70e30",
-   "modified_utc": "2026-10-10T14:29:11+00:00"
+   "bytes": 2223,
+   "sha256_16": "db996c9a13aaf8d7",
+   "modified_utc": "2026-11-03T19:42:15+00:00"
   },
   "v3_paired_bootstrap.json": {
-   "bytes": 1961,
-   "sha256_16": "3c3f5faaaae74d4d",
-   "modified_utc": "2026-10-12T10:49:05+00:00"
+   "bytes": 1958,
+   "sha256_16": "775990d74d44f302",
+   "modified_utc": "2026-11-03T19:27:02+00:00"
   },
   "v3_partition_bounds.json": {
-   "bytes": 7473,
-   "sha256_16": "304dddeb1d52c624",
-   "modified_utc": "2026-10-12T10:49:04+00:00"
+   "bytes": 7472,
+   "sha256_16": "40d205c9cb6515f9",
+   "modified_utc": "2026-11-03T19:27:02+00:00"
   },
   "v3_persistence_rank.json": {
-   "bytes": 9931,
-   "sha256_16": "6ee074e32cabe8e2",
-   "modified_utc": "2026-10-10T14:10:43+00:00"
+   "bytes": 9778,
+   "sha256_16": "96d18c441de59ccf",
+   "modified_utc": "2026-11-03T19:31:21+00:00"
   },
   "v3_persistence_sweep.csv": {
-   "bytes": 84384,
-   "sha256_16": "5e7bc62672342a12",
-   "modified_utc": "2026-10-10T14:10:43+00:00"
+   "bytes": 85166,
+   "sha256_16": "455050a9c9e83488",
+   "modified_utc": "2026-11-03T19:31:20+00:00"
   },
   "v3_powered.csv": {
-   "bytes": 2915,
-   "sha256_16": "305440fed7e5df0b",
-   "modified_utc": "2026-10-12T10:48:38+00:00"
+   "bytes": 2914,
+   "sha256_16": "fc59cd463ef12a2d",
+   "modified_utc": "2026-11-03T19:26:49+00:00"
   },
   "v3_powered_bayes.json": {
-   "bytes": 10685,
-   "sha256_16": "84ebefa59f8d3564",
-   "modified_utc": "2026-10-12T11:08:35+00:00"
+   "bytes": 10707,
+   "sha256_16": "4d570e5c0b98c5c7",
+   "modified_utc": "2026-11-03T19:26:55+00:00"
+  },
+  "v3_powered_perrun.csv": {
+   "bytes": 47704,
+   "sha256_16": "f7a3b8e691d67ffb",
+   "modified_utc": "2026-11-03T19:26:49+00:00"
+  },
+  "v3_ratio_check.csv": {
+   "bytes": 10839,
+   "sha256_16": "e7cd6ab1fdb3d33b",
+   "modified_utc": "2026-11-03T19:56:52+00:00"
+  },
+  "v3_ratio_check_perseed.csv": {
+   "bytes": 19523,
+   "sha256_16": "fdef1f9002e65394",
+   "modified_utc": "2026-11-03T19:56:52+00:00"
   },
   "v3_raw_faults.csv": {
-   "bytes": 13874,
-   "sha256_16": "d8529fde72f2542c",
-   "modified_utc": "2026-10-10T14:27:08+00:00"
+   "bytes": 17209,
+   "sha256_16": "d9a556fe2947aea2",
+   "modified_utc": "2026-11-03T19:40:58+00:00"
   },
   "v3_reject_option.csv": {
-   "bytes": 18366,
-   "sha256_16": "aab50596740f073c",
-   "modified_utc": "2026-10-10T14:17:57+00:00"
+   "bytes": 23688,
+   "sha256_16": "f2fe7da1d9f82d49",
+   "modified_utc": "2026-11-03T19:35:28+00:00"
   },
   "v3_rho_sensitivity.json": {
-   "bytes": 11287,
-   "sha256_16": "fc89c11291f72c38",
-   "modified_utc": "2026-10-12T11:08:39+00:00"
+   "bytes": 11275,
+   "sha256_16": "89a367cd9254ca98",
+   "modified_utc": "2026-11-03T19:26:58+00:00"
   },
   "v3_rope_sensitivity.json": {
-   "bytes": 10502,
-   "sha256_16": "10bb312d1322b75a",
-   "modified_utc": "2026-10-12T11:08:42+00:00"
+   "bytes": 10493,
+   "sha256_16": "07bf4de9c6a7fc1f",
+   "modified_utc": "2026-11-03T19:27:00+00:00"
+  },
+  "v3_rung_check.csv": {
+   "bytes": 3538,
+   "sha256_16": "dc84b06b89be44b6",
+   "modified_utc": "2026-11-03T19:51:12+00:00"
+  },
+  "v3_rung_check_summary.csv": {
+   "bytes": 1362,
+   "sha256_16": "7e154fb335105ad4",
+   "modified_utc": "2026-11-03T19:51:12+00:00"
   },
   "v3_split_counts.json": {
    "bytes": 166,
    "sha256_16": "d3ddb3a6459b1954",
-   "modified_utc": "2026-10-12T10:48:53+00:00"
+   "modified_utc": "2026-11-03T19:26:52+00:00"
   },
   "v3_weighting_probe.csv": {
-   "bytes": 4602,
-   "sha256_16": "57decc5bd196100c",
-   "modified_utc": "2026-10-12T10:54:22+00:00"
-  },
-  "v2_perturb_perseed.csv": {
-   "bytes": 1453,
-   "sha256_16": "5c6b4cc049d92e95",
-   "modified_utc": "2026-10-17T17:07:13.972860+00:00"
-  },
-  "v3_rung_check.csv": {
-   "bytes": 3536,
-   "sha256_16": "7e9b625a6ea390b5",
-   "modified_utc": "2026-10-20T09:16:14+00:00"
-  },
-  "v3_rung_check_summary.csv": {
-   "bytes": 1367,
-   "sha256_16": "d8cfed3bf9d469a5",
-   "modified_utc": "2026-10-20T09:16:14+00:00"
-  },
-  "v3_powered_hazard_gbm.csv": {
-   "bytes": 1052,
-   "sha256_16": "2c2df1fb1df60c52",
-   "modified_utc": "2026-10-20T14:13:37.473251+00:00"
-  },
-  "v3_powered_hazard_gbm_perrun.json": {
-   "bytes": 1439,
-   "sha256_16": "ade4d51e566d3586",
-   "modified_utc": "2026-10-20T14:13:37.475185+00:00"
-  },
-  "v3_powered_hazard_gbm_bayes.json": {
-   "bytes": 2092,
-   "sha256_16": "e7bbc07409df1e23",
-   "modified_utc": "2026-10-20T14:13:37.479934+00:00"
-  },
-  "v3_loco_hazard_gbm.csv": {
-   "bytes": 788,
-   "sha256_16": "9d5b8309e18449bd",
-   "modified_utc": "2026-10-20T14:18:27.835147+00:00"
-  },
-  "v3_loco_hazard_gbm_perseed.csv": {
-   "bytes": 1014,
-   "sha256_16": "cec9d555e9aaa5e3",
-   "modified_utc": "2026-10-20T14:18:27.836145+00:00"
+   "bytes": 4601,
+   "sha256_16": "adfe27005131544d",
+   "modified_utc": "2026-11-03T19:47:14+00:00"
   }
  },
  "figures": {
   "fig_ablation.png": {
-   "bytes": 255831,
-   "sha256_16": "5a5037311661ca4a",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 291339,
+   "sha256_16": "134f4855c8e2542d",
+   "modified_utc": "2026-11-03T19:57:05+00:00"
   },
   "fig_actionmatrix.png": {
-   "bytes": 587415,
-   "sha256_16": "d6fae814f5a29421",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 638226,
+   "sha256_16": "e5373e42188e1f28",
+   "modified_utc": "2026-11-03T19:57:04+00:00"
   },
   "fig_alarmburden.png": {
-   "bytes": 452795,
-   "sha256_16": "9b6364413db410ed",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 474512,
+   "sha256_16": "110dd41b24d154ba",
+   "modified_utc": "2026-11-03T19:57:08+00:00"
   },
   "fig_anomaly.png": {
-   "bytes": 285311,
-   "sha256_16": "bb91c24c91ca4f67",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 310990,
+   "sha256_16": "8464855820676667",
+   "modified_utc": "2026-11-03T19:56:58+00:00"
   },
   "fig_anominfluence.png": {
-   "bytes": 519718,
-   "sha256_16": "ff2f2cb8d737108a",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 494594,
+   "sha256_16": "e15034bffbfd2bfd",
+   "modified_utc": "2026-11-03T19:57:08+00:00"
   },
   "fig_arch_dqn.png": {
-   "bytes": 250388,
-   "sha256_16": "24e1861ebc228d5e",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 262209,
+   "sha256_16": "641658db35fe62c8",
+   "modified_utc": "2026-11-03T19:57:11+00:00"
   },
   "fig_arch_lstm.png": {
-   "bytes": 166617,
-   "sha256_16": "16ba9a6eab244536",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 215893,
+   "sha256_16": "6ce4435c361c7ef9",
+   "modified_utc": "2026-11-03T19:57:11+00:00"
   },
   "fig_arch_yolo.png": {
-   "bytes": 462716,
-   "sha256_16": "ed496cf5fb902e17",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 555576,
+   "sha256_16": "5df44b10b17fff76",
+   "modified_utc": "2026-11-03T19:57:11+00:00"
   },
   "fig_calibration.png": {
-   "bytes": 774594,
-   "sha256_16": "59b0bd0b7be429a5",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 899119,
+   "sha256_16": "e469068ed1e4e458",
+   "modified_utc": "2026-11-03T19:57:09+00:00"
   },
   "fig_costsweep.png": {
-   "bytes": 258019,
-   "sha256_16": "830c4b1610f1461d",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 276245,
+   "sha256_16": "ad8d548cfdd27602",
+   "modified_utc": "2026-11-03T19:57:04+00:00"
+  },
+  "fig_decisionlogic.pdf": {
+   "bytes": 41119,
+   "sha256_16": "ebf3c3515620f4ba",
+   "modified_utc": "2026-11-03T12:51:52+00:00"
   },
   "fig_decisionlogic.png": {
-   "bytes": 531936,
-   "sha256_16": "8fc3fe723018495a",
-   "modified_utc": "2026-10-20T14:27:31.557232+00:00"
+   "bytes": 529141,
+   "sha256_16": "b81d1832739aed51",
+   "modified_utc": "2026-11-03T12:51:52+00:00"
   },
   "fig_disposition.png": {
-   "bytes": 448643,
-   "sha256_16": "96039d18f659497a",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 659315,
+   "sha256_16": "f3e3e3ee3e8aa4c5",
+   "modified_utc": "2026-11-03T19:57:03+00:00"
   },
   "fig_dissociation.png": {
-   "bytes": 362262,
-   "sha256_16": "ee9741c8f4f1a43f",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 398732,
+   "sha256_16": "07e3400d063029e9",
+   "modified_utc": "2026-11-03T19:57:01+00:00"
+  },
+  "fig_leakage.pdf": {
+   "bytes": 21407,
+   "sha256_16": "c77b5240a1054a22",
+   "modified_utc": "2026-11-03T19:56:57+00:00"
   },
   "fig_leakage.png": {
-   "bytes": 682223,
-   "sha256_16": "9606db70be451358",
-   "modified_utc": "2026-10-20T14:27:21.993232+00:00"
+   "bytes": 684496,
+   "sha256_16": "6857525c78dbec37",
+   "modified_utc": "2026-11-03T19:56:56+00:00"
+  },
+  "fig_loco.pdf": {
+   "bytes": 23683,
+   "sha256_16": "86dae93701e34fb4",
+   "modified_utc": "2026-11-03T19:57:02+00:00"
   },
   "fig_loco.png": {
-   "bytes": 1496806,
-   "sha256_16": "6ef24d6c4d2359e8",
-   "modified_utc": "2026-10-20T14:27:16.433233+00:00"
+   "bytes": 1086530,
+   "sha256_16": "9f2d72a65fb71989",
+   "modified_utc": "2026-11-03T19:57:02+00:00"
   },
   "fig_metricdisagreement.png": {
    "bytes": 442295,
    "sha256_16": "0000e106397c9b9b",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "modified_utc": "2026-10-15T21:12:14+00:00"
   },
   "fig_perception.png": {
-   "bytes": 690300,
-   "sha256_16": "0010706090f064fe",
-   "modified_utc": "2026-10-15T21:23:17+00:00"
+   "bytes": 547104,
+   "sha256_16": "9acb406b3a5c28c6",
+   "modified_utc": "2026-11-03T19:56:57+00:00"
+  },
+  "fig_perturb.pdf": {
+   "bytes": 51886,
+   "sha256_16": "cda0fce1cae36e67",
+   "modified_utc": "2026-11-03T19:57:07+00:00"
   },
   "fig_perturb.png": {
-   "bytes": 1599360,
-   "sha256_16": "9e4e08dfc409b0ea",
-   "modified_utc": "2026-10-20T14:27:19.849233+00:00"
+   "bytes": 1516482,
+   "sha256_16": "585f31ff78f6f7b8",
+   "modified_utc": "2026-11-03T19:57:07+00:00"
+  },
+  "fig_powered.pdf": {
+   "bytes": 21538,
+   "sha256_16": "b904c6f63f6d8a62",
+   "modified_utc": "2026-11-03T19:57:00+00:00"
   },
   "fig_powered.png": {
-   "bytes": 900467,
-   "sha256_16": "0798d920eac5f511",
-   "modified_utc": "2026-10-20T14:27:23.773232+00:00"
+   "bytes": 871620,
+   "sha256_16": "ed0ddc7f8ca9c041",
+   "modified_utc": "2026-11-03T19:57:00+00:00"
   },
   "fig_protocol.png": {
-   "bytes": 200667,
-   "sha256_16": "95f367ebeaf86e70",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 252031,
+   "sha256_16": "8450c440715d1fb2",
+   "modified_utc": "2026-11-03T19:56:55+00:00"
   },
   "fig_roc.png": {
-   "bytes": 375434,
-   "sha256_16": "44fc241bf13d6a3e",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 446006,
+   "sha256_16": "ab0342fb1d63fa06",
+   "modified_utc": "2026-11-03T19:56:58+00:00"
+  },
+  "fig_workflow.pdf": {
+   "bytes": 1131196,
+   "sha256_16": "ba43bbc2f897a25f",
+   "modified_utc": "2026-11-03T12:52:16+00:00"
   },
   "fig_workflow.png": {
-   "bytes": 4673749,
-   "sha256_16": "28bad1073e02a093",
-   "modified_utc": "2026-10-20T17:23:03.553608+00:00"
+   "bytes": 4762569,
+   "sha256_16": "9be33c7720c9d2fc",
+   "modified_utc": "2026-11-03T12:52:14+00:00"
   },
   "fig_zoo.png": {
-   "bytes": 312677,
-   "sha256_16": "381117622740595b",
-   "modified_utc": "2026-10-12T13:59:51+00:00"
+   "bytes": 328166,
+   "sha256_16": "d202501d8b20104b",
+   "modified_utc": "2026-11-03T19:56:59+00:00"
   }
- },
- "editorial_update": {
-  "date": "2026-10-20",
-  "base_commit": "b7cc472c3899a69ee1f64044f1ed9bfde3e56444",
-  "release_tag": "v18.1-jlppi-reviewed-2026-10-20",
-  "note": "Method descriptions, release and reproduction workflow, action-2 and closed-set scope, JLPPI literature and document formatting corrected. Workflow figure font fallback and box geometry corrected. Original experiment environment and all stored experimental result files retained; no new training performed."
  }
 }

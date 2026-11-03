@@ -145,23 +145,23 @@
  },
  "E_gbm": {
   "miss": {
-   "point": 0.009177215189873418,
-   "k_per_partition": 5.8,
+   "point": 0.0,
+   "k_per_partition": 0.0,
    "n_per_partition": 632,
-   "binomial_upper_pct": 1.865144247989815,
+   "binomial_upper_pct": 0.47288662485831523,
    "L20": {
-    "ci_lo": 0.0006329113924050633,
-    "ci_hi": 0.021835443037974682,
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
     "effective_n": 31
    },
    "L100": {
-    "ci_lo": 0.00031645569620253165,
-    "ci_hi": 0.025316455696202535,
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
     "effective_n": 6
    },
    "L316": {
     "ci_lo": 0.0,
-    "ci_hi": 0.018354430379746836,
+    "ci_hi": 0.0,
     "effective_n": 2
    }
   },

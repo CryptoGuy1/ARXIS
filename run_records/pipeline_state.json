@@ -1,0 +1,135 @@
+{
+ "done": {
+  "comparison": {
+   "finished": "2026-11-03T17:51:38+00:00",
+   "seconds": 1377.7
+  },
+  "perseed": {
+   "finished": "2026-11-03T17:54:55+00:00",
+   "seconds": 197.8
+  },
+  "classdisjoint": {
+   "finished": "2026-11-03T18:00:22+00:00",
+   "seconds": 327.0
+  },
+  "leakage": {
+   "finished": "2026-11-03T18:17:21+00:00",
+   "seconds": 1018.4
+  },
+  "calibration": {
+   "finished": "2026-11-03T18:24:04+00:00",
+   "seconds": 403.3
+  },
+  "anomaly": {
+   "finished": "2026-11-03T18:27:26+00:00",
+   "seconds": 202.2
+  },
+  "episodes": {
+   "finished": "2026-11-03T18:31:22+00:00",
+   "seconds": 235.9
+  },
+  "hazardepisodes": {
+   "finished": "2026-11-03T18:35:14+00:00",
+   "seconds": 231.9
+  },
+  "blockboot": {
+   "finished": "2026-11-03T18:39:18+00:00",
+   "seconds": 244.1
+  },
+  "final": {
+   "finished": "2026-11-03T19:26:50+00:00",
+   "seconds": 2851.5
+  },
+  "splitcounts": {
+   "finished": "2026-11-03T19:26:53+00:00",
+   "seconds": 3.1
+  },
+  "bayes": {
+   "finished": "2026-11-03T19:26:55+00:00",
+   "seconds": 2.7
+  },
+  "rho": {
+   "finished": "2026-11-03T19:26:58+00:00",
+   "seconds": 2.7
+  },
+  "rope": {
+   "finished": "2026-11-03T19:27:01+00:00",
+   "seconds": 3.0
+  },
+  "bounds": {
+   "finished": "2026-11-03T19:27:02+00:00",
+   "seconds": 1.0
+  },
+  "bootstrap": {
+   "finished": "2026-11-03T19:27:02+00:00",
+   "seconds": 0.1
+  },
+  "anomalyclass": {
+   "finished": "2026-11-03T19:27:20+00:00",
+   "seconds": 18.1
+  },
+  "metriccost": {
+   "finished": "2026-11-03T19:27:28+00:00",
+   "seconds": 7.2
+  },
+  "persistence": {
+   "finished": "2026-11-03T19:31:21+00:00",
+   "seconds": 233.9
+  },
+  "reject": {
+   "finished": "2026-11-03T19:35:30+00:00",
+   "seconds": 248.1
+  },
+  "rawfaults": {
+   "finished": "2026-11-03T19:40:59+00:00",
+   "seconds": 329.7
+  },
+  "overlap": {
+   "finished": "2026-11-03T19:42:15+00:00",
+   "seconds": 76.3
+  },
+  "weighting": {
+   "finished": "2026-11-03T19:47:15+00:00",
+   "seconds": 299.8
+  },
+  "nonhazard": {
+   "finished": "2026-11-03T19:47:18+00:00",
+   "seconds": 3.1
+  },
+  "rungcheck": {
+   "finished": "2026-11-03T19:51:13+00:00",
+   "seconds": 234.8
+  },
+  "ratiocheck": {
+   "finished": "2026-11-03T19:56:54+00:00",
+   "seconds": 340.4
+  },
+  "figures": {
+   "finished": "2026-11-03T19:57:12+00:00",
+   "seconds": 18.1
+  },
+  "manifest": {
+   "finished": "2026-11-03T19:57:15+00:00",
+   "seconds": 3.6
+  },
+  "test": {
+   "finished": "2026-11-03T19:57:22+00:00",
+   "seconds": 7.2
+  }
+ },
+ "environment": {
+  "python": "3.13.16",
+  "executable": "/usr/bin/python3",
+  "platform": "Linux-6.18.44-fc-v230-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 2,
+  "numpy": "2.5.3",
+  "pandas": "3.0.5",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "torch": "2.14.1+cu130",
+  "matplotlib": "3.11.2",
+  "cuda_available": false,
+  "git_commit": "bcd213b2e30ed076fc5a3e73b4a254c398fba4a8"
+ }
+}
